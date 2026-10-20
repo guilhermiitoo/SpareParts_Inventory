@@ -264,7 +264,10 @@ const Kitting = {
             .map(m => ({ ...m }));
 
         if (snapshotItems.length === 0) {
-            Toast.error('Nenhum item encontrado no estoque. O estoque pode ter sido atualizado. Refaca a busca.');
+            // v16.34: explica o motivo e mostra quais codigos sumiram
+            const sumiram = [...new Set(Array.from(checked).map(c => (c.closest('tr')?.dataset.code || c.closest('tr')?.children[1]?.textContent || '').replace('MAIOR','').trim()).filter(Boolean))];
+            Toast.error('Os itens marcados nao estao mais no estoque' + (sumiram.length ? ' (' + sumiram.slice(0,5).join(', ') + (sumiram.length>5?'...':'') + ')' : '') +
+                '. Provavel motivo: outro usuario ja baixou/moveu, ou o banco foi reconectado em outro arquivo. A busca foi atualizada — confira a lista e baixe de novo.', 9000);
             Kitting.execute(true);
             return;
         }

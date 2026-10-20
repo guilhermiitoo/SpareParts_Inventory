@@ -2,6 +2,23 @@
 // SPARE PARTS - 00-state.js (extraido do v16.32)
 // ==========================================================================
 
+// v16.34: TRAVA DAS JANELAS DE ARQUIVO/PASTA — evita o erro "File picker already active"
+// (duplo clique, ou janela que abriu ATRÁS do navegador). Se já houver uma aberta, avisa e não abre outra.
+(function(){
+    let aberta = false;
+    ['showOpenFilePicker','showSaveFilePicker','showDirectoryPicker'].forEach(fn => {
+        const orig = window[fn]; if (!orig) return;
+        window[fn] = async function(...args){
+            if (aberta) {
+                try { Toast.warn('A janela de selecao ja esta aberta — confira se ela ficou atras do navegador (Alt + Tab).', 6000); } catch(_) {}
+                const e = new Error('Janela ja aberta'); e.name = 'AbortError'; throw e;
+            }
+            aberta = true;
+            try { return await orig.apply(window, args); }
+            finally { aberta = false; }
+        };
+    });
+})();
 'use strict';
 
 // ============================================================

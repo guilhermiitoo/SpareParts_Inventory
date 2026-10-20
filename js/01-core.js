@@ -405,6 +405,9 @@ const UI = {
         if (tab === 'confirmacao') {
             setTimeout(function() { if (typeof ListConfirm !== 'undefined') ListConfirm.render(); }, 80);
         }
+        if (tab === 'etiquetas') {
+            setTimeout(function() { if (typeof Etiquetas !== 'undefined') Etiquetas.render(); }, 80);
+        }
         if (tab === 'dashboard_adm') {
             setTimeout(function() { if (typeof AdminDash !== 'undefined') AdminDash.update(); }, 80);
         }
@@ -449,11 +452,12 @@ const UI = {
             { tab: 'estoque',       icon: 'fa-search-location', label: 'Busca Avulsa',   admin: false },
             { tab: 'dashboard',     icon: 'fa-chart-pie',       label: 'Historico',      admin: false },
             { tab: 'confirmacao',   icon: 'fa-clipboard-check', label: 'Confirmacao',    admin: false },
+            { tab: 'etiquetas',     icon: 'fa-barcode',         label: 'Etiquetas',      admin: false },
             { tab: 'ranking',       icon: 'fa-trophy',           label: 'Ranking',        admin: false },
             { tab: 'stock_manage',  icon: 'fa-boxes',           label: 'Estoque',        admin: false },
             { tab: 'users',         icon: 'fa-users-cog',       label: 'Sistema',        admin: true  },
             { tab: 'adm-stockdash', icon: 'fa-chart-bar',       label: 'Dashboard',      admin: true  },
-            { tab: 'dashboard_adm', icon: 'fa-chart-line',      label: 'Rendimento',     admin: true  },
+            { tab: 'dashboard_adm', icon: 'fa-exclamation-triangle', label: 'ALERTA', admin: true  },
         ];
         nav.innerHTML = '';
         const visible = tabs.filter(function(t) { return Perms.can('tab:' + t.tab); });

@@ -177,6 +177,19 @@ const Devolucao = {
             const code    = rawCode.substring(0, CODE_STORE_MAX).trimEnd();
             const { CODE_MIN, CODE_MAX } = Devolucao.RULES;
 
+            // v16.36: BLOQUEIO DE LPN — etiqueta do MES comeca com "BRS" + ano (2 digitos).
+            // 2026 = BRS26, 2027 = BRS27, 2028 = BRS28... atualiza sozinho pelo ano do PC.
+            const lpnPrefix = 'BRS' + String(new Date().getFullYear()).slice(-2);
+            if (rawCode.startsWith(lpnPrefix)) {
+                Devolucao._showError(`Isso e o LPN (${lpnPrefix}...), nao o codigo do material. Bipe o codigo do material (acima do LPN).`);
+                inp.className = 'dev-main-input state-ng';
+                VoiceFeedback.playNG();
+                inp.value = '';
+                document.getElementById('devLiveValidation').textContent = '';
+                setTimeout(() => { inp.className = 'dev-main-input'; inp.focus(); }, 400);
+                return;
+            }
+
             if (code.length < CODE_MIN) {
                 Devolucao._showError(`Codigo muito curto: ${code.length} caracteres. Minimo: ${CODE_MIN}. Tente novamente.`);
                 inp.className = 'dev-main-input state-ng';

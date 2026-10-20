@@ -9,6 +9,7 @@ const Feeder = {
     reset() {
         State.rawFeederData = null;
         State.currentMatchedIds = [];
+        State._semBaixa = null;     // v16.39
         State._reprintMode = false; // libera lock de reimpressao
         document.getElementById('feederDrop').style.display = 'block';
         document.getElementById('feederMapper').style.display = 'none';
@@ -63,6 +64,7 @@ const Feeder = {
     // v16.29: chamado sempre que uma lista termina de carregar com sucesso.
     // Se o operador respondeu SIM na pergunta das caixas, abre o Scanner.
     _afterLoad() {
+        try { Etiquetas.avisar(); } catch (e) {}   // v16.37
         if (!State._boxWanted) return;
         State._boxWanted = false;
         setTimeout(() => { try { BoxScan.startFromFeeder(); } catch (e) { console.error(e); } }, 250);
@@ -768,6 +770,12 @@ const Feeder = {
     },
 
     async checkout() {
+        // v16.39: lista reaberta pela Confirmacao — estoque ja foi baixado, so imprime
+        if (State._semBaixa) {
+            Toast.info('Lista reaberta: estoque NAO sera baixado de novo. Abrindo impressao...', 5000);
+            setTimeout(() => window.print(), 500);
+            return;
+        }
         if (!DB.guard('Baixar Lista Feeder')) return;
         if (State.currentMatchedIds.length === 0) {
             Toast.warn('Nenhum item encontrado no estoque para baixar.');
@@ -808,6 +816,20 @@ const Feeder = {
                 wo:   document.getElementById('printWODisplay').textContent   || State.feederConfig.wo   || '--',
                 machine: State.feederConfig.machine || '',   // v16.20
             };
+            // v16.39: guarda a lista completa (enxuta) para poder reabrir na Confirmacao
+            try {
+                const fc = State.feederConfig, d = State.rawFeederData || [];
+                const rows = [];
+                for (let i = fc.startRow + 1; i < d.length; i++) {
+                    const r = d[i]; if (!r) continue;
+                    const c = String(r[fc.cCode] || '').trim(); if (!c) continue;
+                    if (Feeder._skipByTrk(r) || Feeder._skipByTray(r)) continue;
+                    rows.push([String(r[fc.cMach] || '').trim(), c.toUpperCase(), String(r[fc.cPos] || '').trim()]);
+                }
+                cfg.listRows = rows;
+                cfg.listLocs = itemsToRemove.map(m => [String(m.code || '').toUpperCase(), m.car || '', m.loc || '']);
+                cfg.mode = State.feederMode || 'SMT';
+            } catch (e) { console.warn('listRows', e); }
             State.checkoutHistory.unshift({
                 id: histId, removedItems: itemsToRemove, type: 'CHECKOUT',
                 tableHTML,

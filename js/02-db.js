@@ -454,7 +454,7 @@ const DB = {
     // fazia a devolucao aguardar auto-saves de outras telas). Agora aguarda
     // apenas a propria gravacao e, se ela falhar, tenta 3x rapido.
     // Se as 3 falharem, LANCA o erro — o chamador tem que avisar o operador.
-    async saveNow(tentativas = 3) {
+    async saveNow(tentativas = 6) {   // v16.35: 6 tentativas (conflito de rede entre PCs)
         if (!State.dbFileHandle) return;
         clearTimeout(State._saveTimer); // cancela auto-save agendado
         let ultimoErro = null;
@@ -465,7 +465,7 @@ const DB = {
             } catch (e) {
                 ultimoErro = e;
                 console.warn(`[saveNow] tentativa ${i}/${tentativas} falhou:`, e.message);
-                if (i < tentativas) await new Promise(r => setTimeout(r, 150 * i));
+                if (i < tentativas) await new Promise(r => setTimeout(r, 150 * i + Math.random() * 350));   // v16.35: espera aleatoria
             }
         }
         throw ultimoErro || new Error('Falha ao gravar no banco de dados');
@@ -569,6 +569,17 @@ const DB = {
             // Detecta erros de permissao/cache do FileSystem Access API
             // Esses erros NAO se resolvem com retry — exigem reconexao manual
             const msg = (e.message || '').toLowerCase();
+            // v16.35: "InvalidStateError ... state had changed since it was read from disk"
+            // NAO e permissao: e outro PC gravando o mesmo arquivo no mesmo instante (rede).
+            // Antes era tratado como permissao expirada e entrava em loop. Agora: espera um
+            // tempo aleatorio (para os PCs nao baterem de novo) e regrava, relendo o disco.
+            const isConflito = e.name === 'InvalidStateError' || msg.includes('state had changed');
+            if (isConflito) {
+                State._saveErrorCount = Math.max(0, State._saveErrorCount - 1);   // conflito nao conta como falha de rede
+                DB._setSyncStatus('syncing', 'Outro PC gravando — regravando...');
+                if (silent) setTimeout(() => DB.save(true), 150 + Math.random() * 450);
+                throw e;
+            }
             const isPermissionError = msg.includes('state cache')
                 || msg.includes('permission')
                 || msg.includes('not allowed')
