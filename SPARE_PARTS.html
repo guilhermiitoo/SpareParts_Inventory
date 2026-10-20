@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="css/02-componentes.css">
     <link rel="stylesheet" href="css/03-impressao.css">
     <link rel="stylesheet" href="css/04-telas.css">
+    <link rel="stylesheet" href="css/05-menu-lateral.css">
 </head>
 <body>
 
@@ -73,9 +74,14 @@
                 <i class="fas fa-folder-open"></i> SELECIONAR PASTA DO SISTEMA
             </button>
             <div style="font-size:0.72rem; color:#64748b; margin-top:8px; line-height:1.4;">
-                <i class="fas fa-circle-info"></i> Selecione a <b>pasta</b> do sistema (a que contem <code>dados</code>).
+                <i class="fas fa-circle-info"></i> Selecione a <b>pasta</b> do sistema (a que contem <code>dados</code> e o arquivo
+                <code>SPARE_PARTS_PASTA_DO_SISTEMA.json</code>). Se escolher outra pasta, o sistema recusa e pede para tentar de novo.
                 A autorizacao e pedida <b>uma unica vez</b> e vale para todos os arquivos dentro dela —
                 deste PC em diante, o sistema reconecta sozinho.
+            </div>
+            <div style="text-align:right; margin-top:6px;">
+                <a href="#" onclick="DB.createNew(); return false;" style="font-size:0.68rem; color:#94a3b8; text-decoration:underline;"
+                   title="Somente na instalacao inicial: cria um banco vazio numa pasta nova">Instalacao inicial: criar banco novo</a>
             </div>
             <div id="dbErrorMsg" style="color:var(--ind-red); margin-top:10px; font-weight:bold; font-size:0.8rem; text-align:center;"></div>
         </div>
