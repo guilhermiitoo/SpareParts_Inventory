@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ATENCAO: o `file:` nas diretivas abaixo NAO e opcional.
+         O sistema e aberto direto da pasta de rede (file://), onde a origem e
+         opaca e 'self' nao casa com nada. Sem `file:`, o navegador BLOQUEIA os
+         proprios css/ e js/ desta pasta e a tela abre EM BRANCO. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' file:; script-src 'self' file: 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' file: 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:;">
+    <!-- Icone da aba/janela. Vai embutido como data URI de proposito:
+         assim o favicon funciona tanto na pasta dividida quanto no
+         dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
+         O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.00</title>
+
+    <!-- bibliotecas externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <!-- ==================================================================
+         ESTILOS DO SISTEMA — a ORDEM importa (cascata do CSS).
+         03-impressao.css vem ANTES de 04-telas.css de proposito: as regras
+         .print-only / .print-header sao redefinidas DEPOIS do bloco
+         @media print no original. Inverter estes dois quebra a impressao.
+    =================================================================== -->
+    <link rel="stylesheet" href="css/01-base.css">
+    <link rel="stylesheet" href="css/02-componentes.css">
+    <link rel="stylesheet" href="css/03-impressao.css">
+    <link rel="stylesheet" href="css/04-telas.css">
+</head>
+<body>
+
+<!-- Container de Toasts (substitui todos os alert()) -->
+<div id="toastContainer"></div>
+
+<!-- Drag Drop Overlay -->
+<div id="dragOverlay" class="global-drag-overlay">
+    <i class="fas fa-file-excel"></i>
+    <div>SOLTE O ARQUIVO AQUI</div>
+    <div style="font-size:1.2rem; margin-top:15px; font-weight:normal; text-align:center;">
+        Smart Parse ativo.<br>Leitura de cabecalhos e mapeamento automatico.
+    </div>
+</div>
+
+<!-- 1. TELA DE LOGIN -->
+<div id="loginWrapper" class="overlay-screen">
+    <div id="userLoginCard" class="card-panel">
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 3.5rem; color: var(--tpv-blue); font-weight: 900; line-height: 0.8;">TPV</div>
+            <div style="font-size: 0.9rem; color: var(--tpv-grey); font-weight: 700; letter-spacing: 4px; margin-top: 5px;">VISION</div>
+        </div>
+
+        <!-- PASSO 1: BANCO DE DADOS -->
+        <div id="dbStepContainer" style="background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 6px; padding: 15px; margin-bottom: 20px; text-align: left; transition: 0.3s;">
+            <div style="font-size: 0.85rem; font-weight: 800; color: var(--tpv-blue); margin-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between;">
+                <span><i class="fas fa-database"></i> Desenvolvido por Guilherme Fernandes</span>
+                <i id="dbStatusIcon" class="fas fa-exclamation-circle" style="color: var(--ind-yellow);"></i>
+            </div>
+            <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <input type="text" id="dbPathInput" readonly value="S:\MMT\49. JOÃO - ARQUIVOS HTML\GUILHERME FERNANDES\Banco de dados sistemas MMT\Database Estoque spare parts" style="flex:1; font-size:0.7rem; font-family:'Roboto Mono',monospace; padding:8px; border:1px solid #cbd5e1; border-radius:4px; background:#fff; color:#334155;">
+                <button class="btn-3d btn-gray" style="padding:8px 12px; font-size:0.8rem;" onclick="UI.copyDbPath()" title="Copiar"><i class="fas fa-copy"></i></button>
+            </div>
+            <button id="btnReconnectDb" class="btn-3d btn-green" style="width:100%; padding:12px; margin-bottom:8px; display:none;" onclick="DB.reconnectFromMemory()">
+                <i class="fas fa-bolt"></i> RECONECTAR (ULTIMA PASTA USADA)
+            </button>
+            <button id="btnImportDb" class="btn-3d btn-blue" style="width:100%; padding:12px;" onclick="DB.loadFile()">
+                <i class="fas fa-folder-open"></i> SELECIONAR PASTA DO SISTEMA
+            </button>
+            <div style="font-size:0.72rem; color:#64748b; margin-top:8px; line-height:1.4;">
+                <i class="fas fa-circle-info"></i> Selecione a <b>pasta</b> do sistema (a que contem <code>dados</code>).
+                A autorizacao e pedida <b>uma unica vez</b> e vale para todos os arquivos dentro dela —
+                deste PC em diante, o sistema reconecta sozinho.
+            </div>
+            <div id="dbErrorMsg" style="color:var(--ind-red); margin-top:10px; font-weight:bold; font-size:0.8rem; text-align:center;"></div>
+        </div>
+
+        <!-- PASSO 2: LOGIN -->
+        <div id="loginStepContainer" style="opacity:0.4; pointer-events:none; transition:0.3s;">
+            <div style="font-size:0.85rem; font-weight:800; color:#94a3b8; margin-bottom:15px; text-transform:uppercase; text-align:left; border-bottom:2px solid #e2e8f0; padding-bottom:5px;" id="loginStepTitle">
+                <i class="fas fa-lock"></i> Passo 2: Autenticacao
+            </div>
+            <input type="text" id="userMatricula" class="login-input" placeholder="MATRICULA" maxlength="5" autocomplete="username">
+            <input type="password" id="userPass" class="login-input" placeholder="SENHA" autocomplete="current-password">
+            <button class="btn-3d btn-blue" style="width:100%; margin-top:10px;" onclick="Auth.attemptUserLogin()">ENTRAR NO SISTEMA</button>
+            <!-- Botao de acesso rapido para visualizacao de estoque -->
+            <div style="position:relative; text-align:center; margin:14px 0 4px;">
+                <hr style="border:none; border-top:1px solid #e2e8f0; margin:0;">
+                <span style="position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:white; padding:0 10px; font-size:0.72rem; color:#94a3b8; font-weight:600; letter-spacing:0.5px; white-space:nowrap;">ou acesso rapido</span>
+            </div>
+            <button class="btn-3d btn-gray" id="btnViewerAccess" style="width:100%; margin-top:4px; opacity:0.45; pointer-events:none;" onclick="Auth.enterViewerMode()" title="Disponivel apos importar o banco de dados">
+                <i class="fas fa-eye"></i> VER ESTOQUE (sem login)
+            </button>
+            <!-- Dots de tentativas de login (feedback visual de segurança) -->
+            <div class="attempt-dots" id="loginAttemptDots"></div>
+            <p id="userLoginMsg" style="color:var(--ind-red); margin-top:15px; font-weight:bold; font-size:0.9rem;"></p>
+        </div>
+    </div>
+
+
+    <div id="firstAccessCard" class="card-panel" style="display:none; border-top-color:var(--ind-green);">
+        <h3 style="color:var(--ind-green); margin-top:0;">DEFINIR SENHA</h3>
+        <p style="color:#64748b; font-size:0.9rem; margin-bottom:15px;">Primeiro acesso detectado.</p>
+        <input type="password" id="newPass1" class="login-input" placeholder="Nova Senha">
+        <input type="password" id="newPass2" class="login-input" placeholder="Confirmar Senha">
+        <button class="btn-3d btn-green" style="width:100%; margin-top:10px;" onclick="Auth.setNewPassword()">SALVAR E ENTRAR</button>
+        <p id="firstAccessMsg" style="color:var(--ind-red); margin-top:10px;"></p>
+    </div>
+</div>
+
+<!-- Indicador de Salvamento -->
+<div id="saveIndicator"><i class="fas fa-sync fa-spin"></i> Salvando...</div>
+
+<!-- Modal Commitment (Poka-Yoke de Retirada) -->
+<div id="commitmentModal" class="audit-modal" style="z-index:100005;">
+    <div class="audit-box" style="border-top-color:var(--ind-red); max-width:500px;">
+        <div style="font-size:3.5rem; color:var(--ind-red); margin-bottom:15px;"><i class="fas fa-user-lock"></i></div>
+        <h2 style="color:var(--ind-red); border-bottom:none; margin-bottom:10px; font-size:1.6rem;">ASSUMIR COMPROMISSO DE RETIRADA</h2>
+        <div style="background:#fef2f2; border:1px solid #fecaca; padding:15px; border-radius:6px; text-align:left; margin-bottom:25px;">
+            <p style="color:#991b1b; font-size:0.95rem; margin:0 0 10px 0; line-height:1.5;">
+                <strong>Atencao:</strong> A visualizacao das localizacoes implica obrigatoriamente na <strong>retirada fisica</strong> e na <strong>baixa sistemica</strong> do(s) item(ns).
+            </p>
+            <p style="color:#7f1d1d; font-size:0.85rem; margin:0; font-style:italic;">
+                Ao confirmar, a operacao sera registrada em seu nome no Log de Auditoria.
+            </p>
+        </div>
+        <div style="display:flex; gap:15px;">
+            <button class="btn-3d btn-gray" style="flex:1;" id="btnCancelCommitment">CANCELAR</button>
+            <button class="btn-3d btn-red" style="flex:1;" id="btnConfirmCommitment">CONFIRMAR E REVELAR</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     v16.29 — SCANNER DE CAIXAS (leitura de itens soltos em caixa)
+     Conferencia dos materiais que ainda estao em caixa, ANTES de
+     procurar o restante nos carros do estoque.
+     ============================================================ -->
+<div id="boxScanOverlay" style="display:none;">
+  <div class="bx-shell">
+
+    <div class="bx-head">
+      <div class="bx-head-l">
+        <div class="bx-ico"><i class="fas fa-box-open"></i></div>
+        <div>
+          <div class="bx-title">Scanner de Caixas</div>
+          <div class="bx-sub" id="bxHeadInfo">--</div>
+        </div>
+      </div>
+      <div class="bx-head-r">
+        <div class="bx-prog">
+          <div class="bx-prog-bar"><div id="bxProgFill"></div></div>
+          <div class="bx-prog-txt"><span id="bxProgTxt">0 / 0</span></div>
+        </div>
+        <button class="btn-3d btn-gray" onclick="BoxScan.sair()"><i class="fas fa-arrow-left"></i> SAIR E CONTINUAR DEPOIS</button>
+      </div>
+    </div>
+
+    <div class="bx-tabs">
+      <button id="bxTabBtn-regras"  class="bx-tab active" onclick="BoxScan.tab('regras')"><i class="fas fa-sliders-h"></i> 1. REGRAS DE LEITURA</button>
+      <button id="bxTabBtn-scanner" class="bx-tab"        onclick="BoxScan.tab('scanner')"><i class="fas fa-barcode"></i> 2. SCANNER</button>
+    </div>
+
+    <div class="bx-body">
+
+      <!-- ---------- REGRAS ---------- -->
+      <div id="bxPane-regras" class="bx-pane">
+        <div class="bx-card" style="max-width:760px;margin:0 auto;">
+          <h3 class="bx-h3"><i class="fas fa-sliders-h"></i> Formatacao do codigo lido</h3>
+          <p class="bx-p">
+            O codigo do rolo/caixa costuma vir maior do que o codigo da lista (35, 43 caracteres...).
+            Ajuste aqui quantos caracteres devem ser ignorados no inicio e quantos devem ser lidos.
+            Na maioria dos casos o que interessa sao os <b>18 primeiros caracteres</b>.
+          </p>
+
+          <div class="bx-rules">
+            <div>
+              <label>Ignorar no inicio</label>
+              <input type="number" id="bxRuleOff" value="0" min="0" oninput="BoxScan.saveRules()">
+              <span class="bx-hint">caracteres</span>
+            </div>
+            <div>
+              <label>Ler ate (comprimento)</label>
+              <input type="number" id="bxRuleLen" value="18" min="1" placeholder="todos" oninput="BoxScan.saveRules()">
+              <span class="bx-hint">caracteres</span>
+            </div>
+            <div style="flex:2;min-width:240px;">
+              <label>Teste rapido — cole ou bipe um codigo</label>
+              <input type="text" id="bxRuleTest" placeholder="bipe aqui para testar" oninput="BoxScan.testRule()" style="font-family:'Roboto Mono',monospace;">
+              <div class="bx-test" id="bxRuleOut">Resultado: <b>--</b></div>
+            </div>
+          </div>
+
+          <div class="bx-presets">
+            <span>Atalhos:</span>
+            <button class="bx-chip" onclick="BoxScan.preset(0,18)">18 primeiros</button>
+            <button class="bx-chip" onclick="BoxScan.preset(0,15)">15 primeiros</button>
+            <button class="bx-chip" onclick="BoxScan.preset(0,12)">12 primeiros</button>
+            <button class="bx-chip" onclick="BoxScan.preset(0,0)">codigo inteiro</button>
+          </div>
+
+          <div style="margin-top:24px;text-align:right;">
+            <button class="btn-3d btn-blue" onclick="BoxScan.tab('scanner')">IR PARA O SCANNER <i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------- SCANNER ---------- -->
+      <div id="bxPane-scanner" class="bx-pane" style="display:none;">
+        <div class="bx-split">
+
+          <div class="bx-left">
+            <div class="bx-card">
+              <label class="bx-lbl">Entrada do scanner</label>
+              <div style="position:relative;">
+                <i class="fas fa-barcode bx-inico"></i>
+                <input type="text" id="bxScanInput" class="bx-scan" placeholder="BIPE AQUI..." autocomplete="off">
+              </div>
+              <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+                <span class="bx-hint" id="bxRuleEcho">--</span>
+                <button class="bx-undo" onclick="BoxScan.desfazer()"><i class="fas fa-undo"></i> Desfazer ultimo</button>
+              </div>
+            </div>
+
+            <div id="bxResult" class="bx-result">
+              <div id="bxResIcon" class="bx-res-ico"><i class="fas fa-search"></i></div>
+              <div id="bxResTitle" class="bx-res-t">Aguardando</div>
+              <div id="bxResDesc"  class="bx-res-d">Bipe um componente da caixa.</div>
+              <div id="bxResList"  class="bx-res-list"></div>
+            </div>
+
+            <div class="bx-stats">
+              <div class="bx-stat"><span>Total</span><b id="bxStTotal">0</b></div>
+              <div class="bx-stat ok"><span>Nas caixas</span><b id="bxStFound">0</b></div>
+              <div class="bx-stat pend"><span>Faltam</span><b id="bxStPend">0</b></div>
+            </div>
+
+            <button class="btn-3d btn-green" style="width:100%;margin-top:12px;" onclick="BoxScan.finalizar()">
+              <i class="fas fa-flag-checkered"></i> FINALIZAR LEITURA E BUSCAR O RESTANTE NO ESTOQUE
+            </button>
+          </div>
+
+          <div class="bx-right">
+            <div class="bx-right-h">
+              <span><i class="fas fa-list-alt"></i> Materiais da lista</span>
+              <input type="text" id="bxFilter" placeholder="filtrar..." oninput="BoxScan.renderList()">
+            </div>
+            <div class="bx-right-b">
+              <table class="bx-table">
+                <thead><tr><th style="width:34px;"></th><th id="bxThA">Maquina</th><th>Codigo</th><th id="bxThB">Posicao</th></tr></thead>
+                <tbody id="bxTableBody"><tr><td colspan="4" class="bx-empty">Sem dados</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal Generico (substitui confirm/prompt nativos) -->
+<div id="genericModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-box" id="genericModalBox">
+        <div class="modal-title" id="genericModalTitle">Confirmacao</div>
+        <div class="modal-body"  id="genericModalBody">Mensagem</div>
+        <input type="text" id="genericModalInput" class="modal-input" style="display:none;">
+        <div class="modal-actions" id="genericModalActions">
+            <button class="btn-3d btn-gray" id="genericModalCancel">Cancelar</button>
+            <button class="btn-3d btn-blue" id="genericModalConfirm">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detalhe Usuario -->
+<div id="userDetailModal" class="audit-modal" onclick="if(event.target===this) UI.closeUserDetailModal()">
+    <div class="audit-box" style="max-width:800px; width:95%;">
+        <h3 id="udTitle" style="color:var(--tpv-blue); margin-top:0; border-bottom:2px solid #e2e8f0; padding-bottom:10px; text-transform:uppercase;">
+            <i class="fas fa-search-plus"></i> Raio-X de Operacao
+        </h3>
+        <div id="udTimeline" style="max-height:60vh; overflow-y:auto; text-align:left; padding-right:10px; margin-top:20px;"></div>
+        <button class="btn-3d btn-gray" style="width:100%; margin-top:20px;" onclick="UI.closeUserDetailModal()">FECHAR</button>
+    </div>
+</div>
+
+<!-- 2. APLICACAO PRINCIPAL -->
+<div id="app" class="app-container">
+    <header>
+        <div class="header-left">
+            MMT PECAS DE REPOSICAO
+            <span>SISTEMA DE CONTROLE</span>
+        </div>
+        <div class="header-center">
+            <div class="tpv-logo-text">TPV</div>
+            <div class="vision-subtext">VISION</div>
+        </div>
+        <div class="header-right">
+            <div id="userInfo">--</div>
+            <div style="margin-top:5px; text-align:right;">
+                <div id="connectionStatus" class="mode-indicator mode-online" style="position:relative; top:auto; right:auto; display:inline-block;">
+                    <span class="sync-dot" id="syncDot"></span>
+                    <span id="syncLabel">BD Conectado</span>
+                </div>
+                <span id="onlineUsersIndicator" style="display:none; margin-left:8px; background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; font-size:0.72rem; font-weight:800; padding:4px 10px; border-radius:20px; font-family:'Roboto Mono',monospace;" title="Usuarios com atividade nos ultimos 30 minutos">
+                    <i class="fas fa-users"></i> <span id="onlineUsersCount">0</span> online
+                </span>
+                <div id="syncDetails">aguardando...</div>
+                <button id="headerReconnectBtn" onclick="DB.reconnect()" style="display:none; margin-top:5px; background:#dc2626; color:white; border:none; border-radius:5px; padding:4px 10px; font-size:0.72rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
+                    <i class="fas fa-plug"></i> RECONECTAR
+                </button>
+                <!-- aviso de tamanho removido -->
+            </div>
+            <div style="margin-top:8px;">
+                <a href="#" onclick="Auth.logout()" style="color:var(--tpv-blue); text-decoration:none; font-weight:bold; text-transform:uppercase; font-size:0.8rem;">[ Sair ]</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- APP USUARIO -->
+    <!-- APP UNIFICADO (operacional + admin, nav controlado por perfil) -->
+    <div id="mainApp" style="display:none;">
+
+        <!-- ALERTA: pasta de backup diario perdida / nao vinculada -->
+        <div id="backupDiarioAlerta" class="no-print" style="display:none; background:#fef2f2; border:2px solid #ef4444; border-radius:10px; padding:14px 18px; margin-bottom:16px; box-shadow:0 2px 8px rgba(239,68,68,0.18);">
+            <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                <i class="fas fa-triangle-exclamation" style="color:#dc2626; font-size:1.6rem;"></i>
+                <div style="flex:1; min-width:240px;">
+                    <div style="font-weight:900; color:#b91c1c; font-size:0.95rem; text-transform:uppercase; letter-spacing:0.4px;">Backup diario de seguranca desativado</div>
+                    <div id="backupDiarioAlertaMsg" style="font-size:0.85rem; color:#7f1d1d; line-height:1.4; margin-top:3px;">A pasta de rede para o backup diario nao esta vinculada ou foi movida/renomeada. Vincule novamente para retomar a copia automatica e evitar perda de dados.</div>
+                </div>
+                <button class="btn-3d btn-red" style="padding:9px 18px;" onclick="AutoBackup.vincularPastaAlerta()"><i class="fas fa-folder-plus"></i> VINCULAR PASTA</button>
+            </div>
+        </div>
+
+        <!-- NAV DINAMICO (renderizado pelo JS conforme perfil) -->
+        <div id="mainNav" class="nav-grid"></div>
+
+        <!-- ==================== TABS OPERACIONAIS ==================== -->
+        <!-- COMPARADOR -->
+        <div id="tab-feeder" class="section active">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 class="no-print">Comparador de Listas (BOM/OP)</h2>
+                <button class="btn-3d btn-blue no-print" onclick="Feeder.reset()"><i class="fas fa-file-upload"></i> Subir Nova Lista</button>
+            </div>
+            <details class="no-print" style="margin-bottom:20px; background:#f8fafc; border:1px solid #cbd5e1; padding:15px; border-radius:6px;">
+                <summary style="font-weight:bold; color:var(--tpv-blue); cursor:pointer;"><i class="fas fa-cogs"></i> Ajuste Avancado: Regras de Cruzamento</summary>
+                <div class="rules-bar" style="border:none; padding:0; background:none; margin-top:15px;">
+                    <div style="flex:1;"><label style="font-weight:bold; color:#475569;">Ignorar Inicio (Digitos):</label><input type="number" id="ruleOffset" class="big-input" value="0" placeholder="Ex: 1" oninput="Feeder.recalcDebounced()"></div>
+                    <div style="flex:1;"><label style="font-weight:bold; color:#475569;">Ler ate (Comprimento):</label><input type="number" id="ruleLength" class="big-input" placeholder="Ex: 15" oninput="Feeder.recalcDebounced()"></div>
+                    <div style="flex:1; align-self:center; padding-top:25px;">
+                        <label style="font-weight:bold; cursor:pointer; display:flex; align-items:center; color:#334155;">
+                            <input type="checkbox" id="ruleHyphen" style="width:20px; height:20px; margin-right:10px;" onchange="Feeder.recalcMatches()">
+                            <span>Trocar Hifen "-" por Espaco</span>
+                        </label>
+                    </div>
+                </div>
+            </details>
+            <div id="feederDrop" class="drop-zone">
+                <i class="fas fa-file-excel"></i>
+                <h3 style="color:#64748b;">Arraste a lista (SMT ou IA) ou clique aqui</h3>
+                <div style="font-size:0.8rem; color:#94a3b8; margin-top:6px;">O sistema identifica sozinho pela OP: <b>-SMT</b> = alimentadores &nbsp;|&nbsp; <b>-AI</b> = armarios PTH</div>
+                <input type="file" id="feederFileInput" accept=".xlsx,.xls,.csv" onchange="if(this.files[0]) Feeder.processFile(this.files[0])">
+            </div>
+            <!-- v16.30: enquanto a leitura de caixas esta aberta, o comparador
+                 fica escondido. So volta a aparecer quando a leitura e finalizada. -->
+            <div id="feederBoxWait" class="no-print" style="display:none; background:#f0f9ff; border:1px solid #bae6fd; border-left:6px solid #0ea5e9; border-radius:10px; padding:20px; margin-bottom:20px;">
+                <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                    <i class="fas fa-box-open" style="font-size:2.2rem; color:#0284c7;"></i>
+                    <div style="flex:1; min-width:260px;">
+                        <div style="font-weight:900; font-size:1.05rem; color:#075985;">Leitura de caixas em andamento</div>
+                        <div style="font-size:0.88rem; color:#0369a1; margin-top:4px;" id="fbwInfo">--</div>
+                        <div style="margin-top:10px; height:9px; border-radius:5px; background:#e0f2fe; overflow:hidden; max-width:420px;">
+                            <div id="fbwBar" style="height:100%; width:0; background:#0ea5e9; transition:width .3s;"></div>
+                        </div>
+                        <div style="font-size:0.8rem; color:#0284c7; margin-top:6px;" id="fbwProg">0 / 0</div>
+                    </div>
+                    <button class="btn-3d btn-blue" onclick="BoxScan.continuarAtiva()"><i class="fas fa-barcode"></i> CONTINUAR LEITURA</button>
+                </div>
+                <div style="font-size:0.8rem; color:#0369a1; margin-top:14px; border-top:1px dashed #bae6fd; padding-top:10px;">
+                    A comparação com o estoque só aparece depois que você <b>finalizar a leitura das caixas</b> dentro do scanner.
+                </div>
+            </div>
+
+            <div id="feederMapper" style="display:none; background:#f8fafc; border:1px solid #cbd5e1; padding:20px; border-radius:6px; margin-bottom:20px;">
+                <h3 style="color:var(--tpv-blue); margin-top:0;"><i class="fas fa-table"></i> Configurar Colunas (Modo Manual)</h3>
+                <div style="margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:15px;">
+                    <label style="font-weight:bold; color:var(--tpv-blue);">Comecar a ler da Linha:</label>
+                    <input type="number" id="feedStartRow" class="big-input" value="1" onchange="Feeder.updateCols()" style="max-width:100px;">
+                </div>
+                <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:200px;"><label>Col. MAQUINA:</label><select id="feedColMach" class="big-input"></select></div>
+                    <div style="flex:1; min-width:200px;"><label>Col. POSICAO:</label><select id="feedColPos" class="big-input"></select></div>
+                    <div style="flex:1; min-width:200px;"><label>Col. CODIGO:</label><select id="feedColCode" class="big-input"></select></div>
+                </div>
+                <button class="btn-3d btn-blue" style="width:100%; margin-top:25px;" onclick="Feeder.confirmLoad()">PROCESSAR</button>
+            </div>
+            <div id="feederResults" style="display:none; margin-top:30px;">
+                <div class="print-header">
+                    <div style="flex:1;"><span style="font-size:1.8rem; font-weight:900; color:#002060;">TPV<span style="font-size:0.9rem; letter-spacing:1px;">VISION</span></span></div>
+                    <div style="flex:2; text-align:center; color:#002060;">
+                        <div style="font-size:1.1rem; font-weight:900; text-transform:uppercase;">RELATORIO DE SEPARACAO - MMT</div>
+                        <div style="font-size:1rem; font-weight:900;">LINHA: <span id="printLineDisplay">--</span> | W/O: <span id="printWODisplay">--</span></div>
+                        <div style="font-size:0.95rem; font-weight:900; display:none;" id="printMachineWrap">MAQUINA: <span id="printMachineDisplay">--</span></div>
+                        <div style="font-weight:bold; text-transform:uppercase;">RESPONSAVEL: <span id="printUser">--</span></div>
+                    </div>
+                    <div style="flex:1; text-align:right; font-weight:bold; color:#002060;" id="printDateTime">--/--/---- - --:--</div>
+                </div>
+                <div class="no-print" style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:flex-end; flex-wrap:wrap; gap:10px;">
+                    <h3 style="margin:0; color:var(--tpv-dark-blue);">Resultados <span id="feederTypeBadge"></span></h3>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn-3d btn-yellow" onclick="Feeder.recalcMatches()"><i class="fas fa-sync-alt"></i> RE-CRUZAR</button>
+                        <button class="btn-3d btn-gray" id="btnNotFoundFeeder" onclick="Feeder.showNotFound()" style="display:none;"><i class="fas fa-exclamation-triangle"></i> NAO ENCONTRADOS</button>
+                        <button class="btn-3d btn-red" id="btnCheckoutFeeder" onclick="Feeder.checkout()"><i class="fas fa-check-circle"></i> BAIXAR E IMPRIMIR</button>
+                    </div>
+                </div>
+                <div id="feederProcessSuccess" class="no-print" style="display:none; padding:15px; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; border-radius:6px; margin-bottom:15px;">
+                    <strong><i class="fas fa-check-double"></i> Operacao Finalizada!</strong> Estoque descontado com sucesso.
+                </div>
+                <div id="feederRulesBar" class="rules-bar no-print" style="margin-top:0; font-size:0.9rem; padding:10px 15px;">
+                    <strong><i class="fas fa-filter"></i> Regras Ativas:</strong> <span id="rulesDisplay">Padrao</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table id="resTable">
+                        <thead><tr><th>Maquina</th><th>Posicao</th><th>Codigo</th><th>LOCAL ESTOQUE <i class="fas fa-lock" style="color:#94a3b8; margin-left:5px;"></i></th><th style="text-align:center;">Status</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEVOLUCAO -->
+        <div id="tab-devolucao" class="section">
+
+            <!-- Badge flutuante OK/NG -->
+            <div id="devVoiceBadge" class="dev-voice-badge"></div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:10px;">
+                <h2 style="margin:0;">Entrada / Devolucao</h2>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button id="btnDevBack" class="btn-3d btn-gray" style="padding:8px 14px; font-size:0.82rem; display:none;" onclick="Devolucao.goBack()" title="Voltar etapa (Ctrl+Z)">
+                        <i class="fas fa-undo"></i> Voltar Etapa
+                    </button>
+                    <button class="btn-3d btn-red" style="padding:8px 14px; font-size:0.82rem; display:none;" id="btnCancelDev" onclick="Devolucao.reset()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Barra de etapas -->
+            <div class="dev-step-bar">
+                <div class="dev-step active" id="devStep1">
+                    <div class="dev-step-circle" id="devStepCircle1"><i class="fas fa-qrcode"></i></div>
+                    <div class="dev-step-label">1. Posicao</div>
+                </div>
+                <div class="dev-step-connector" id="devConn1"></div>
+                <div class="dev-step" id="devStep2">
+                    <div class="dev-step-circle" id="devStepCircle2"><i class="fas fa-barcode"></i></div>
+                    <div class="dev-step-label">2. Codigo</div>
+                </div>
+                <div class="dev-step-connector" id="devConn2"></div>
+                <div class="dev-step" id="devStep3">
+                    <div class="dev-step-circle" id="devStepCircle3"><i class="fas fa-hashtag"></i></div>
+                    <div class="dev-step-label">3. Qtd.</div>
+                </div>
+            </div>
+
+            <!-- Label instrucao atual -->
+            <div id="devInputLabel" style="font-size:1rem; font-weight:800; color:var(--tpv-blue); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                <span id="devInputLabelText"><i class="fas fa-qrcode"></i> Bipe o QR Code da posicao</span>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;" id="devRulesTags"></div>
+            </div>
+
+            <!-- Input principal -->
+            <input type="text" id="devSingleInput" class="dev-main-input"
+                placeholder="Aguardando leitura..."
+                autocomplete="off" autocorrect="off" spellcheck="false"
+                onkeydown="if(event.key==='Enter'){event.preventDefault(); Devolucao.handleInput();}"
+                oninput="Devolucao.onInputChange(this.value)">
+
+            <!-- Feedback de validacao em tempo real -->
+            <div id="devLiveValidation" style="min-height:28px; margin-top:8px; text-align:center; font-size:0.85rem; font-weight:700; color:#94a3b8; font-family:'Roboto Mono',monospace; letter-spacing:0.5px;"></div>
+
+            <!-- Painel de info acumulada -->
+            <div class="dev-info-panel">
+                <div class="dev-info-cell active" id="devCellLoc">
+                    <div class="cell-label"><i class="fas fa-map-pin"></i> Posicao</div>
+                    <div class="cell-value" id="devCellLocVal">&#8212;</div>
+                </div>
+                <div class="dev-info-cell" id="devCellCode">
+                    <div class="cell-label"><i class="fas fa-barcode"></i> Codigo</div>
+                    <div class="cell-value" id="devCellCodeVal">&#8212;</div>
+                </div>
+                <!-- Descricao do catalogo (aparece apos bipar o codigo) -->
+                <div id="devCatalogDesc" style="display:none; grid-column:1/-1; background:#eff6ff; border:1px solid #bae6fd; border-radius:6px; padding:10px 14px; margin-top:6px;">
+                    <span style="font-size:0.72rem; font-weight:800; color:#0369a1; text-transform:uppercase; letter-spacing:0.5px;"><i class="fas fa-tag"></i> Descricao do Catalogo:</span>
+                    <span id="devCatalogDescText" style="font-size:0.88rem; font-weight:700; color:#0c4a6e; margin-left:8px;"></span>
+                </div>
+                <div class="dev-info-cell" id="devCellQty">
+                    <div class="cell-label"><i class="fas fa-hashtag"></i> Quantidade</div>
+                    <div class="cell-value" id="devCellQtyVal">&#8212;</div>
+                </div>
+            </div>
+
+            <!-- Aviso de posicao ocupada -->
+            <div id="devOccupiedWarning" style="display:none; margin-top:14px; padding:12px 16px; background:#fffbeb; border-left:5px solid var(--ind-yellow); border-radius:6px; color:#b45309; font-size:0.9rem;">
+                <strong><i class="fas fa-exclamation-triangle"></i> Posicao Ocupada:</strong>
+                Material atual: <span id="devOccupiedCode" style="font-family:'Roboto Mono'; font-size:1.1rem; font-weight:900; color:var(--ind-red); background:#fef3c7; padding:2px 8px; border-radius:4px;"></span>
+                <div style="font-size:0.78rem; margin-top:4px; opacity:0.85;">O material acima sera substituido ao confirmar.</div>
+            </div>
+
+            <!-- Mensagens de erro -->
+            <div id="devErrorMsg" style="display:none; margin-top:14px; padding:14px 18px; background:var(--ind-red); color:white; font-weight:800; border-radius:8px; text-align:center; font-size:1rem; letter-spacing:0.5px;">
+                <i class="fas fa-times-circle" style="font-size:1.3rem; margin-right:8px;"></i><span id="devErrorText">Erro!</span>
+            </div>
+
+            <!-- Botao confirmar (etapa 3) -->
+            <button class="btn-3d btn-green" id="btnConfirmDev" style="width:100%; margin-top:18px; padding:16px; font-size:1.1rem; display:none;" onclick="Devolucao.handleInput(true)">
+                <i class="fas fa-check-circle"></i> CONFIRMAR ENTRADA
+            </button>
+
+            <!-- Historico rapido da sessao -->
+            <div id="devRecentLog" style="margin-top:24px; display:none;">
+                <div style="font-size:0.8rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
+                    <i class="fas fa-history"></i> Ultimas entradas desta sessao
+                </div>
+                <div id="devRecentItems"></div>
+            </div>
+
+        </div>
+
+        <!-- KITTING/ESTOQUE -->
+        <div id="tab-estoque" class="section">
+            <!-- Cabecalho de impressao do Kitting (invisivel na tela) -->
+            <div class="print-header print-only" id="kittingPrintHeader">
+                <div style="flex:1;"><span style="font-size:1.8rem; font-weight:900; color:#002060;">TPV<span style="font-size:0.9rem; letter-spacing:1px;">VISION</span></span></div>
+                <div style="flex:2; text-align:center; color:#002060;">
+                    <div style="font-size:1.1rem; font-weight:900; text-transform:uppercase;">NOTA DE RETIRADA - MMT</div>
+                    <div style="font-weight:bold; text-transform:uppercase;">RESPONSAVEL: <span id="kittingPrintUser">--</span></div>
+                </div>
+                <div style="flex:1; text-align:right; font-weight:bold; color:#002060;" id="kittingPrintDate">--/--/----</div>
+            </div>
+            <!-- Tabela de impressao do kitting (invisivel na tela) -->
+            <table id="kittingPrintTable" class="print-only" style="display:none;">
+                <thead><tr><th>Codigo Material</th><th>Quantidade</th><th>Carro</th><th>Posicao</th></tr></thead>
+                <tbody id="kittingPrintBody"></tbody>
+            </table>
+            <h2 class="no-print">Busca Avulsa</h2>
+
+            <!-- Painel de entrada -->
+            <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:20px; border-radius:6px; margin-bottom:20px;">
+
+                <div style="display:flex; gap:12px; align-items:flex-end; margin-bottom:16px; flex-wrap:wrap;">
+                    <div>
+                        <label style="font-weight:bold; color:#475569; display:block; margin-bottom:5px; font-size:0.85rem;">Qtd. de Itens:</label>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <input type="number" id="dynamicSearchCount" class="big-input" value="1" min="1" max="200" style="width:80px; text-align:center;" oninput="Kitting.generateInputs()">
+                            <button class="btn-3d btn-gray" onclick="Kitting.setCount(5)" style="padding:6px 10px; font-size:0.8rem;">5</button>
+                            <button class="btn-3d btn-gray" onclick="Kitting.setCount(10)" style="padding:6px 10px; font-size:0.8rem;">10</button>
+                            <button class="btn-3d btn-gray" onclick="Kitting.setCount(30)" style="padding:6px 10px; font-size:0.8rem;">30</button>
+                        </div>
+                    </div>
+                    <button class="btn-3d btn-blue" style="height:46px;" onclick="Kitting.execute()"><i class="fas fa-search"></i> PROCESSAR BUSCA</button>
+                    <button class="btn-3d btn-gray" style="height:46px;" onclick="Kitting.reset()"><i class="fas fa-redo"></i> LIMPAR</button>
+                </div>
+
+                <!-- Modos de busca: tabs -->
+                <div style="display:flex; gap:6px; margin-bottom:14px; border-bottom:2px solid #e2e8f0; padding-bottom:0;">
+                    <button id="kModeTabCode" onclick="Kitting.setMode('code')" style="padding:8px 18px; font-weight:800; font-size:0.82rem; text-transform:uppercase; border:1px solid #e2e8f0; border-bottom:3px solid var(--tpv-blue); background:#eff6ff; color:var(--tpv-blue); cursor:pointer; border-radius:6px 6px 0 0;"><i class="fas fa-barcode"></i> Por Codigo</button>
+                    <button id="kModeTabPaste" onclick="Kitting.setMode('paste')" style="padding:8px 18px; font-weight:800; font-size:0.82rem; text-transform:uppercase; border:1px solid #e2e8f0; border-bottom:3px solid transparent; background:#fff; color:#64748b; cursor:pointer; border-radius:6px 6px 0 0;"><i class="fas fa-paste"></i> Colar do Excel</button>
+                    <button id="kModeTabDesc" onclick="Kitting.setMode('desc')" style="padding:8px 18px; font-weight:800; font-size:0.82rem; text-transform:uppercase; border:1px solid #e2e8f0; border-bottom:3px solid transparent; background:#fff; color:#64748b; cursor:pointer; border-radius:6px 6px 0 0;"><i class="fas fa-tags"></i> Por Descricao</button>
+                </div>
+
+                <!-- Painel: Por Codigo -->
+                <div id="kPanelCode">
+                    <div id="dynamicSearchInputsContainer" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:10px;">
+                        <input type="text" class="dynamic-search-input big-input" placeholder="Bipe/Digite o codigo 1..." onkeydown="if(event.key==='Enter') Kitting.execute()">
+                    </div>
+                </div>
+
+                <!-- Painel: Colar do Excel -->
+                <div id="kPanelPaste" style="display:none;">
+                    <p style="font-size:0.82rem; color:#64748b; margin:0 0 8px 0;">Cole diretamente de uma coluna do Excel (Ctrl+V). O sistema le os primeiros 18 caracteres por linha.</p>
+                    <textarea id="kPasteArea" class="big-input" rows="6" placeholder="Cole aqui os codigos copiados do Excel (Ctrl+V)..."
+                        style="resize:vertical; font-family:'Roboto Mono',monospace; font-size:0.9rem; width:100%;"
+                        onpaste="setTimeout(() => Kitting.parsePaste(), 50)"
+                        oninput="Kitting.parsePaste()"></textarea>
+                    <div id="kPastePreview" style="margin-top:8px; font-size:0.8rem; color:#64748b;"></div>
+                </div>
+
+                <!-- Painel: Por Descricao -->
+                <div id="kPanelDesc" style="display:none;">
+                    <p style="font-size:0.82rem; color:#64748b; margin:0 0 8px 0;">Busca inteligente no catalogo. Digite qualquer parte do nome — ex: <b>RESISTOR</b>, <b>100R</b>, <b>0402</b>.</p>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="text" id="kDescInput" class="big-input" style="flex:1;" placeholder="Ex: CAPACITOR 100NF 0402..."
+                            oninput="Kitting.descLive()"
+                            onkeydown="if(event.key==='Enter') Kitting.descSearch()">
+                        <button class="btn-3d btn-blue" style="height:46px;" onclick="Kitting.descSearch()"><i class="fas fa-search"></i> BUSCAR NO ESTOQUE</button>
+                    </div>
+                    <div id="kDescResults" style="margin-top:12px; max-height:220px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:6px; display:none;"></div>
+                </div>
+            </div>
+
+            <!-- Resultados de busca -->
+            <div id="searchResultsContainer" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+                    <h3 style="margin:0; color:var(--ind-red); text-transform:uppercase;"><i class="fas fa-user-lock"></i> Itens Localizados</h3>
+                    <div id="searchActionsContainer">
+                        <button class="btn-3d btn-red" onclick="Kitting.releaseAndCheckout()"><i class="fas fa-unlock"></i> LIBERAR POSICOES E BAIXAR</button>
+                    </div>
+                </div>
+                <p id="searchInstructionText" style="color:#64748b; font-size:0.9rem;">Selecione os itens e clique em <b>Liberar</b>.</p>
+                <div style="max-height:420px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:6px;">
+                    <table style="margin-top:0; border-collapse:collapse;">
+                        <colgroup>
+                            <col style="width:50px;">
+                            <col style="width:22%;">
+                            <col style="width:30%;">
+                            <col style="width:10%;">
+                            <col style="width:10%;">
+                            <col style="width:18%;">
+                        </colgroup>
+                        <thead><tr><th style="text-align:center;"><i class="fas fa-check-circle" style="color:#94a3b8;"></i></th><th>Codigo Material</th><th style="color:#64748b; font-size:0.8rem;">Descricao</th><th style="text-align:center;">Qtd.</th><th style="text-align:center;">Carro</th><th style="text-align:center;">Posicao</th></tr></thead>
+                        <tbody id="searchResultsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Painel de sucesso apos liberacao (separado para nao destruir a estrutura) -->
+            <div id="kSuccessPanel" style="display:none; background:#dcfce7; border:2px solid #16a34a; padding:20px; border-radius:8px; margin-top:16px;">
+                <div style="font-weight:900; color:#15803d; font-size:1.1rem; margin-bottom:12px;"><i class="fas fa-check-circle"></i> <span id="kSuccessMsg"></span></div>
+                <div style="overflow-x:auto; border-radius:6px; overflow:hidden;">
+                    <table style="margin-top:0; border-collapse:collapse; width:100%; font-size:0.85rem;">
+                        <colgroup><col style="width:40%"><col style="width:15%;text-align:center"><col style="width:20%;text-align:center"><col style="width:25%;text-align:center"></colgroup>
+                        <thead><tr style="background:#15803d; color:white;">
+                            <th style="padding:8px 10px; text-align:left;">Codigo</th>
+                            <th style="padding:8px 10px; text-align:center;">Qtd</th>
+                            <th style="padding:8px 10px; text-align:center;">Carro</th>
+                            <th style="padding:8px 10px; text-align:center;">Posicao</th>
+                        </tr></thead>
+                        <tbody id="kSuccessBody"></tbody>
+                    </table>
+                </div>
+                <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-3d btn-blue" id="kSuccessPrintBtn"><i class="fas fa-print"></i> IMPRIMIR LISTA</button>
+                </div>
+            </div>
+
+            <!-- Mini modal de confirmação de nova busca -->
+            <div id="kConfirmModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:200000; justify-content:center; align-items:center; backdrop-filter:blur(3px);">
+                <div style="background:#fff; border-radius:10px; padding:28px 32px; box-shadow:0 20px 50px rgba(0,0,0,0.3); width:90%; max-width:380px; border-top:5px solid var(--tpv-blue); animation:slideDown 0.25s ease-out; text-align:center;">
+                    <div style="font-size:2rem; color:var(--ind-yellow); margin-bottom:10px;"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div style="font-weight:900; color:var(--tpv-dark-blue); font-size:1.05rem; margin-bottom:8px; text-transform:uppercase;">Nova Busca</div>
+                    <div style="color:#475569; font-size:0.9rem; line-height:1.5; margin-bottom:22px;">Voce acabou de liberar um item. A busca atual <b>desaparecera</b> da tela. Deseja continuar?</div>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="Kitting._confirmModalResolve(false)" style="flex:1; padding:11px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; font-weight:800; color:#475569; cursor:pointer; font-size:0.9rem;">NAO</button>
+                        <button onclick="Kitting._confirmModalResolve(true)" style="flex:1; padding:11px; background:var(--tpv-blue); border:none; border-radius:6px; font-weight:800; color:#fff; cursor:pointer; font-size:0.9rem;">SIM, CONTINUAR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD USUARIO -->
+        <div id="tab-dashboard" class="section">
+            <h2>Dashboard Operacional</h2>
+            <h3 style="margin-top:0; color:var(--tpv-blue);"><i class="fas fa-history"></i> Historico de Baixas</h3>
+            <div style="background:#f0f9ff; border:1px solid #bae6fd; padding:15px; border-radius:6px; margin-bottom:15px;">
+                <div style="display:flex; gap:15px; align-items:flex-end; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:200px;">
+                        <label style="font-weight:bold; color:#0369a1; display:block; margin-bottom:5px;"><i class="fas fa-filter"></i> Filtrar por Tipo:</label>
+                        <select id="histFilterType" class="big-input" onchange="HistoryModule.applyFilters(); HistoryModule.render();" style="border-color:#7dd3fc;">
+                            <option value="ALL">Todas as Operacoes</option>
+                            <option value="CHECKOUT">Lista de Producao (Feeder)</option>
+                            <option value="MANUAL_KITTING">Busca Avulsa (Kitting)</option>
+                            <option value="RETURN">Devolucao de Material</option>
+                            <option value="AUDIT_CLEAR">Auditoria de Carro (Limpeza)</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="histReturnFilters" style="display:none; gap:10px; margin-top:15px; flex-wrap:wrap; padding-top:15px; border-top:1px dashed #7dd3fc;">
+                    <div style="flex:1; min-width:140px;"><label>Carro:</label><select id="histFilterCar" class="big-input" onchange="HistoryModule.render()"></select></div>
+                    <div style="flex:1; min-width:140px;"><label>Operador:</label><select id="histFilterUser" class="big-input" onchange="HistoryModule.render()"></select></div>
+                    <div style="flex:1; min-width:140px;"><label>Data Inicio:</label><input type="datetime-local" id="histFilterStart" class="big-input" onchange="HistoryModule.render()"></div>
+                    <div style="flex:1; min-width:140px;"><label>Data Fim:</label><input type="datetime-local" id="histFilterEnd" class="big-input" onchange="HistoryModule.render()"></div>
+                </div>
+                <div style="margin-top:15px; padding-top:15px; border-top:1px dashed #7dd3fc; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <button class="btn-3d btn-green" onclick="HistoryModule.exportToExcel()"><i class="fas fa-file-excel"></i> EXPORTAR PARA EXCEL</button>
+                    <span style="font-size:0.78rem; color:#0369a1; font-style:italic;"><i class="fas fa-info-circle"></i> Exporta exatamente o que esta filtrado na tela &mdash; 1 linha por item movimentado.</span>
+                </div>
+            </div>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:15px; border-radius:6px;">
+                <div id="checkoutHistoryList" style="max-height:400px; overflow-y:auto;"><div style="color:#94a3b8; text-align:center; font-style:italic;">Nenhum historico.</div></div>
+            </div>
+        </div>
+
+        <!-- MEU RENDIMENTO (operador) -->
+        <!-- ==================== RANKING ==================== -->
+        <div id="tab-ranking" class="section">
+            <h2>Ranking da Semana</h2>
+            <div id="rankingContent">
+                <div style="color:#94a3b8; text-align:center; padding:30px;">Carregando...</div>
+            </div>
+        </div>
+
+        <!-- ==================== CONFIRMACAO DE LISTA (v16.23) ==================== -->
+        <div id="tab-confirmacao" class="section">
+            <h2>Confirmacao de Listas</h2>
+            <div id="confirmContent">
+                <div style="color:#94a3b8; text-align:center; padding:30px;">Carregando...</div>
+            </div>
+        </div>
+
+        <!-- ==================== TABS ADMIN ==================== -->
+        <!-- GESTAO ESTOQUE -->
+        <div id="adm-stock_manage" class="section active">
+            <h2 style="color:var(--ind-red); border-color:var(--ind-red);" id="stockManageTitle">Gestao de Estoque Completa</h2>
+            <details class="viewer-hidden op-hidden" style="margin-bottom:20px; background:#fff5f5; border:1px solid #fecaca; padding:15px; border-radius:6px;">
+                <summary style="font-weight:bold; color:var(--ind-red); cursor:pointer;">Opcoes Avancadas: Carga Mestra (Reset Total)</summary>
+                <div style="padding-top:15px;">
+                    <div class="drop-zone" style="padding:30px; background:white; border-color:#fca5a5;">
+                        <span>Selecionar Planilha Mestra (.xlsx)</span>
+                        <input type="file" id="masterFileIn" onchange="StockAdmin.prepareMasterLoad(this)">
+                    </div>
+                    <div id="masterMapper" style="display:none;">
+                        <h4>Mapear Colunas</h4>
+                        <div style="margin-bottom:10px;"><label>Comecar na Linha:</label><input type="number" id="masterStartRow" class="big-input" value="1" onchange="StockAdmin.updateMasterCols()"></div>
+                        <label>Col. CARRO:</label><select id="selColCar" class="big-input"></select>
+                        <label>Col. LOCACAO:</label><select id="selColLoc" class="big-input"></select>
+                        <label>Col. CODIGO:</label><select id="selColCode" class="big-input"></select>
+                        <label>Col. QTD:</label><select id="selColQty" class="big-input"></select>
+                        <button class="btn-3d btn-red" onclick="StockAdmin.confirmMasterLoad()" style="width:100%; margin-top:15px;">IMPORTAR TUDO (APAGAR ESTOQUE ATUAL)</button>
+                    </div>
+                </div>
+            </details>
+            <div class="viewer-hidden" style="margin-bottom:20px; text-align:right;">
+                <button class="btn-3d btn-green" onclick="StockAdmin.exportToExcel()"><i class="fas fa-file-excel"></i> Baixar Estoque Atual (Excel)</button>
+            </div>
+            <div id="viewerExportRow" style="display:none; margin-bottom:20px; text-align:right;">
+                <span style="font-size:0.8rem; color:#94a3b8; margin-right:12px; font-style:italic;"><i class="fas fa-eye"></i> Modo leitura — edicao desabilitada</span>
+                <button class="btn-3d btn-green" onclick="StockAdmin.exportToExcel()"><i class="fas fa-file-excel"></i> Baixar Estoque (Excel)</button>
+            </div>
+            <div class="admin-split-view">
+                <div class="car-list-panel">
+                    <div class="car-list-header">
+                        <div><i class="fas fa-car"></i> Carros</div>
+                        <div style="display:flex; gap:5px;">
+                            <button class="btn-3d btn-green op-hidden" style="padding:2px 8px;" onclick="StockAdmin.addCar()"><i class="fas fa-plus"></i> Carro</button>
+                        </div>
+                    </div>
+                    <div id="adminCarList" class="car-list-content"></div>
+                </div>
+                <div class="loc-editor-panel">
+                    <div id="locEditorEmpty" style="display:flex; justify-content:center; align-items:center; height:100%; color:#94a3b8; font-size:1.2rem; font-weight:bold; text-align:center;">
+                        <i class="fas fa-arrow-left" style="margin-right:10px;"></i> Selecione um Carro ao lado
+                    </div>
+                    <div id="locEditorContent" style="display:none; flex-direction:column; height:100%;">
+                        <div class="editor-toolbar op-hidden" id="adminEditorToolbar">
+                            <div style="flex:3;">
+                                <label style="font-size:0.8rem; font-weight:bold; color:#475569;">Adicionar Locacoes (Virgula "1,2" ou Faixa "1-50"):</label>
+                                <div style="display:flex; gap:10px;">
+                                    <input type="text" id="newLocInput" class="big-input" placeholder="Ex: 1-50 ou 101, 102..." onkeyup="if(event.key==='Enter') StockAdmin.addLocation()">
+                                    <button class="btn-3d btn-green" onclick="StockAdmin.addLocation()">ADD</button>
+                                </div>
+                            </div>
+                            <div style="flex:1; display:flex; align-items:flex-end; justify-content:flex-end;">
+                                <button class="btn-3d btn-red" onclick="StockAdmin.deleteCar()">Excluir Carro</button>
+                            </div>
+                        </div>
+                        <div class="editor-grid-wrapper">
+                            <div id="estoquePaginacao"></div>
+                            <table class="editor-table">
+                                <thead id="adminLocTableHead"><tr><th>Locacao</th><th>Item (Cod)</th><th>Qtd</th><th style="width:80px; text-align:center;">Acoes</th></tr></thead>
+                                <tbody id="adminLocTableBody"></tbody>
+                            </table>
+                        </div>
+                        <div style="margin-top:10px; font-size:0.8rem; color:#64748b; font-weight:bold;">Total de Posicoes: <span id="locCountBadge">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GESTAO DO SISTEMA -->
+        <div id="adm-users" class="section">
+            <h2 style="color:var(--ind-red); border-color:var(--ind-red);">Gestao do Sistema</h2>
+
+            <!-- Sub-abas internas -->
+            <div style="display:flex; gap:8px; margin-bottom:24px; border-bottom:2px solid #e2e8f0; padding-bottom:0;">
+                <button class="gs-tab-btn active" onclick="GestaoSistema.showTab('usuarios')" id="gsTabUsuarios" style="padding:10px 22px; font-weight:800; font-size:0.88rem; text-transform:uppercase; letter-spacing:0.5px; border:1px solid #e2e8f0; border-bottom:3px solid var(--ind-red); background:#fef2f2; color:var(--ind-red); cursor:pointer; border-radius:6px 6px 0 0;">
+                    <i class="fas fa-users-cog"></i> Usuarios &amp; Senha
+                </button>
+                <button class="gs-tab-btn" onclick="GestaoSistema.showTab('banco')" id="gsTabBanco" style="padding:10px 22px; font-weight:800; font-size:0.88rem; text-transform:uppercase; letter-spacing:0.5px; border:1px solid #e2e8f0; border-bottom:3px solid transparent; background:#fff; color:#64748b; cursor:pointer; border-radius:6px 6px 0 0;">
+                    <i class="fas fa-database"></i> Banco de Dados
+                </button>
+                <button class="gs-tab-btn" onclick="GestaoSistema.showTab('catalogo')" id="gsTabCatalogo" style="padding:10px 22px; font-weight:800; font-size:0.88rem; text-transform:uppercase; letter-spacing:0.5px; border:1px solid #e2e8f0; border-bottom:3px solid transparent; background:#fff; color:#64748b; cursor:pointer; border-radius:6px 6px 0 0;">
+                    <i class="fas fa-tags"></i> Catalogo de Componentes
+                </button>
+                <button class="gs-tab-btn" onclick="GestaoSistema.showTab('config')" id="gsTabConfig" style="padding:10px 22px; font-weight:800; font-size:0.88rem; text-transform:uppercase; letter-spacing:0.5px; border:1px solid #e2e8f0; border-bottom:3px solid transparent; background:#fff; color:#64748b; cursor:pointer; border-radius:6px 6px 0 0;">
+                    <i class="fas fa-cog"></i> Conf. do Sistema
+                </button>
+                <button class="gs-tab-btn" onclick="GestaoSistema.showTab('familias')" id="gsTabFamilias" style="padding:10px 22px; font-weight:800; font-size:0.88rem; text-transform:uppercase; letter-spacing:0.5px; border:1px solid #e2e8f0; border-bottom:3px solid transparent; background:#fff; color:#64748b; cursor:pointer; border-radius:6px 6px 0 0;">
+                    <i class="fas fa-shapes"></i> Familias
+                </button>
+            </div>
+
+            <!-- Sub-aba: Usuarios & Senha -->
+            <div id="gsPanel-usuarios">
+                <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:300px;">
+                        <h3 style="margin-top:0; color:#475569;">Novo Usuario</h3>
+                        <input type="text" id="newUserName" class="big-input" placeholder="Nome Completo" style="margin-bottom:10px;">
+                        <input type="text" id="newUserMat" class="big-input" placeholder="Matricula (max 5 digitos)" maxlength="5" style="margin-bottom:10px;">
+                        <div style="display:flex; gap:10px; margin-bottom:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:12px;">
+                            <label style="font-weight:800; color:#475569; align-self:center; white-space:nowrap;">Perfil:</label>
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; flex:1; padding:8px 12px; border-radius:6px; border:2px solid #e2e8f0; transition:0.2s;" id="lblRoleOp">
+                                <input type="radio" name="newUserRole" value="operacional" id="roleOp" checked style="width:16px;height:16px;">
+                                <span><i class="fas fa-user" style="color:var(--tpv-blue);"></i> <b>Operacional</b> <span style="font-size:0.75rem; color:#64748b;">— acesso as telas de producao</span></span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; flex:1; padding:8px 12px; border-radius:6px; border:2px solid #e2e8f0; transition:0.2s;" id="lblRoleAdm">
+                                <input type="radio" name="newUserRole" value="admin" id="roleAdm" style="width:16px;height:16px;">
+                                <span><i class="fas fa-shield-alt" style="color:var(--ind-red);"></i> <b>Administrador</b> <span style="font-size:0.75rem; color:#64748b;">— acesso completo</span></span>
+                            </label>
+                        </div>
+                        <button class="btn-3d btn-blue" onclick="UserAdmin.addUser()" style="width:100%;">CRIAR ACESSO</button>
+                        <hr style="margin:25px 0; border-top:1px solid #e2e8f0;">
+                        <h3 style="margin-top:0; color:#475569;">Trocar Senha ADM</h3>
+                        <input type="password" id="newAdmPass" class="big-input" placeholder="Nova Senha Admin" style="margin-bottom:10px;">
+                        <button class="btn-3d btn-red" onclick="UserAdmin.changeAdmPassword()" style="width:100%;">ALTERAR SENHA ADM</button>
+                    </div>
+                    <div style="flex:2; min-width:300px;">
+                        <h3 style="margin-top:0; color:#475569;">Lista de Usuarios</h3>
+                        <div id="userList" style="max-height:400px; overflow-y:auto; padding-right:5px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-aba: Banco de Dados -->
+            <div id="gsPanel-banco" style="display:none;">
+                <h3 style="color:var(--ind-red); margin-top:0; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-database"></i> Gerenciamento de Banco de Dados
+                </h3>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
+                    <!-- Card: Exportar Banco Compacto -->
+                    <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:20px;">
+                        <div style="font-weight:900; color:#0369a1; font-size:1rem; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                            <i class="fas fa-compress-arrows-alt"></i> Exportar Banco Compacto
+                        </div>
+                        <p style="font-size:0.85rem; color:#0369a1; margin:0 0 15px 0; line-height:1.5;">
+                            Gera um novo arquivo <code>.json</code> compacto e leve:<br>
+                            <b>Estoque completo + Usuarios + Historico das ultimas 48 horas.</b><br>
+                            Dados mais antigos sao descartados. Ideal para manter o arquivo rapido.
+                        </p>
+                        <div style="margin-bottom:12px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:6px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
+                            <i class="fas fa-clock" style="color:#0369a1; font-size:1.1rem;"></i>
+                            <div>
+                                <div style="font-size:0.8rem; font-weight:800; color:#0369a1;">Historico preservado: ultimas 48 horas</div>
+                                <div style="font-size:0.72rem; color:#64748b; margin-top:2px;">Estoque completo + Usuarios + Historico dos ultimos 2 dias</div>
+                            </div>
+                        </div>
+                        <button class="btn-3d btn-blue" style="width:100%;" onclick="UserAdmin.exportCleanDB()">
+                            <i class="fas fa-file-export"></i> EXPORTAR BANCO COMPACTO
+                        </button>
+                        <div id="exportDbStatus" style="margin-top:10px; font-size:0.8rem; font-weight:700; min-height:1.2em;"></div>
+                    </div>
+                    <!-- Card: Backup Historico -->
+                    <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:20px;">
+                        <div style="font-weight:900; color:#15803d; font-size:1rem; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                            <i class="fas fa-archive"></i> Backup Diario de Seguranca
+                        </div>
+                        <p style="font-size:0.85rem; color:#166534; margin:0 0 15px 0; line-height:1.5;">
+                            Gera um <code>.xlsx</code> com <b>estoque + historico + logs completos</b> e salva <b>direto na pasta de rede vinculada</b>.<br>
+                            Roda <b>1x por dia, apos 07:00</b>, no primeiro login. <b>Nao apaga nada do JSON</b> — e uma copia extra de seguranca.
+                        </p>
+                        <button class="btn-3d btn-green" style="width:100%;" onclick="AutoBackup.run(false)">
+                            <i class="fas fa-download"></i> FAZER BACKUP DIARIO AGORA
+                        </button>
+                    </div>
+                    <!-- Card: Importar banco antigo (.json) -->
+                    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:20px;">
+                        <div style="font-weight:900; color:#b45309; font-size:1rem; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                            <i class="fas fa-file-import"></i> Importar Banco (.json)
+                        </div>
+                        <p style="font-size:0.85rem; color:#92400e; margin:0 0 15px 0; line-height:1.5;">
+                            Carrega um <code>.json</code> no <b>formato antigo</b> (arquivo unico) para dentro desta pasta.<br>
+                            Use para trazer uma base que ainda rodava no formato antigo, ou para <b>voltar um backup</b>.
+                        </p>
+                        <div style="background:#fef3c7; border:1px solid #fcd34d; border-radius:6px; padding:10px 14px; margin-bottom:14px; font-size:0.8rem; color:#78350f; line-height:1.5;">
+                            <i class="fas fa-exclamation-triangle"></i> <b>Substitui</b> estoque, usuarios e catalogo desta pasta.<br>
+                            O historico e <b>acrescentado</b>, nunca apagado. Uma copia do estado atual e guardada automaticamente.
+                        </div>
+                        <button class="btn-3d btn-yellow" style="width:100%;" onclick="ImportarBanco.escolherArquivo()">
+                            <i class="fas fa-file-import"></i> ESCOLHER ARQUIVO .JSON
+                        </button>
+                        <div id="importDbStatus" style="margin-top:10px; font-size:0.8rem; font-weight:700; min-height:1.2em; line-height:1.4;"></div>
+                    </div>
+
+                    <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:20px;">
+                        <div style="font-weight:900; color:var(--ind-red); font-size:1rem; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                            <i class="fas fa-file-code"></i> Criar Banco do Zero
+                        </div>
+                        <p style="font-size:0.85rem; color:#991b1b; margin:0 0 15px 0; line-height:1.5;">
+                            Cria um arquivo <code>.json</code> completamente novo e em branco.<br>
+                            <b>Apenas os logins de usuarios e a senha ADM atual serao preservados.</b><br>
+                            Estoque e historico NAO sao copiados.
+                        </p>
+                        <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:10px 14px; margin-bottom:14px; font-size:0.8rem; color:#7f1d1d; font-weight:700;">
+                            <i class="fas fa-exclamation-triangle"></i> O sistema sera recarregado apos criar o arquivo. Voce devera importa-lo manualmente na proxima abertura.
+                        </div>
+                        <button class="btn-3d btn-red" style="width:100%;" onclick="UserAdmin.createBlankDB()">
+                            <i class="fas fa-plus-circle"></i> CRIAR BANCO EM BRANCO
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ===== PASTA DE BACKUP DIARIO DE SEGURANCA (unica) ===== -->
+                <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:20px; margin-top:16px;">
+                    <div style="font-weight:900; color:#1d4ed8; font-size:1rem; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">
+                        <i class="fas fa-shield-halved"></i> Pasta de Backup Diario de Seguranca
+                    </div>
+                    <p style="font-size:0.85rem; color:#1e40af; margin:0 0 15px 0; line-height:1.5;">
+                        Vincule a pasta de rede da copia de seguranca. Uma vez por dia, <b>apos 07:00</b> no primeiro login, o sistema salva aqui um <code>.xlsx</code> completo (Estoque + Historico + Logs). <b>Nao apaga nada</b> — e copia extra.<br>
+                        <span style="font-size:0.78rem;">Se esta pasta sumir ou for movida, um alerta aparece no topo da tela.</span>
+                    </p>
+                    <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+                        <div>
+                            <p id="seg-pasta-status" style="font-size:0.8rem; font-weight:800; color:#94a3b8; margin:0; display:flex; align-items:center; gap:6px;"><i class="fas fa-folder-open"></i> Nenhuma pasta vinculada.</p>
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button id="btn-vincular-seg" class="btn-3d btn-green" style="padding:9px 16px;" onclick="AutoBackup.vincularPasta()"><i class="fas fa-folder-plus"></i> VINCULAR PASTA</button>
+                            <button id="btn-desvincular-seg" class="btn-3d btn-red" style="padding:9px 16px; display:none;" onclick="AutoBackup.desvincularPasta()"><i class="fas fa-folder-minus"></i> DESVINCULAR</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-aba: Catalogo de Componentes -->
+            <div id="gsPanel-catalogo" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <h3 style="margin:0; color:#475569;">Catalogo de Componentes</h3>
+                        <p style="margin:4px 0 0 0; font-size:0.82rem; color:#94a3b8;">Cadastre codigos e descricoes para pesquisa por nome. Total: <b id="catalogCount">0</b> componentes.</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn-3d btn-blue" onclick="Catalog.importFromStock()" style="padding:9px 16px;">
+                            <i class="fas fa-magic"></i> IMPORTAR CODIGOS DO ESTOQUE
+                        </button>
+                        <input type="file" id="catXlsxInput" accept=".xlsx,.xls" style="display:none;" onchange="Catalog.importFromXlsx(this)">
+                        <button class="btn-3d btn-yellow" onclick="document.getElementById('catXlsxInput').click()" style="padding:9px 16px;">
+                            <i class="fas fa-file-import"></i> IMPORTAR EXCEL
+                        </button>
+                        <button class="btn-3d btn-green" onclick="Catalog.exportXlsx()" style="padding:9px 16px;">
+                            <i class="fas fa-file-excel"></i> EXPORTAR XLSX
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Formulario de cadastro -->
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:20px; margin-bottom:20px;">
+                    <h4 style="margin:0 0 14px 0; color:#475569; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.5px;"><i class="fas fa-plus-circle" style="color:var(--tpv-blue);"></i> Adicionar / Atualizar Componente</h4>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                        <div style="flex:1; min-width:180px;">
+                            <label style="font-size:0.78rem; font-weight:800; color:#64748b; display:block; margin-bottom:4px;">CODIGO</label>
+                            <input type="text" id="catCode" class="big-input" placeholder="Ex: 123456789012" style="text-transform:uppercase; font-family:'Roboto Mono',monospace;" oninput="this.value=this.value.toUpperCase()">
+                        </div>
+                        <div style="flex:3; min-width:260px;">
+                            <label style="font-size:0.78rem; font-weight:800; color:#64748b; display:block; margin-bottom:4px;">DESCRICAO</label>
+                            <input type="text" id="catDesc" class="big-input" placeholder="Ex: RESISTOR 100R 1% 0402 SMD" onkeydown="if(event.key==='Enter') Catalog.add()">
+                        </div>
+                        <button class="btn-3d btn-blue" onclick="Catalog.add()" style="height:46px; padding:0 20px;">
+                            <i class="fas fa-save"></i> SALVAR
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Busca no catalogo -->
+                <div style="display:flex; gap:10px; margin-bottom:14px; align-items:center;">
+                    <input type="text" id="catSearch" class="big-input" placeholder="Buscar por codigo ou descricao..." oninput="Catalog.render()" style="flex:1;">
+                    <button class="btn-3d btn-gray" onclick="document.getElementById('catSearch').value=''; Catalog.render();" style="padding:9px 16px; height:46px;">
+                        <i class="fas fa-times"></i> LIMPAR
+                    </button>
+                </div>
+
+                <!-- Tabela do catalogo -->
+                <div style="max-height:420px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:6px;">
+                    <table style="margin-top:0;">
+                        <thead>
+                            <tr>
+                                <th style="width:200px;">CODIGO</th>
+                                <th>DESCRICAO</th>
+                                <th style="width:100px; text-align:center;">ACAO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="catalogTableBody">
+                            <tr><td colspan="3" style="text-align:center; color:#94a3b8; padding:30px;">Catalogo vazio. Cadastre componentes ou importe do estoque.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sub-aba: Conf. do Sistema -->
+            <div id="gsPanel-config" style="display:none;">
+                <h3 style="color:#475569; margin-top:0;"><i class="fas fa-cog" style="color:var(--ind-red);"></i> Configuracoes do Sistema</h3>
+
+                <!-- Card: Tipo de Material por Carro -->
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:20px; margin-bottom:20px;">
+                    <div style="font-weight:900; color:var(--tpv-dark-blue); font-size:0.95rem; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">
+                        <i class="fas fa-car" style="color:var(--tpv-blue);"></i> Tipo de Material por Carro
+                    </div>
+                    <p style="font-size:0.82rem; color:#64748b; margin:0 0 16px 0;">
+                        Define que tipo de material cada carro armazena. Aparece no Dashboard em <b>Ocupacao por Carro</b>.
+                    </p>
+                    <div id="sysConfigCarList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px;">
+                        <div style="color:#94a3b8; font-style:italic;">Nenhum carro cadastrado.</div>
+                    </div>
+                    <button class="btn-3d btn-green" style="margin-top:16px;" onclick="SysConfig.saveCarTypes()">
+                        <i class="fas fa-save"></i> SALVAR CONFIGURACOES
+                    </button>
+                </div>
+
+                <!-- Card: Derrubar Acessos -->
+                <div style="background:#fff5f5; border:1px solid #fecaca; border-radius:8px; padding:20px; margin-bottom:20px;">
+                    <div style="font-weight:900; color:var(--ind-red); font-size:0.95rem; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px;">
+                        <i class="fas fa-power-off"></i> Derrubar Todos os Acessos
+                    </div>
+                    <p style="font-size:0.82rem; color:#64748b; margin:0 0 16px 0;">
+                        Desconecta <b>todos os outros usuarios</b> conectados no sistema. Seu proprio acesso <b>nao</b> e encerrado. Use quando precisar mexer no sistema sem ninguem atrapalhar.
+                    </p>
+                    <button class="btn-3d btn-red" onclick="SessionControl.kickAll()">
+                        <i class="fas fa-power-off"></i> DERRUBAR ACESSOS
+                    </button>
+                </div>
+            </div>
+            <!-- v17.04 — Familias de Materiais -->
+            <div id="gsPanel-familias" style="display:none;"></div>
+
+        </div>
+
+        <!-- DASHBOARD ADM -->
+        <div id="adm-dashboard" class="section">
+            <h2 style="color:var(--ind-red); border-color:var(--ind-red);">Rendimento e Auditoria</h2>
+            <!-- ===== PAINEL RENDIMENTO (KPIs + Ranking Devolucoes / Busca Avulsa) ===== -->
+            <div id="rendPanel" style="background:#F6F4EF; border:1px solid #C9C3B6; border-radius:10px; padding:0; margin-bottom:25px; overflow:hidden;">
+                <div style="background:#12161C; color:#F6F4EF; padding:16px 22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <div style="font-size:1.05rem; font-weight:900; letter-spacing:0.5px; text-transform:uppercase;">Painel de Rendimento</div>
+                        <div style="font-size:0.72rem; color:#C9C3B6; margin-top:2px;">TPV VISION · MANAUS — MMT / SPARE PARTS</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div id="rendPeriodLabel" style="font-size:0.85rem; font-weight:800;">SEMANA ATUAL</div>
+                        <div id="rendPeriodSub" style="font-size:0.7rem; color:#C9C3B6;">--</div>
+                    </div>
+                </div>
+
+                <div style="padding:20px 22px;">
+                    <div id="rendKpiRow" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:14px; margin-bottom:20px;"></div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:18px;">
+                        <div style="background:#fff; border:1px solid #C9C3B6; border-radius:8px; padding:16px;">
+                            <div style="font-weight:900; font-size:0.85rem; color:#12161C; text-transform:uppercase; letter-spacing:0.6px;">Devolucoes por Operador</div>
+                            <div style="font-size:0.72rem; color:#8a8579; margin-bottom:10px;">Do maior para o menor · lancamentos na semana</div>
+                            <div style="height:290px; position:relative;"><canvas id="rendChartDev"></canvas></div>
+                        </div>
+                        <div style="background:#fff; border:1px solid #C9C3B6; border-radius:8px; padding:16px;">
+                            <div style="font-weight:900; font-size:0.85rem; color:#12161C; text-transform:uppercase; letter-spacing:0.6px;">Busca Avulsa por Operador</div>
+                            <div style="font-size:0.72rem; color:#8a8579; margin-bottom:10px;">Do maior para o menor · lancamentos na semana</div>
+                            <div style="height:290px; position:relative;"><canvas id="rendChartBusca"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:0.7rem; color:#5c5850; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
+                        <span><span style="display:inline-block;width:12px;height:12px;background:#8A5A2B;border-radius:2px;vertical-align:-1px;margin-right:6px;"></span>Devolucoes</span>
+                        <span><span style="display:inline-block;width:12px;height:12px;background:#1F4E5F;border-radius:2px;vertical-align:-1px;margin-right:6px;"></span>Busca Avulsa</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RESUMO OPERACIONAL (mesma paleta do Painel de Rendimento) ===== -->
+            <div style="background:#F6F4EF; border:1px solid #C9C3B6; border-radius:10px; padding:0; margin-bottom:25px; overflow:hidden;">
+                <div style="background:#12161C; color:#F6F4EF; padding:16px 22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div>
+                        <div style="font-size:1.05rem; font-weight:900; letter-spacing:0.5px; text-transform:uppercase;">Resumo Operacional</div>
+                        <div id="dashWeekLabel" style="font-size:0.72rem; color:#C9C3B6; margin-top:2px;">Semana atual</div>
+                    </div>
+                    <button class="btn-3d" style="padding:8px 18px; font-size:0.8rem; background:#1F4E5F; box-shadow:0 3px 0 #143843; color:#F6F4EF; text-transform:uppercase; letter-spacing:0.5px;" onclick="AdminDash.update()"><i class="fas fa-sync-alt"></i> Atualizar</button>
+                </div>
+                <div style="padding:20px 22px;">
+                    <div id="dashUserCards" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:15px;"></div>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:20px; height:400px;">
+                <div style="flex:2; border:1px solid #e2e8f0; padding:15px; background:white; display:flex; flex-direction:column; border-radius:6px;">
+                    <h3 style="margin:0; border-bottom:1px solid #e2e8f0; padding-bottom:10px; font-size:1rem; color:#475569;">Atividade Principal</h3>
+                    <div style="flex:1; position:relative;"><canvas id="chartActivity"></canvas></div>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column;">
+                    <div style="flex:1; border:2px solid var(--ind-red); background:#fef2f2; display:flex; flex-direction:column; border-radius:6px; overflow:hidden;">
+                        <h3 style="margin:0; background:var(--ind-red); color:white; padding:12px; font-size:0.9rem; text-transform:uppercase;"><i class="fas fa-exclamation-triangle"></i> Alertas de Processo</h3>
+                        <div id="alertBoxContent" style="padding:15px; overflow-y:auto; flex:1;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORICO ADM -->
+        <div id="adm-history" class="section">
+            <h2 style="color:var(--ind-red); border-color:var(--ind-red);">Historico de Baixas</h2>
+            <p style="color:#64748b; font-size:0.9rem; margin-top:0;">Apenas admins podem estornar (desfazer) baixas.</p>
+            <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:15px; border-radius:6px;">
+                <div id="adminCheckoutHistoryList" style="max-height:500px; overflow-y:auto;"></div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD ADM (graficos de estoque) -->
+        <div id="tab-adm-stockdash" class="section" style="display:none;">
+
+            <!-- CABECALHO DO DASHBOARD -->
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+                <div>
+                    <h2 style="color:var(--tpv-dark-blue); border-color:var(--ind-yellow); margin-bottom:4px;">Dashboard de Estoque MMT</h2>
+                    <div style="font-size:0.82rem; color:#64748b; font-family:'Roboto Mono',monospace;" id="sdTimestamp">--</div>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <select id="sdPeriodSelect" class="big-input" style="width:auto; padding:8px 12px;" onchange="StockDash.update()">
+                        <option value="7">Ultimos 7 dias</option>
+                        <option value="14">Ultimos 14 dias</option>
+                        <option value="30" selected>Ultimos 30 dias</option>
+                        <option value="60">Ultimos 60 dias</option>
+                        <option value="90">Ultimos 90 dias</option>
+                    </select>
+                    <button class="btn-3d btn-blue" onclick="StockDash.update()" style="padding:9px 16px;">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                    <button class="btn-3d btn-green" onclick="StockDash.exportReport()" style="padding:9px 16px;">
+                        <i class="fas fa-file-excel"></i> Exportar Relatorio
+                    </button>
+                    <button class="btn-3d" onclick="StockDash.copyToOutlook()" style="padding:9px 16px; background:#0078d4; box-shadow:0 3px 0 #005a9e; color:white;" title="Abre o Outlook desktop com assunto e corpo pre-preenchidos. O relatorio visual e copiado para o clipboard — cole (Ctrl+V) no corpo do email.">
+                        <i class="fas fa-envelope"></i> Enviar para Outlook
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI CARDS (linha 1) -->
+            <!-- Area capturada pelo html2canvas para o email -->
+            <!-- v17.03 — Graficos do Dashboard de Estoque MMT (modulo DashMMT) -->
+            <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+                <button class="btn-3d btn-blue" style="padding:9px 14px; font-size:0.82rem;"
+                        onclick="DashMMT.exportarTodos()"
+                        title="Salva cada grafico em PNG, numerados na ordem da apresentacao">
+                    <i class="fas fa-file-image"></i> EXPORTAR TODOS OS GRAFICOS (PNG)
+                </button>
+            </div>
+            <div id="dashMmtArea"></div>
+
+            <div id="sdCaptureArea" style="background:#f1f5f9; padding:20px; border-radius:10px; margin-bottom:0;">
+            <div id="sdKpiRow" style="display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:16px;">
+                <!-- preenchidos pelo JS -->
+            </div>
+
+            <!-- Snapshot estatico do ultimo relatorio -->
+            <div id="sdSnapshotWrapper" style="display:none; background:white; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:0;">
+                <div style="font-size:0.72rem; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;"><i class="fas fa-camera"></i> Ultima Foto do Dashboard</div>
+                <img id="sdSnapshotImg" alt="Snapshot" style="max-width:100%; border-radius:6px; border:1px solid #e2e8f0;">
+            </div>
+
+            </div><!-- /sdCaptureArea -->
+
+            <!-- OCUPACAO POR CARRO -->
+            <div style="background:white; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin-bottom:24px;">
+                <div style="font-weight:900; font-size:1rem; color:var(--tpv-dark-blue); margin-bottom:4px;"><i class="fas fa-car" style="color:var(--tpv-blue);"></i> Ocupação por Carro</div>
+                <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:16px;">Porcentagem de posições preenchidas por carro. Verde = ≥80% | Amarelo = 40–79% | Vermelho = &lt;40%</div>
+                <div id="sdCarOccupationGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px;">
+                    <div style="color:#94a3b8; font-style:italic; grid-column:1/-1; text-align:center; padding:20px;">Atualize o dashboard para carregar.</div>
+                </div>
+            </div>
+            <div style="background:white; border:1px solid #e2e8f0; border-radius:10px; padding:20px; margin-bottom:24px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <div style="font-weight:900; font-size:1rem; color:var(--tpv-dark-blue);">Relatorio de Estoque Consolidado</div>
+                        <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">Codigos unicos, quantidades somadas, sem repeticao. Pronto para PCM.</div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="text" id="sdSearchCode" class="big-input" placeholder="Filtrar codigo..." style="width:200px; padding:7px 12px; font-size:0.85rem;" oninput="StockDash.filterTable()">
+                        <span id="sdTableCount" style="font-size:0.8rem; color:#64748b; font-weight:700; white-space:nowrap;"></span>
+                    </div>
+                </div>
+                <div style="max-height:360px; overflow-y:auto; border:1px solid #f1f5f9; border-radius:6px;">
+                    <table id="sdConsolidatedTable" style="margin-top:0; font-size:0.88rem;">
+                        <thead style="position:sticky; top:0; z-index:10;">
+                            <tr>
+                                <th style="width:40px; text-align:center;">#</th>
+                                <th>Codigo do Material</th>
+                                <th style="text-align:center; width:110px;">Qtd. Total</th>
+                                <th style="text-align:center; width:90px;">Posicoes</th>
+                                <th style="text-align:center; width:130px;">Ultima Movim.</th>
+                                <th style="text-align:center; width:110px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sdConsolidatedBody">
+                            <tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:30px; font-style:italic;">Atualize o dashboard para carregar o relatorio.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div><!-- /mainApp -->
+</div><!-- /app -->
+
+<!-- Modal Audit Estoque -->
+<div id="auditModal" class="audit-modal" onclick="if(event.target===this) StockAdmin.closeAuditModal()">
+    <div class="audit-box">
+        <h3 style="color:var(--ind-blue); margin-top:0;">EDITAR ESTOQUE MANUAL</h3>
+        <div class="audit-tabs">
+            <button id="btnAuditSingle" class="audit-tab-btn active" onclick="StockAdmin.setAuditMode('single')">Modo Unico</button>
+            <button id="btnAuditRange" class="audit-tab-btn" onclick="StockAdmin.setAuditMode('range')">Modo Faixa (Lote)</button>
+        </div>
+        <div id="auditSingleWrapper">
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <div style="flex:1; text-align:left;"><label>Carro:</label><select id="auditCar" class="big-input" onchange="StockAdmin.updateAuditLocs()"></select></div>
+                <div style="flex:1; text-align:left;"><label>Locacao:</label><select id="auditLoc" class="big-input" onchange="StockAdmin.checkAuditStatus()"></select></div>
+            </div>
+            <div id="auditStatusBox" class="audit-status status-empty">Selecione uma posicao...</div>
+            <div style="text-align:left; margin-bottom:20px;">
+                <label>Codigo Real:</label>
+                <input type="text" id="auditCode" class="big-input" placeholder="Codigo do material">
+                <div style="display:flex; gap:10px; margin-top:10px;"><label>Qtd:</label><input type="number" id="auditQty" class="big-input" value="1" style="width:100px;"></div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-3d btn-green" style="flex:2;" onclick="StockAdmin.saveAudit()">ATUALIZAR / PREENCHER</button>
+                <button class="btn-3d btn-red" style="flex:1;" onclick="StockAdmin.clearAudit()"><i class="fas fa-trash"></i> ESVAZIAR</button>
+            </div>
+        </div>
+        <div id="auditRangeWrapper" style="display:none; text-align:left;">
+            <div style="margin-bottom:15px;"><label style="font-weight:bold;">1. Selecione o Carro:</label><select id="auditRangeCar" class="big-input" onchange="StockAdmin.populateRangeSelects()"></select></div>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <div style="flex:1;"><label>2. Do Local:</label><select id="auditRangeStart" class="big-input"></select></div>
+                <div style="flex:1;"><label>3. Ate Local:</label><select id="auditRangeEnd" class="big-input"></select></div>
+            </div>
+            <div style="padding:15px; background:#fff1f2; border:2px solid #e11d48; margin-bottom:20px;">
+                <i class="fas fa-exclamation-triangle" style="color:#e11d48;"></i>
+                <strong>ATENCAO:</strong> Todos os materiais no intervalo serao apagados.
+            </div>
+            <button class="btn-3d btn-red" style="width:100%;" onclick="StockAdmin.executeBulkClear()"><i class="fas fa-trash-alt"></i> ESVAZIAR INTERVALO</button>
+        </div>
+        <button class="btn-3d btn-gray" style="width:100%; margin-top:15px;" onclick="StockAdmin.closeAuditModal()">Cancelar</button>
+    </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT - ARQUITETURA MODULAR
+============================================================ -->
+
+<!-- ==================================================================
+     JAVASCRIPT — a ORDEM das tags E o sistema de dependencias.
+     Nao existe import/export aqui: em file:// os ES modules sao bloqueados
+     por CORS. Sao scripts classicos, carregados na ordem abaixo.
+     O prefixo numerico do arquivo E a ordem de carga. NAO reordene.
+=================================================================== -->
+<script src="js/00-state.js"></script>
+<script src="js/01-core.js"></script>
+<script src="js/02-store.js"></script>
+<script src="js/02-db.js"></script>
+<script src="js/03-auth.js"></script>
+<script src="js/10-feeder.js"></script>
+<script src="js/11-devolucao.js"></script>
+<script src="js/12-kitting.js"></script>
+<script src="js/13-estoque.js"></script>
+<script src="js/14-historico.js"></script>
+<script src="js/15-listas.js"></script>
+<script src="js/16-boxscan.js"></script>
+<script src="js/18-familias.js"></script>
+<script src="js/20-ranking.js"></script>
+<script src="js/19-familias-ui.js"></script>
+<script src="js/22-dashmmt.js"></script>
+<script src="js/21-dashboards.js"></script>
+<script src="js/30-admin.js"></script>
+<script src="js/40-backup.js"></script>
+<script src="js/99-boot.js"></script>
+</body>
+</html>
