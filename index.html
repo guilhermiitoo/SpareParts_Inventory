@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.16</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.17</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -13556,15 +13556,38 @@ const Consumo = {
         return { linhas, tot };
     },
 
+    // Dias que TEM estoque salvo (pasta estoque_diario + formato antigo) entre de e ate
+    async diasComEstoque(de, ate, cache) {
+        cache = cache || {};
+        const out = [];
+        for (let d = de; d <= ate; d = Consumo._maisDias(d, 1)) if (await Consumo._fotoDe(d, cache)) out.push(d);
+        return out;
+    },
+
+    // v17.17: o Est. Inicial SO vem de um estoque salvo DENTRO do periodo.
+    //   - existe no 1o dia -> usa ele
+    //   - nao existe -> o periodo passa a comecar no 1o dia que tem estoque salvo
+    //   - nenhum dia do periodo tem estoque salvo -> nao calcula (semBase)
+    // Est. Final: se o periodo vai ate hoje, e o ESTOQUE ATUAL do sistema;
+    // se e um periodo passado, e o estoque salvo do dia seguinte ao fim.
     async calcular(de, ate) {
         const sap = Consumo._sap || await Consumo._carregarSap();
         const cache = {};
-        const a = await Consumo.saldoNoInicio(de, cache);
+        const hoje = Consumo._hoje();
+        let ini = de, fIni = null;
+        for (; ini <= ate && ini <= hoje; ini = Consumo._maisDias(ini, 1)) { fIni = await Consumo._fotoDe(ini, cache); if (fIni) break; }
+        if (!fIni) {
+            const r = Consumo.montar({}, {}, {}, {}, {}, {}, new Set());
+            r.semBase = true; r.de = de; r.ate = ate;
+            return r;
+        }
         const b = await Consumo.saldoNoInicio(Consumo._maisDias(ate, 1), cache);
-        const r = Consumo.montar(a.s, b.s,
-            Consumo._somaSap(sap.s315, de, ate), Consumo._somaSap(sap.s261, de, ate),
+        const r = Consumo.montar(fIni, b.s,
+            Consumo._somaSap(sap.s315, ini, ate), Consumo._somaSap(sap.s261, ini, ate),
             sap.precos, Consumo._desc(), Consumo._codigosArmario());
-        r.fonteIni = a.fonte; r.fonteFim = b.fonte; r.exato = a.exato && b.exato;
+        r.de = ini; r.ate = ate; r.ajustado = ini !== de;
+        r.fonteIni = 'estoque salvo de ' + Consumo._br(ini);
+        r.fonteFim = b.fonte; r.exato = b.exato;
         return r;
     },
 
@@ -13920,6 +13943,7 @@ const Consumo = {
         corpo.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Calculando...</div>';
         try {
             const r = await Consumo.calcular(p.de, p.ate);
+            Consumo._diasSalvos = await Consumo.diasComEstoque(p.de, p.ate > Consumo._hoje() ? Consumo._hoje() : p.ate);
             Consumo._periodo = p; Consumo._linhas = r.linhas; Consumo._tot = r.tot; Consumo._res = r;
             Consumo._corpo();
         } catch (e) {
@@ -13950,10 +13974,25 @@ const Consumo = {
         const r = Consumo._res, p = Consumo._periodo, S = Security.sanitize;
         const corpo = document.getElementById('csCorpo'); if (!r || !corpo) return;
         const cols = Consumo._colsVisiveis();
+        const dias = (Consumo._diasSalvos || []).map(d => Consumo._br(d).slice(0, 5));
+        const listaDias = `<div style="font-size:0.75rem; color:#475569; margin-top:4px;">Dias com estoque salvo neste periodo (pasta dados/estoque_diario): <b>${dias.length ? dias.join(', ') : 'nenhum'}</b></div>`;
+        if (r.semBase) {
+            corpo.innerHTML = `
+            <div style="background:#fef2f2; border:1px solid #fecaca; border-left:5px solid var(--ind-red); border-radius:6px; padding:16px 18px; color:#7f1d1d;">
+                <div style="font-weight:900; text-transform:uppercase; letter-spacing:0.5px;">Sem estoque inicial salvo para este periodo</div>
+                <div style="font-size:0.85rem; margin-top:6px; line-height:1.5;">Nao existe nenhum estoque salvo entre <b>${Consumo._br(p.de)}</b> e <b>${Consumo._br(p.ate)}</b>
+                na pasta <code>dados/estoque_diario</code>. Sem o estoque inicial nao da para calcular o consumo.<br>
+                O sistema salva o estoque todo dia no primeiro acesso; escolha um periodo a partir de um dia que ja tenha estoque salvo.</div>
+                ${listaDias}
+            </div>`;
+            return;
+        }
         corpo.innerHTML = `
-        <div style="font-size:0.78rem; color:#334155; margin-bottom:10px;">
-            Periodo: <b>${Consumo._br(p.de)} a ${Consumo._br(p.ate)}</b> · Est. Inicio: ${S(r.fonteIni)} · <b>Est. Final: ${S(r.fonteFim)}</b>
-            ${r.exato ? '' : ' · <b style="color:#b45309;">saldo aproximado: faltou foto em algum dia do periodo</b>'}
+        <div style="font-size:0.8rem; color:#334155; margin-bottom:10px; line-height:1.6;">
+            Periodo calculado: <b>${Consumo._br(r.de)} a ${Consumo._br(r.ate)}</b><br>
+            <b>Est. Inicial:</b> ${S(r.fonteIni)}${r.ajustado ? ` <span style="color:#b45309; font-weight:700;">(nao ha estoque salvo de ${Consumo._br(p.de)}: o calculo comeca em ${Consumo._br(r.de)})</span>` : ''}
+            · <b>Est. Final:</b> ${S(r.fonteFim)}${r.exato ? '' : ' <span style="color:#b45309; font-weight:700;">(aproximado)</span>'}
+            ${listaDias}
         </div>
         ${Consumo._cards(r.tot)}
         <div id="csCount" class="oa-lbl" style="margin-bottom:6px;"></div>
@@ -14163,6 +14202,11 @@ const Consumo = {
             a = Consumo._maisDias(b, 1);
         }
         const [mes, ...porSemana] = await Promise.all([Consumo.calcular(p.de, p.ate)].concat(semanas.map(s => Consumo.calcular(s.de, s.ate))));
+        if (mes.semBase) {
+            document.getElementById('csDash').innerHTML = `<div style="background:#fef2f2; border:1px solid #fecaca; border-left:5px solid var(--ind-red); border-radius:6px; padding:16px 18px; color:#7f1d1d; font-weight:700;">
+                Sem estoque inicial salvo entre ${Consumo._br(p.de)} e ${Consumo._br(p.ate)} (pasta dados/estoque_diario). Escolha um mes que tenha estoque salvo.</div>`;
+            return;
+        }
         const t = mes.tot, Q = Consumo._fmtQ;
         const validas = mes.linhas.filter(r => r.status !== 'USO NEGATIVO' && r.uso > 0);
         const top5 = validas.slice().sort((x, y) => y.uso - x.uso).slice(0, 5);
@@ -14182,12 +14226,14 @@ const Consumo = {
         const eixoN = { beginAtZero: true, ticks: { callback: v => fmtN(v) } };
 
         // Tendencia: linha do consumo semanal + reta de tendencia (minimos quadrados)
-        const ys = porSemana.map(r => Math.round(r.tot.uso));
-        const n = ys.length, xm = (n - 1) / 2, ym = ys.reduce((a2, v) => a2 + v, 0) / (n || 1);
+        const ys = porSemana.map(r => r.semBase ? null : Math.round(r.tot.uso));   // semana sem estoque salvo = sem ponto
+        // reta de tendencia so com as semanas que tem dado
+        const pts = ys.map((v, i) => [i, v]).filter(x => x[1] != null);
+        const n = pts.length, xm = pts.reduce((a2, x) => a2 + x[0], 0) / (n || 1), ym = pts.reduce((a2, x) => a2 + x[1], 0) / (n || 1);
         let num = 0, den = 0;
-        ys.forEach((v, i) => { num += (i - xm) * (v - ym); den += (i - xm) * (i - xm); });
+        pts.forEach(([i, v]) => { num += (i - xm) * (v - ym); den += (i - xm) * (i - xm); });
         const incl = den ? num / den : 0;
-        const tend = ys.map((_, i) => Math.round(ym + incl * (i - xm)));
+        const tend = ys.map((v, i) => v == null ? null : Math.round(ym + incl * (i - xm)));
         Consumo._novoGrafico('csChSemana', {
             type: 'line',
             data: { labels: semanas.map(s2 => s2.rot), datasets: [
