@@ -55,6 +55,8 @@ const Consumo = {
     _fmtQ(n) { return Math.round(n || 0).toLocaleString('pt-BR'); },
     _fmtP(f) { return f == null ? '-' : (f * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%'; },
     _fmtR(n) { return n == null ? '-' : n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); },
+    // preco de UMA peca: centavos nao bastam (ex.: R$ 0,00505)
+    _fmtPU(n) { return n == null ? '-' : 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 5 }); },
 
     // Data do Excel: numero serial, objeto Date ou texto dd/mm/aaaa (ou aaaa-mm-dd)
     _data(v) {
@@ -256,7 +258,7 @@ const Consumo = {
     },
 
     // Colunas do relatorio do SAP (procuradas pelo NOME do cabecalho).
-    // O 261 traz tambem o preco unitario na coluna "Montante em MI".
+    // O 261 traz tambem o "Montante em MI" = valor TOTAL da linha (vira preco por peca na importacao).
     COLUNAS_SAP: {
         s261: { code: 'material', qtd: 'quantidade', data: 'data do documento', preco: 'montante em mi' },
         s315: { code: 'material', qtd: 'quantidade', data: 'data do documento' },
@@ -290,7 +292,10 @@ const Consumo = {
                 return;
             }
             const { idx } = mapa, saldo = Consumo.saldoAtual();
-            const novos = [], precoDe = {};   // codigo -> { d, p } (preco da data mais recente)
+            // "Montante em MI" e o VALOR TOTAL da linha (qtd x preco). O preco de uma
+            // peca = soma dos montantes / soma das quantidades do componente no arquivo
+            // (media ponderada: lote grande pesa mais que lote pequeno).
+            const novos = [], somaPreco = {};   // codigo -> { m: montante, q: quantidade }
             let ignoradas = 0;
             rows.slice(mapa.linha + 1).forEach(r => {
                 if (!r || r.every(v => v === '' || v == null)) return;
@@ -301,10 +306,15 @@ const Consumo = {
                 // O SAP lanca o 261 (saida) com sinal negativo: o que importa e a quantidade.
                 novos.push([c, Math.abs(q), d]);
                 if (idx.preco !== undefined) {
-                    const pr = Math.abs(Consumo._num(r[idx.preco]));
-                    if (isFinite(pr) && pr > 0 && (!precoDe[c] || d >= precoDe[c].d)) precoDe[c] = { d, p: pr };
+                    const m = Math.abs(Consumo._num(r[idx.preco]));
+                    if (isFinite(m) && m > 0 && q !== 0) {
+                        const a = somaPreco[c] || (somaPreco[c] = { m: 0, q: 0 });
+                        a.m += m; a.q += Math.abs(q);
+                    }
                 }
             });
+            const precoDe = {};
+            Object.keys(somaPreco).forEach(c => { precoDe[c] = { p: somaPreco[c].m / somaPreco[c].q, m: somaPreco[c].m, q: somaPreco[c].q }; });
             if (!novos.length) { Toast.error('Nenhuma linha valida no arquivo.'); return; }
 
             const datas = novos.map(r => r[2]).sort();
@@ -318,8 +328,8 @@ const Consumo = {
                 `${ignoradas ? ` · ${ignoradas} linha(s) ignorada(s)` : ''}\n` +
                 `Periodo coberto: ${Consumo._br(de)} a ${Consumo._br(ate)}\n` +
                 `${fora} componente(s) nao encontrados no estoque.\n` +
-                (tipo === 's261' ? `${nPreco} componente(s) com preco unitario (coluna "Montante em MI")` +
-                    (ex ? ` — ex.: ${ex} = ${Consumo._fmtR(precoDe[ex].p)}` : '') + '\n' : '') +
+                (tipo === 's261' ? `${nPreco} componente(s) com preco por peca (Montante em MI ÷ Quantidade)` +
+                    (ex ? `\n   ex.: ${ex} — ${Consumo._fmtR(precoDe[ex].m)} ÷ ${Consumo._fmtQ(precoDe[ex].q)} pecas = ${Consumo._fmtPU(precoDe[ex].p)} por peca` : '') + '\n' : '') +
                 `\nOs registros de ${nome} entre essas datas serao SUBSTITUIDOS por este arquivo (sem duplicar).`, 'Importar');
             if (!ok) return;
 
@@ -390,13 +400,13 @@ const Consumo = {
         };
         box.innerHTML = `
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;">
-            ${card('s261', 'Apontamento (SAP 261)', 'var(--tpv-blue)', 'Material · Quantidade · Data do documento · Montante em MI (preco unit.)')}
+            ${card('s261', 'Apontamento (SAP 261)', 'var(--tpv-blue)', 'Material · Quantidade · Data do documento · Montante em MI (valor total)')}
             ${card('s315', 'Entradas (SAP 315)', 'var(--ind-green)', 'Material · Quantidade · Data do documento')}
         </div>
         <div style="font-size:0.75rem; color:#475569; margin-top:14px; line-height:1.6;">
             Pode importar varias vezes no mes: os registros do mesmo tipo dentro das datas do arquivo sao substituidos, nunca duplicados.
             Use o Excel exportado do SAP como ele vem: as colunas sao achadas pelo nome do cabecalho, em qualquer ordem, e as demais colunas sao ignoradas.
-            Quantidade e preco negativos (saida no SAP) sao lidos como positivos. O preco unitario de cada componente vem do 261 (o da data mais recente).
+            Quantidade e preco negativos (saida no SAP) sao lidos como positivos. O preco de uma peca vem do 261: soma do "Montante em MI" ÷ soma da Quantidade do componente.
             O codigo do componente e normalizado como no resto do sistema (maiusculas, sem espacos, 18 caracteres).
         </div>`;
     },
@@ -610,7 +620,7 @@ const Consumo = {
             case 'desc':   return `<td>${S(r.desc || '-')}</td>`;
             case 'uso':    return `<td style="${dir} font-weight:900;">${Q(r.uso)}</td>`;
             case 'pct':    return `<td style="${dir} font-weight:900;">${Consumo._fmtP(r.pct)}</td>`;
-            case 'preco':  return `<td style="${dir}">${Consumo._fmtR(r.preco)}</td>`;
+            case 'preco':  return `<td style="${dir}">${Consumo._fmtPU(r.preco)}</td>`;
             case 'valor':  return `<td style="${dir}">${Consumo._fmtR(r.valor)}</td>`;
             case 'status': return `<td><span class="oa-tag" style="background:${Consumo.COR_STATUS[r.status]};">${r.status}</span></td>`;
             default:       return `<td style="${dir}">${Q(r[k])}</td>`;
@@ -679,10 +689,10 @@ const Consumo = {
                 [`Periodo: de ${Consumo._br(p.de)} a ${Consumo._br(p.ate)}`],
                 [`Exportado em ${new Date().toLocaleString('pt-BR')} · Equipe MMT`], []];
     },
-    _formatar(ws, linIni, linFim, colsQtd, colsPct, colsR) {
+    _formatar(ws, linIni, linFim, colsQtd, colsPct, colsR, colsPU) {
         for (let r = linIni; r <= linFim; r++) {
             const f = (cs, z) => cs.forEach(c => { const a = XLSX.utils.encode_cell({ r, c }); if (ws[a] && typeof ws[a].v === 'number') ws[a].z = z; });
-            f(colsQtd, '#,##0'); f(colsPct, '0.00%'); f(colsR, '"R$" #,##0.00');
+            f(colsQtd, '#,##0'); f(colsPct, '0.00%'); f(colsR, '"R$" #,##0.00'); f(colsPU || [], '"R$" #,##0.00000');
         }
     },
 
@@ -708,7 +718,7 @@ const Consumo = {
             ['uso',    'Uso',                   r => Math.round(r.uso),  Math.round(t.uso), 'q'],
             ['apo',    'Apontamento (SAP 261)', r => Math.round(r.apo),  Math.round(t.apo), 'q'],
             ['pct',    '% Uso',                 r => r.pct,              t.pct,   'p'],
-            ['preco',  'Preco unit.',           r => r.preco,            null,    'r'],
+            ['preco',  'Preco unit.',           r => r.preco,            null,    'pu'],
             ['valor',  'Valor do uso (R$)',     r => r.valor,            t.valor, 'r'],
             ['status', 'Status',                r => r.status,           '% geral = soma do Uso / soma do Apontamento (itens validos)'],
         ].filter(c => sel[c[0]] !== false);
@@ -718,7 +728,7 @@ const Consumo = {
         aoa.push(cols.map(c => c[3]));
         const ws = XLSX.utils.aoa_to_sheet(aoa);
         const idx = f => cols.map((c, i) => c[4] === f ? i : -1).filter(i => i >= 0);
-        Consumo._formatar(ws, 5, aoa.length - 1, idx('q'), idx('p'), idx('r'));
+        Consumo._formatar(ws, 5, aoa.length - 1, idx('q'), idx('p'), idx('r'), idx('pu'));
         ws['!cols'] = cols.map(c => ({ wch: c[0] === 'desc' ? 36 : c[0] === 'code' || c[0] === 'status' ? 20 : 14 }));
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, Consumo._sub === 'semanal' ? 'Semanal' : 'Mensal');
