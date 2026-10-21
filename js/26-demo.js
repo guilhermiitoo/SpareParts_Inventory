@@ -10,6 +10,8 @@
 // que tem a mesma API de uma pasta real. Assim a demonstracao passa pelo
 // MESMO codigo de gravacao/leitura do sistema verdadeiro, sem simulacao.
 //
+// - Sem faixa nem campos preenchidos: a tela fica igual a do sistema real,
+//   so pula a escolha da pasta. Login: ADMIN / admin123 (ou OP01 / 1234).
 // - Cada navegador tem a sua propria copia: nada vai para a rede da empresa.
 // - Dados 100% ficticios, criados na primeira abertura.
 // - A pasta demo nunca e "lembrada" como pasta oficial deste PC.
@@ -35,11 +37,8 @@ const Demo = {
             Demo.ativo = true;
             await DB._finishInitialConnect({ criar: true, aceitarOutra: true, demo: true });
             if (nova) await Demo._semear();
-            Demo._faixa();
-            const m = document.getElementById('userMatricula'), s = document.getElementById('userPass');
-            if (m) m.value = 'ADMIN';
-            if (s) s.value = 'admin123';
-            Toast.success('Modo demonstracao: dados ficticios. Entre com ADMIN / admin123 (ou OP01 / 1234 para operador).', 9000);
+            const m = document.getElementById('userMatricula');
+            if (m) m.focus();
         } catch (e) {
             console.error('[Demo]', e);
             Toast.error('Nao foi possivel abrir a demonstracao: ' + e.message, 8000);
@@ -53,17 +52,6 @@ const Demo = {
         const root = await navigator.storage.getDirectory();
         try { await root.removeEntry(Demo.PASTA, { recursive: true }); } catch (e) {}
         location.reload();
-    },
-
-    _faixa() {
-        if (document.getElementById('demoFaixa')) return;
-        const f = document.createElement('div');
-        f.id = 'demoFaixa'; f.className = 'no-print';
-        f.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99990;background:var(--ind-yellow);color:#000;' +
-            'font-weight:800;font-size:.8rem;padding:6px 14px;display:flex;justify-content:center;align-items:center;gap:14px;letter-spacing:.3px;';
-        f.innerHTML = '<span><i class="fas fa-flask"></i> MODO DEMONSTRACAO — dados ficticios, salvos so neste navegador</span>' +
-            '<button class="btn-3d btn-gray" style="padding:3px 10px;font-size:.7rem;" onclick="Demo.recomecar()">Recomecar</button>';
-        document.body.appendChild(f);
     },
 
     // ------------------------------------------------------------------

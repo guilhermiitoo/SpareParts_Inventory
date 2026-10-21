@@ -47,7 +47,7 @@ def main():
         print('  css  %-26s %7d bytes' % (rel, os.path.getsize(caminho)))
         return '<style>\n/* ===== %s ===== */\n%s\n</style>' % (rel, ler(caminho))
 
-    html, n_css = re.subn(r'[ \t]*<link rel="stylesheet" href="(css/[^"]+)">', troca_css, html)
+    html, n_css = re.subn(r'[ \t]*<link rel="stylesheet" href="(css/[^"?]+)(?:\?[^"]*)?">', troca_css, html)
 
     # --- JS: cada <script src="js/..."> vira um <script> com o conteudo ---
     def troca_js(m):
@@ -65,7 +65,7 @@ def main():
         print('  js   %-26s %7d bytes' % (rel, os.path.getsize(caminho)))
         return '<script>\n// ===== %s =====\n%s\n</script>' % (rel, codigo)
 
-    html, n_js = re.subn(r'[ \t]*<script src="(js/[^"]+)"></script>', troca_js, html)
+    html, n_js = re.subn(r'[ \t]*<script src="(js/[^"?]+)(?:\?[^"]*)?"></script>', troca_js, html)
 
     if n_css == 0 or n_js == 0:
         print('ERRO: nenhum arquivo local foi embutido — o HTML mudou de formato?')
