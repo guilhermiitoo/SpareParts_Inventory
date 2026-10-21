@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.15</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.16</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -13503,7 +13503,7 @@ const Consumo = {
 
     // Saldo no INICIO do dia `iso`. Retorna { s, fonte, exato }.
     async saldoNoInicio(iso, cache) {
-        if (iso > Consumo._hoje()) return { s: Consumo.saldoAtual(), fonte: 'saldo atual', exato: true };
+        if (iso > Consumo._hoje()) return { s: Consumo.saldoAtual(), fonte: 'ESTOQUE ATUAL do sistema (agora)', exato: true };
         const f = await Consumo._fotoDe(iso, cache);
         if (f) return { s: f, fonte: 'estoque de ' + Consumo._br(iso), exato: true };
         // sem foto naquele dia (ninguem abriu o sistema): a proxima foto disponivel
@@ -13592,8 +13592,7 @@ const Consumo = {
         const de = ym + '-01';
         const d = new Date(+ym.slice(0, 4), +ym.slice(5, 7), 0);
         let ate = Consumo._iso(d);
-        const ult = Consumo._ultimaDataSap();
-        if (ult && ult >= de && ult < ate) ate = ult;
+        // v17.16: o mes atual vai ate HOJE, para o Est. Final ser o estoque atual do sistema
         if (ate > Consumo._hoje()) ate = Consumo._hoje();
         return { de, ate, rotulo: 'Mensal ' + ym.slice(5) + '/' + ym.slice(0, 4), arquivo: 'Consumo_SpareParts_Mensal_' + ym + '.xlsx', ym };
     },
@@ -13940,7 +13939,7 @@ const Consumo = {
         return `
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:14px;">
             ${Consumo._kpi('Est. Inicial', Q(t.ini), '#475569')}
-            ${Consumo._kpi('Est. Final', Q(t.fim), 'var(--tpv-dark-blue)')}
+            ${Consumo._kpi('Est. Final (atual)', Q(t.fim), 'var(--tpv-dark-blue)')}
             ${Consumo._kpi('Consumo (pecas)', Q(t.uso), 'var(--tpv-blue)')}
             ${Consumo._kpi('Valor do uso', Consumo._fmtR(t.valor), 'var(--ind-green)')}
             ${Consumo._kpi('% Uso geral', Consumo._fmtP(t.pct), '#C08A1E')}
@@ -13953,7 +13952,7 @@ const Consumo = {
         const cols = Consumo._colsVisiveis();
         corpo.innerHTML = `
         <div style="font-size:0.78rem; color:#334155; margin-bottom:10px;">
-            Periodo: <b>${Consumo._br(p.de)} a ${Consumo._br(p.ate)}</b> · Est. Inicio: ${S(r.fonteIni)} · Est. Final: ${S(r.fonteFim)}
+            Periodo: <b>${Consumo._br(p.de)} a ${Consumo._br(p.ate)}</b> · Est. Inicio: ${S(r.fonteIni)} · <b>Est. Final: ${S(r.fonteFim)}</b>
             ${r.exato ? '' : ' · <b style="color:#b45309;">saldo aproximado: faltou foto em algum dia do periodo</b>'}
         </div>
         ${Consumo._cards(r.tot)}
@@ -13965,7 +13964,7 @@ const Consumo = {
         Consumo._tabela();
     },
 
-    COLS: [['code', 'Componente'], ['desc', 'Descricao'], ['ini', 'Est. Inicio', 1], ['ent', 'Entradas (SAP 315)', 1], ['fim', 'Est. Final', 1],
+    COLS: [['code', 'Componente'], ['desc', 'Descricao'], ['ini', 'Est. Inicio', 1], ['ent', 'Entradas (SAP 315)', 1], ['fim', 'Est. Final (atual)', 1],
            ['uso', 'Uso', 1], ['apo', 'Apontamento (SAP 261)', 1], ['pct', '% Uso', 1], ['preco', 'Preco unit.', 1], ['valor', 'Valor do uso (R$)', 1], ['status', 'Status']],
     COR_STATUS: { 'OK': '#4A6B3A', 'USO NEGATIVO': '#B42318', 'SEM APONTAMENTO': '#C08A1E', 'SEM PRECO': '#64748b' },
     _colsVisiveis() { const sel = Consumo._colsExcel(); return Consumo.COLS.filter(c => sel[c[0]] !== false); },
@@ -14060,7 +14059,7 @@ const Consumo = {
         const compra = Object.keys(apo).filter(c => apo[c] > 0 && !(saldo[c] > 0) && !fora.has(c)).sort((a, b) => apo[b] - apo[a])
             .map(c => [c, desc[c] || '-', q(apo[c]), q(saldo[c] || 0), Consumo._br(ultEnt[c])]);
         const linha = x => [x.code, x.desc || '-', q(x.ini), q(x.ent), q(x.fim), q(x.uso), q(x.apo)];
-        const cab = ['Componente', 'Descricao', 'Est. Inicio', 'Entradas (SAP 315)', 'Est. Final', 'Uso', 'Apontamento (SAP 261)'];
+        const cab = ['Componente', 'Descricao', 'Est. Inicio', 'Entradas (SAP 315)', 'Est. Final (atual)', 'Uso', 'Apontamento (SAP 261)'];
         return {
             compra:   { cab: ['Componente', 'Descricao', 'Apontado no periodo', 'Saldo atual', 'Ultima entrada (SAP 315)'], rows: compra },
             negativo: { cab, rows: r.linhas.filter(x => x.status === 'USO NEGATIVO').sort((a, b) => a.uso - b.uso).map(linha) },
@@ -14099,7 +14098,7 @@ const Consumo = {
             ['desc',   'Descricao',             r => r.desc || '',       ''],
             ['ini',    'Est. Inicio',           r => Math.round(r.ini),  Math.round(t.ini), 'q'],
             ['ent',    'Entradas (SAP 315)',    r => Math.round(r.ent),  Math.round(t.ent), 'q'],
-            ['fim',    'Est. Final',            r => Math.round(r.fim),  Math.round(t.fim), 'q'],
+            ['fim',    'Est. Final (atual)',    r => Math.round(r.fim),  Math.round(t.fim), 'q'],
             ['uso',    'Uso',                   r => Math.round(r.uso),  Math.round(t.uso), 'q'],
             ['apo',    'Apontamento (SAP 261)', r => Math.round(r.apo),  Math.round(t.apo), 'q'],
             ['pct',    '% Uso',                 r => r.pct,              t.pct,   'p'],
