@@ -405,6 +405,9 @@ const UI = {
         if (tab === 'confirmacao') {
             setTimeout(function() { if (typeof ListConfirm !== 'undefined') ListConfirm.render(); }, 80);
         }
+        if (tab === 'consumo') {   // v17.07: so calcula quando a aba e aberta
+            setTimeout(function() { if (typeof Consumo !== 'undefined') Consumo.render(); }, 80);
+        }
         if (tab === 'etiquetas') {
             setTimeout(function() { if (typeof Etiquetas !== 'undefined') Etiquetas.render(); }, 80);
         }
@@ -459,6 +462,7 @@ const UI = {
             { tab: 'users',         icon: 'fa-users-cog',       label: 'Sistema',        admin: true  },
             { tab: 'adm-stockdash', icon: 'fa-chart-bar',       label: 'Dashboard',      admin: true  },
             { tab: 'dashboard_adm', icon: 'fa-exclamation-triangle', label: 'ALERTA', admin: true  },
+            { tab: 'consumo',       icon: 'fa-scale-balanced',  label: 'Consumo',        admin: true  },
         ];
         nav.innerHTML = '';
         const visible = tabs.filter(function(t) { return Perms.can('tab:' + t.tab); });

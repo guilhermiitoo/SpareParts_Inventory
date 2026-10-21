@@ -936,6 +936,8 @@ const DB = {
         Store.lembrarPasta(State.dbDirHandle);   // memoriza para a proxima vez
         DB._reconnBtnLoginUI(false);
         try { AutoBackup.reconectar(); } catch (_) {}
+        // v17.07: foto diaria do saldo por componente (base da aba Consumo)
+        try { Consumo.fotoDoDia().catch(e => console.warn('[Consumo] foto:', e.message)); } catch (_) {}
         UI.unlockLoginStep();
     },
 

@@ -20,7 +20,7 @@ diferente entre os dois — e so uma outra embalagem do mesmo sistema.
 import os, re, sys, io, datetime
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-ENTRADA = os.path.join(AQUI, 'SPARE_PARTS.html')
+ENTRADA = os.path.join(AQUI, 'index.html')
 SAIDA_DIR = os.path.join(AQUI, 'dist')
 SAIDA = os.path.join(SAIDA_DIR, 'SPARE_PARTS_UNICO.html')
 

@@ -202,6 +202,7 @@ const Perms = {
             { key: 'tab:stock_manage',  label: 'Estoque',               desc: 'Gestao de estoque (mapa dos carros)' },
             { key: 'tab:users',         label: 'Sistema',               desc: 'Usuarios, backups e manutencao' },
             { key: 'tab:adm-stockdash', label: 'Dashboard',             desc: 'Graficos de estoque' },
+            { key: 'tab:consumo',      label: 'Consumo',               desc: 'Relatorio de consumo x SAP (Controladoria)' },
             { key: 'tab:dashboard_adm', label: 'ALERTA',   desc: 'Codigos sem movimentacao (obsoletos)' },
         ]},
         { group: 'Aba Estoque — coluna "Acoes"', icon: 'fa-pen-to-square', items: [
