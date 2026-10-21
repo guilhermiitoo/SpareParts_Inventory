@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.14</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.15</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -13436,42 +13436,83 @@ const Consumo = {
     },
 
     // ------------------------------------------------------- foto diaria
-    // Chamada ao conectar e a cada 30 min. Le um arquivo pequeno uma vez por
-    // dia por PC; so grava se ninguem gravou a foto de hoje ainda.
+    // v17.15: UM ARQUIVO POR DIA em dados/estoque_diario/, gravado no PRIMEIRO
+    // acesso do dia (de qualquer PC). Ex.: "Estoque 21.10.2026 - 09h12 (primeiro acesso).json".
+    // O sistema sabe que o dia ja foi salvo quando acha na pasta um arquivo
+    // que comeca com "Estoque <data de hoje>". Conteudo: saldo de cada
+    // componente (todos os rolos somados, sem armarios IA/PTH).
+    PASTA_DIARIA: 'estoque_diario',
+    async _pastaDiaria() { return Store._dados.getDirectoryHandle(Consumo.PASTA_DIARIA, { create: true }); },
+    _nomeDia(iso) { const [a, m, d] = iso.split('-'); return `Estoque ${d}.${m}.${a}`; },
+
+    // { 'AAAA-MM-DD': 'nome do arquivo' } de tudo que existe na pasta
+    async _indiceDiario(cache) {
+        if (cache && cache._idx) return cache._idx;
+        const idx = {};
+        const dir = await Consumo._pastaDiaria();
+        for await (const [nome, h] of dir.entries()) {
+            const m = h.kind === 'file' && nome.match(/^Estoque (\d{2})\.(\d{2})\.(\d{4})\b.*\.json$/i);
+            if (m) idx[`${m[3]}-${m[2]}-${m[1]}`] = nome;
+        }
+        if (cache) cache._idx = idx;
+        return idx;
+    },
+
     async fotoDoDia() {
         if (!Consumo._timer) Consumo._timer = setInterval(() => { Consumo.fotoDoDia().catch(() => {}); }, 30 * 60 * 1000);
         if (!State.isConnected || typeof Store === 'undefined' || !Store._dados) return;
         const hoje = Consumo._hoje();
         if (Consumo._fotoFeitaEm === hoje) return;
-        const dir = await Consumo._pastaFotos();
-        const nome = hoje.slice(0, 7) + '.json';
-        const mes = (await Consumo._lerJson(dir, nome)) || { dias: {} };
-        if (!mes.dias[hoje]) {
-            mes.dias[hoje] = { t: Date.now(), pc: Store.pcId(), s: Consumo.saldoAtual() };
-            await Store._gravarTexto(dir, nome, JSON.stringify(mes));
+        const idx = await Consumo._indiceDiario();
+        if (!idx[hoje]) {
+            const agora = new Date();
+            const hh = String(agora.getHours()).padStart(2, '0') + 'h' + String(agora.getMinutes()).padStart(2, '0');
+            const nome = `${Consumo._nomeDia(hoje)} - ${hh} (primeiro acesso).json`;
+            const s = Consumo.saldoAtual();
+            await Store._gravarTexto(await Consumo._pastaDiaria(), nome, JSON.stringify({
+                data: hoje, hora: hh.replace('h', ':'), pc: Store.pcId(),
+                usuario: State.currentUser ? State.currentUser.nome : '(antes do login)',
+                componentes: Object.keys(s).length, pecas: Object.values(s).reduce((x, y) => x + y, 0),
+                s,
+            }, null, 1), false);
         }
         Consumo._fotoFeitaEm = hoje;
     },
 
-    async _fotosDoMes(ym, cache) {
-        if (cache[ym] !== undefined) return cache[ym];
-        const d = await Consumo._lerJson(await Consumo._pastaFotos(), ym + '.json');
-        cache[ym] = (d && d.dias) || {};
-        return cache[ym];
+    // Foto do dia `iso` (ou null). Le o arquivo diario; para dias antigos,
+    // ainda aceita o formato anterior (dados/consumo/fotos/AAAA-MM.json).
+    async _fotoDe(iso, cache) {
+        if (cache[iso] !== undefined) return cache[iso];
+        let foto = null;
+        const idx = await Consumo._indiceDiario(cache);
+        if (idx[iso]) {
+            const d = await Consumo._lerJson(await Consumo._pastaDiaria(), idx[iso]);
+            if (d && d.s) foto = d.s;
+        }
+        if (!foto) {
+            const ym = iso.slice(0, 7);
+            if (cache['m' + ym] === undefined) {
+                const d = await Consumo._lerJson(await Consumo._pastaFotos(), ym + '.json');
+                cache['m' + ym] = (d && d.dias) || {};
+            }
+            if (cache['m' + ym][iso]) foto = cache['m' + ym][iso].s;
+        }
+        cache[iso] = foto;
+        return foto;
     },
 
     // Saldo no INICIO do dia `iso`. Retorna { s, fonte, exato }.
     async saldoNoInicio(iso, cache) {
         if (iso > Consumo._hoje()) return { s: Consumo.saldoAtual(), fonte: 'saldo atual', exato: true };
-        const dias = await Consumo._fotosDoMes(iso.slice(0, 7), cache);
-        if (dias[iso]) return { s: dias[iso].s, fonte: 'foto de ' + Consumo._br(iso), exato: true };
+        const f = await Consumo._fotoDe(iso, cache);
+        if (f) return { s: f, fonte: 'estoque de ' + Consumo._br(iso), exato: true };
         // sem foto naquele dia (ninguem abriu o sistema): a proxima foto disponivel
         let d = iso;
-        for (let i = 0; i < 62 && d <= Consumo._hoje(); i++) {
+        for (let i = 0; i < 62; i++) {
             d = Consumo._maisDias(d, 1);
             if (d > Consumo._hoje()) break;
-            const m = await Consumo._fotosDoMes(d.slice(0, 7), cache);
-            if (m[d]) return { s: m[d].s, fonte: 'foto de ' + Consumo._br(d) + ' (aproximado)', exato: false };
+            const f2 = await Consumo._fotoDe(d, cache);
+            if (f2) return { s: f2, fonte: 'estoque de ' + Consumo._br(d) + ' (aproximado)', exato: false };
         }
         return { s: Consumo.saldoAtual(), fonte: 'saldo atual (sem foto no periodo)', exato: false };
     },
@@ -13536,6 +13577,17 @@ const Consumo = {
     },
 
     // Mes 'AAAA-MM' -> periodo, cortado na data mais recente importada
+    // v17.15: na janela Mensal, um periodo livre (inicio e fim) vale no lugar do mes.
+    _mDe: '', _mAte: '',
+    _periodoMensal() {
+        if (Consumo._mDe && Consumo._mAte && Consumo._mDe <= Consumo._mAte) {
+            const ate = Consumo._mAte > Consumo._hoje() ? Consumo._hoje() : Consumo._mAte;
+            return { de: Consumo._mDe, ate, rotulo: 'Periodo', ym: Consumo._mDe.slice(0, 7),
+                     arquivo: `Consumo_SpareParts_Periodo_${Consumo._mDe}_a_${ate}.xlsx` };
+        }
+        return Consumo._periodoMes(Consumo._ym);
+    },
+
     _periodoMes(ym) {
         const de = ym + '-01';
         const d = new Date(+ym.slice(0, 4), +ym.slice(5, 7), 0);
@@ -13836,7 +13888,13 @@ const Consumo = {
         const mensal = Consumo._sub === 'mensal';
         if (mensal && !Consumo._ym) Consumo._ym = Consumo._hoje().slice(0, 7);
         const filtro = mensal
-            ? `<div><div class="oa-lbl">Mes</div><input type="month" class="big-input" style="padding:8px 10px; margin:0; width:auto;" value="${Consumo._ym}" onchange="Consumo._ym=this.value; Consumo._recalcular()"></div>`
+            ? `<div><div class="oa-lbl">Mes</div><input type="month" class="big-input" style="padding:8px 10px; margin:0; width:auto;" value="${Consumo._ym}" onchange="Consumo._ym=this.value; Consumo._mDe=''; Consumo._mAte=''; Consumo.render()"></div>
+               <div><div class="oa-lbl">Periodo (opcional)</div>
+                   <div style="display:flex; gap:6px; align-items:center;">
+                       <input type="date" class="big-input" style="padding:7px 8px; margin:0; width:auto;" value="${Consumo._mDe}" onchange="Consumo._mDe=this.value; Consumo._recalcular()">
+                       <span style="font-size:0.75rem; color:#475569;">a</span>
+                       <input type="date" class="big-input" style="padding:7px 8px; margin:0; width:auto;" value="${Consumo._mAte}" onchange="Consumo._mAte=this.value; Consumo._recalcular()">
+                   </div></div>`
             : Consumo._filtroSemana();
         const sel = Consumo._colsExcel();
         box.innerHTML = `
@@ -13859,7 +13917,7 @@ const Consumo = {
     // a lista de semanas continua aberta enquanto o usuario marca.
     async _recalcular() {
         const corpo = document.getElementById('csCorpo'); if (!corpo) return;
-        const p = Consumo._sub === 'mensal' ? Consumo._periodoMes(Consumo._ym) : Consumo._periodoSemanal();
+        const p = Consumo._sub === 'mensal' ? Consumo._periodoMensal() : Consumo._periodoSemanal();
         corpo.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Calculando...</div>';
         try {
             const r = await Consumo.calcular(p.de, p.ate);
@@ -13957,30 +14015,40 @@ const Consumo = {
     // --------------------------------------------------- alertas e compras
     async _telaAlertas(box) {
         if (!Consumo._ym) Consumo._ym = Consumo._hoje().slice(0, 7);
-        const p = Consumo._periodoMes(Consumo._ym);
+        const p = Consumo._periodoMensal();
         box.innerHTML = `
         <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; background:#f8fafc; border:1px solid var(--ind-border); border-radius:6px; padding:12px 14px; margin-bottom:14px;">
-            <div><div class="oa-lbl">Mes</div><input type="month" class="big-input" style="padding:8px 10px; margin:0; width:auto;" value="${Consumo._ym}" onchange="Consumo._ym=this.value; Consumo.render()"></div>
-            <button class="btn-3d btn-green" style="padding:9px 16px; font-size:0.8rem;" onclick="Consumo.exportarAlertas()"><i class="fas fa-file-excel"></i> EXPORTAR EXCEL (3 LISTAS)</button>
+            <div><div class="oa-lbl">Mes</div><input type="month" class="big-input" style="padding:8px 10px; margin:0; width:auto;" value="${Consumo._ym}" onchange="Consumo._ym=this.value; Consumo._mDe=''; Consumo._mAte=''; Consumo.render()"></div>
+            <div><div class="oa-lbl">Periodo (opcional)</div>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <input type="date" class="big-input" style="padding:7px 8px; margin:0; width:auto;" value="${Consumo._mDe}" onchange="Consumo._mDe=this.value; Consumo.render()">
+                    <span style="font-size:0.75rem; color:#475569;">a</span>
+                    <input type="date" class="big-input" style="padding:7px 8px; margin:0; width:auto;" value="${Consumo._mAte}" onchange="Consumo._mAte=this.value; Consumo.render()">
+                </div></div>
+            <button class="btn-3d btn-green" style="padding:9px 16px; font-size:0.8rem;" onclick="Consumo.exportarAlertas()"><i class="fas fa-file-excel"></i> EXPORTAR TUDO (3 LISTAS)</button>
         </div>
         <div id="csAlertas"><div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Calculando...</div></div>`;
         const r = await Consumo.calcular(p.de, p.ate);
         Consumo._periodo = p; Consumo._res = r;
         Consumo._alertas = Consumo.listasAlerta(r, p);
         const S = Security.sanitize, A = Consumo._alertas;
-        const bloco = (titulo, cor, sub, cols, rows) => `
+        const fmt = v => typeof v === 'number' ? Consumo._fmtQ(v) : String(v);
+        const bloco = (chave, titulo, cor, sub, cols, rows) => `
             <div style="background:#fff; border:1px solid var(--ind-border); border-top:4px solid ${cor}; border-radius:8px; margin-bottom:18px; overflow:hidden;">
-                <div style="padding:12px 16px;"><div style="font-weight:900; color:var(--tpv-dark-blue); text-transform:uppercase; letter-spacing:0.5px;">${titulo} (${rows.length})</div>
-                <div style="font-size:0.75rem; color:#475569; margin-top:2px;">${sub}</div></div>
+                <div style="padding:12px 16px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+                    <div><div style="font-weight:900; color:var(--tpv-dark-blue); text-transform:uppercase; letter-spacing:0.5px;">${titulo} (${rows.length})</div>
+                    <div style="font-size:0.75rem; color:#475569; margin-top:2px;">${sub}</div></div>
+                    <button class="btn-3d btn-green" style="padding:7px 14px; font-size:0.75rem;" ${rows.length ? '' : 'disabled'} onclick="Consumo.exportarLista('${chave}')"><i class="fas fa-file-excel"></i> EXPORTAR EXCEL</button>
+                </div>
                 <div style="overflow:auto; max-height:380px;"><table class="oa-table"><thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>
-                ${rows.length ? rows.map(r => `<tr>${r.map((v, i) => `<td style="${i === 0 ? 'font-weight:900; font-family:Roboto Mono,monospace;' : ''}">${S(String(v))}</td>`).join('')}</tr>`).join('')
+                ${rows.length ? rows.map(r => `<tr>${r.map((v, i) => `<td style="${i === 0 ? 'font-weight:900; font-family:Roboto Mono,monospace;' : typeof v === 'number' ? 'text-align:right;' : ''}">${S(fmt(v))}</td>`).join('')}</tr>`).join('')
                   : `<tr><td colspan="${cols.length}" style="text-align:center; color:#94a3b8; padding:18px;">Nenhum item.</td></tr>`}
                 </tbody></table></div></div>`;
         document.getElementById('csAlertas').innerHTML =
             `<div style="font-size:0.78rem; color:#334155; margin-bottom:12px;">Periodo: <b>${Consumo._br(p.de)} a ${Consumo._br(p.ate)}</b></div>` +
-            bloco('Usado e sem estoque — sugestao de compra', 'var(--ind-red)', 'Tiveram Apontamento (SAP 261) no periodo e estao com saldo zero (ou nao existem) no Spare Parts.', A.compra.cab, A.compra.rows) +
-            bloco('Uso negativo', '#B42318', 'Terminou com mais do que poderia ter: entrada nao registrada ou saldo errado. Fica FORA do total ate ser revisado.', A.negativo.cab, A.negativo.rows) +
-            bloco('Sem apontamento', '#C08A1E', 'Houve uso, mas o SAP nao mostra o componente nos kits: a % nao pode ser calculada.', A.semApo.cab, A.semApo.rows);
+            bloco('compra', 'Usado e sem estoque', 'var(--ind-red)', 'Tiveram Apontamento (SAP 261) no periodo e estao com saldo zero (ou nao existem) no Spare Parts.', A.compra.cab, A.compra.rows) +
+            bloco('negativo', 'Uso negativo', '#B42318', 'Terminou com mais do que poderia ter: entrada nao registrada ou saldo errado. Fica FORA do total ate ser revisado.', A.negativo.cab, A.negativo.rows) +
+            bloco('semApo', 'Sem apontamento', '#C08A1E', 'Houve uso, mas o SAP nao mostra o componente nos kits: a % nao pode ser calculada.', A.semApo.cab, A.semApo.rows);
     },
 
     listasAlerta(r, p) {
@@ -13988,7 +14056,7 @@ const Consumo = {
         const ultEnt = {};
         (sap.s315 || []).forEach(x => { if (!ultEnt[x[0]] || x[2] > ultEnt[x[0]]) ultEnt[x[0]] = x[2]; });
         const apo = Consumo._somaSap(sap.s261, p.de, p.ate);
-        const q = Consumo._fmtQ;
+        const q = v => Math.round(v || 0);
         const compra = Object.keys(apo).filter(c => apo[c] > 0 && !(saldo[c] > 0) && !fora.has(c)).sort((a, b) => apo[b] - apo[a])
             .map(c => [c, desc[c] || '-', q(apo[c]), q(saldo[c] || 0), Consumo._br(ultEnt[c])]);
         const linha = x => [x.code, x.desc || '-', q(x.ini), q(x.ent), q(x.fim), q(x.uso), q(x.apo)];
@@ -14167,11 +14235,29 @@ const Consumo = {
         });
     },
 
+    // v17.15: Excel de UMA lista da janela Alertas e Compras
+    NOMES_ALERTA: { compra: ['Usado e sem estoque', 'SemEstoque'], negativo: ['Uso negativo', 'UsoNegativo'], semApo: ['Sem apontamento', 'SemApontamento'] },
+    exportarLista(k) {
+        const A = Consumo._alertas, p = Consumo._periodo, l = A && A[k];
+        if (!l || !l.rows.length) { Toast.warn('Nada para exportar.'); return; }
+        const [titulo, arq] = Consumo.NOMES_ALERTA[k];
+        const cab = Consumo._cabecalho(p); cab[0] = ['Consumo Spare Parts – MMT · ' + titulo];
+        const aoa = cab.concat([l.cab], l.rows);
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        Consumo._formatar(ws, 5, aoa.length - 1, l.cab.map((c, i) => i).slice(2), [], []);
+        ws['!cols'] = [{ wch: 20 }, { wch: 36 }, ...Array(5).fill({ wch: 18 })];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, titulo.slice(0, 31));
+        const nome = `Consumo_SpareParts_${arq}_${p.ym || p.de}.xlsx`;
+        XLSX.writeFile(wb, nome);
+        Logs.log('CONSUMO_EXPORT', `Exportou ${nome}`);
+    },
+
     exportarAlertas() {
         const A = Consumo._alertas, p = Consumo._periodo;
         if (!A || !p) { Toast.warn('Nada para exportar.'); return; }
         const wb = XLSX.utils.book_new();
-        [['Sugestao de compra', A.compra], ['Uso negativo', A.negativo], ['Sem apontamento', A.semApo]].forEach(([nome, l]) => {
+        [['Usado e sem estoque', A.compra], ['Uso negativo', A.negativo], ['Sem apontamento', A.semApo]].forEach(([nome, l]) => {
             const ws = XLSX.utils.aoa_to_sheet(Consumo._cabecalho(p).concat([l.cab], l.rows));
             ws['!cols'] = [{ wch: 20 }, { wch: 36 }, ...Array(5).fill({ wch: 16 })];
             XLSX.utils.book_append_sheet(wb, ws, nome);
@@ -14306,7 +14392,7 @@ const Demo = {
     // Consumo do mes: uma foto de saldo POR DIA (como o sistema real faz) e
     // apontamentos espalhados nos dias, com ritmo diferente em cada semana —
     // assim os graficos de tendencia mostram algo parecido com a realidade.
-    SEMENTE_CONSUMO: '2',
+    SEMENTE_CONSUMO: '3',
     async _semearConsumo() {
         try {
             const hj = Consumo._hoje(), ym = hj.slice(0, 7), d1 = ym + '-01', agora = Date.now();
@@ -14316,12 +14402,18 @@ const Demo = {
             const acum = []; peso.reduce((a, p, k) => (acum[k] = a + p, a + p), 0);
             const totPeso = acum[acum.length - 1] || 1;
 
-            const saldo = Consumo.saldoAtual(), ini = {}, ent = {}, s261 = [], s315 = [];
+            const saldo = Consumo.saldoAtual(), ini = {}, ent = {}, s261 = [], s315Base = [];
             Object.keys(saldo).forEach((c, i) => {
                 ini[c] = saldo[c] + (i % 4 + 1) * 1500;               // havia mais no inicio do mes
-                if (i % 3 === 0) { ent[c] = 2000; s315.push([c, 2000, d1]); }
+                if (i % 3 === 0) { ent[c] = 2000; s315Base.push([c, 2000, d1]); }
             });
-            ini['AO3401A'] = 0; ent['AO3401A'] = 0;                   // forca um uso negativo
+            // uso negativo: alguns itens terminam com mais do que comecaram (sem entrada registrada)
+            ['AO3401A', 'BAT54C-7-F', 'B2B-PH-K-S', 'LTST-C191KRKT'].forEach((c, i) => {
+                if (c in saldo) { ini[c] = Math.round(saldo[c] * (0.3 + i * 0.15)); ent[c] = 0; }
+            });
+            const s315 = s315Base;
+            const pasta = await Consumo._pastaDiaria();
+            for await (const [nome] of pasta.entries()) await pasta.removeEntry(nome);
             const fotos = { dias: {} };
             dias.forEach((d, k) => {
                 const frac = k === 0 ? 0 : acum[k - 1] / totPeso;     // consumo ate o INICIO do dia
@@ -14334,12 +14426,32 @@ const Demo = {
             });
             Object.keys(saldo).forEach((c, i) => {
                 if (i % 5 === 4) return;                              // um sem apontamento a cada 5
+                if (s315.some(x => x[0] === c) === false && ini[c] < saldo[c]) return;   // uso negativo fica sem 261
                 const total = (i + 2) * 40000;
                 dias.forEach((d, k) => { const q = Math.round(total * peso[k] / totPeso); if (q > 0) s261.push([c, q, d]); });
             });
-            s261.push(['XC7A35T-1CSG324C', 15000, hj]);               // usado e sem estoque
+            // usado e sem estoque: componentes apontados no SAP que o Spare Parts nao tem
+            const semEstoque = [
+                ['XC7A35T-1CSG324C', 'FPGA Artix-7'], ['ESP32-WROOM-32E', 'Modulo Wi-Fi ESP32'], ['ADS1115IDGSR', 'ADC 16 bits I2C'],
+                ['MAX3232CDR', 'Transceiver RS-232'], ['SI2302CDS-T1-GE3', 'MOSFET N SI2302'], ['1N4148WS', 'Diodo sinal 1N4148'],
+                ['LM1117IMP-3.3', 'Regulador LDO 3V3'], ['TLV70033DDCR', 'Regulador LDO 3V3 200mA'], ['CC0603KRX7R9BB104', 'Capacitor 100nF 0603'],
+                ['RC0805FR-074K7L', 'Resistor 4K7 0805'], ['74HC595D', 'Shift register 8 bits'], ['PCF8574T', 'Expansor I/O I2C'],
+                ['USBLC6-2SC6', 'Protecao ESD USB'], ['NCP1117ST50T3G', 'Regulador 5V 1A'], ['W25Q32JVSSIQ', 'Flash SPI 32Mbit'],
+                ['CH340G', 'Conversor USB-Serial'], ['SMBJ5.0A', 'Diodo TVS 5V'], ['FDV301N', 'MOSFET N digital'],
+            ];
+            semEstoque.forEach(([c, desc], i) => {
+                if (!State.componentCatalog.some(x => x.code === c)) State.componentCatalog.push({ code: c, description: desc });
+                const dd = dias[Math.min(dias.length - 1, (i * 3) % dias.length)];
+                s261.push([c, (i + 1) * 2500, dd]);
+                if (i % 2 === 0) s315.push([c, 5000, Consumo._maisDias(d1, -20 - i)]);   // entrou no mes passado e acabou
+            });
+            try { await DB.saveNow(); } catch (e) {}
 
-            await Store._gravarTexto(await Consumo._pastaFotos(), ym + '.json', JSON.stringify(fotos));
+            for (const d of dias) {
+                const hh = `07h${String(10 + (d.charCodeAt(9) % 40)).padStart(2, '0')}`;
+                await Store._gravarTexto(pasta, `${Consumo._nomeDia(d)} - ${hh} (primeiro acesso).json`,
+                    JSON.stringify({ data: d, hora: hh.replace('h', ':'), pc: 'DEMO', usuario: 'Demonstracao', s: fotos.dias[d].s }, null, 1), false);
+            }
             const precos = {};
             Object.keys(saldo).forEach((c, i) => { if (i % 6) precos[c] = +(0.002 + i * 0.013).toFixed(4); });
             const imp = { em: agora, por: 'Demonstracao', arquivo: 'dados_ficticios.xlsx', de: d1, ate: hj };
