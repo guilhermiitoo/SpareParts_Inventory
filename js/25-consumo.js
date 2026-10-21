@@ -380,47 +380,146 @@ const Consumo = {
         </div>`;
     },
 
+    // ---------------------------------------------- semana (multi-selecao)
+    // Lista das ultimas 26 semanas (segunda a domingo), mais recente primeiro.
     _opcoesSemana() {
         const out = [];
-        let seg = Consumo._segunda(Date.now());
-        for (let i = 0; i < 16; i++) {
+        const seg = Consumo._segunda(Date.now());
+        for (let i = 0; i < 26; i++) {
             const iso = Consumo._iso(seg);
             const w = Consumo._numSemana(seg);
-            out.push([iso, `S${String(w.n).padStart(2, '0')}/${w.ano} — ${Consumo._br(iso)} a ${Consumo._br(Consumo._maisDias(iso, 6))}`]);
+            const fim = Consumo._maisDias(iso, 6);
+            out.push([iso, `W${String(w.n).padStart(2, '0')} · ${Consumo._br(iso).slice(0, 5)} a ${Consumo._br(fim).slice(0, 5)}`]);
             seg.setDate(seg.getDate() - 7);
         }
         return out;
     },
+    _semanas: [],             // segundas-feiras escolhidas (AAAA-MM-DD)
+    _perDe: '', _perAte: '',  // periodo livre (tem prioridade sobre as semanas)
 
+    _rotuloSemanas() {
+        const n = Consumo._semanas.length;
+        if (!n) return 'Semana atual';
+        if (n === 1) return Consumo._opcoesSemana().find(o => o[0] === Consumo._semanas[0])?.[1] || '1 semana';
+        return n + ' semanas selecionadas';
+    },
+
+    // Periodo da janela Semanal: periodo livre > semanas marcadas > semana atual.
+    // Varias semanas = do inicio da primeira ao fim da ultima (o saldo inicial e
+    // final precisam ser de um intervalo continuo para a conta fechar).
+    _periodoSemanal() {
+        const hoje = Consumo._hoje();
+        let de, ate, tag;
+        if (Consumo._perDe && Consumo._perAte && Consumo._perDe <= Consumo._perAte) {
+            de = Consumo._perDe; ate = Consumo._perAte; tag = de + '_a_' + ate;
+        } else if (Consumo._semanas.length) {
+            const ss = Consumo._semanas.slice().sort();
+            de = ss[0]; ate = Consumo._maisDias(ss[ss.length - 1], 6);
+            const w1 = Consumo._numSemana(new Date(ss[0] + 'T12:00:00')), w2 = Consumo._numSemana(new Date(ss[ss.length - 1] + 'T12:00:00'));
+            tag = w1.ano + '-S' + String(w1.n).padStart(2, '0') + (ss.length > 1 ? '_a_S' + String(w2.n).padStart(2, '0') : '');
+        } else {
+            return Consumo._periodoSemana(Consumo._iso(Consumo._segunda(Date.now())));
+        }
+        if (ate > hoje) ate = hoje;
+        return { de, ate, rotulo: 'Semanal', arquivo: 'Consumo_SpareParts_Semanal_' + tag + '.xlsx' };
+    },
+
+    _filtroSemana() {
+        const marc = new Set(Consumo._semanas);
+        return `
+        <div style="position:relative;">
+            <div class="oa-lbl">Semana</div>
+            <button type="button" id="csSemBtn" class="big-input" onclick="Consumo._abrirSemanas(event)"
+                style="padding:8px 34px 8px 10px; margin:0; width:240px; text-align:left; cursor:pointer; position:relative;">
+                <span id="csSemRot">${Consumo._rotuloSemanas()}</span>
+                <i class="fas fa-chevron-down" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:0.75rem;"></i>
+            </button>
+            <div id="csSemPainel" style="display:none; position:absolute; top:100%; left:0; z-index:60; margin-top:4px; width:260px;
+                 background:#fff; border:1px solid var(--ind-border); border-radius:6px; box-shadow:0 10px 25px rgba(0,0,0,.15);">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-bottom:1px solid #e2e8f0;">
+                    <span style="font-size:0.72rem; color:#475569;">selecione uma ou mais</span>
+                    <button type="button" class="btn-3d btn-gray" style="padding:3px 10px; font-size:0.68rem;" onclick="Consumo._limparSemanas()">Limpar</button>
+                </div>
+                <div style="max-height:300px; overflow-y:auto; padding:4px 0;">
+                    ${Consumo._opcoesSemana().map(([v, l]) => `
+                    <label style="display:flex; align-items:center; gap:10px; padding:7px 12px; cursor:pointer; font-size:0.85rem; font-weight:600; color:#1F2329;"
+                           onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background=''">
+                        <input type="checkbox" class="csSemChk" value="${v}" ${marc.has(v) ? 'checked' : ''} onchange="Consumo._marcarSemana()"> ${l}</label>`).join('')}
+                </div>
+            </div>
+        </div>
+        <div><div class="oa-lbl">Periodo</div>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <input type="date" class="big-input" style="padding:7px 8px; margin:0; width:auto;" value="${Consumo._perDe}" onchange="Consumo._perDe=this.value; Consumo._recalcular()">
+                <span style="font-size:0.75rem; color:#475569;">a</span>
+                <input type="date" class="big-input" style="padding:7px 8px; margin:0; width:auto;" value="${Consumo._perAte}" onchange="Consumo._perAte=this.value; Consumo._recalcular()">
+            </div>
+        </div>`;
+    },
+
+    _abrirSemanas(ev) {
+        ev.stopPropagation();
+        const pn = document.getElementById('csSemPainel'); if (!pn) return;
+        const abrir = pn.style.display === 'none';
+        pn.style.display = abrir ? 'block' : 'none';
+        if (abrir && !Consumo._fecharFora) {
+            Consumo._fecharFora = e => {
+                const p2 = document.getElementById('csSemPainel');
+                if (p2 && !p2.contains(e.target) && e.target.id !== 'csSemBtn') p2.style.display = 'none';
+            };
+            document.addEventListener('click', Consumo._fecharFora);
+        }
+    },
+    _marcarSemana() {
+        Consumo._semanas = [...document.querySelectorAll('.csSemChk:checked')].map(c => c.value);
+        const r = document.getElementById('csSemRot'); if (r) r.textContent = Consumo._rotuloSemanas();
+        clearTimeout(Consumo._tSem);
+        Consumo._tSem = setTimeout(Consumo._recalcular, 350);   // espera o usuario terminar de marcar
+    },
+    _limparSemanas() {
+        Consumo._semanas = [];
+        document.querySelectorAll('.csSemChk').forEach(c => { c.checked = false; });
+        const r = document.getElementById('csSemRot'); if (r) r.textContent = Consumo._rotuloSemanas();
+        Consumo._recalcular();
+    },
+
+    // ---------------------------------------------- telas Mensal / Semanal
     async _telaPeriodo(box) {
         const mensal = Consumo._sub === 'mensal';
         if (mensal && !Consumo._ym) Consumo._ym = Consumo._hoje().slice(0, 7);
-        if (!mensal && !Consumo._seg) Consumo._seg = Consumo._iso(Consumo._segunda(Date.now()));
-        const sel = mensal
-            ? `<input type="month" class="big-input" style="padding:8px 10px; margin:0; width:auto;" value="${Consumo._ym}" onchange="Consumo._ym=this.value; Consumo.render()">`
-            : `<select class="big-input" style="padding:8px 10px; margin:0; width:auto;" onchange="Consumo._seg=this.value; Consumo.render()">
-                ${Consumo._opcoesSemana().map(([v, l]) => `<option value="${v}" ${v === Consumo._seg ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
-        const p = mensal ? Consumo._periodoMes(Consumo._ym) : Consumo._periodoSemana(Consumo._seg);
+        const filtro = mensal
+            ? `<div><div class="oa-lbl">Mes</div><input type="month" class="big-input" style="padding:8px 10px; margin:0; width:auto;" value="${Consumo._ym}" onchange="Consumo._ym=this.value; Consumo._recalcular()"></div>`
+            : Consumo._filtroSemana();
+        const sel = Consumo._colsExcel();
         box.innerHTML = `
         <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; background:#f8fafc; border:1px solid var(--ind-border); border-radius:6px; padding:12px 14px; margin-bottom:14px;">
-            <div><div class="oa-lbl">${mensal ? 'Mes' : 'Semana (segunda a domingo)'}</div>${sel}</div>
+            ${filtro}
             <div style="flex:2; min-width:200px;"><div class="oa-lbl">Buscar codigo / descricao</div>
                 <input id="csBusca" class="big-input" style="padding:8px 10px; margin:0;" placeholder="Ex.: 065G0805..." oninput="Consumo._tabela()"></div>
             <button class="btn-3d btn-green" style="padding:9px 16px; font-size:0.8rem;" onclick="Consumo.exportar()"><i class="fas fa-file-excel"></i> EXPORTAR EXCEL</button>
             <div style="flex-basis:100%; display:flex; gap:16px; align-items:center; flex-wrap:wrap; font-size:0.78rem; font-weight:700; color:var(--tpv-dark-blue);">
-                <span class="oa-lbl" style="margin:0;">Colunas no Excel:</span>
+                <span class="oa-lbl" style="margin:0;">Colunas:</span>
                 ${Consumo.OPCIONAIS.map(([k, l]) => `<label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
-                    <input type="checkbox" ${Consumo._colsExcel()[k] !== false ? 'checked' : ''} onchange="Consumo.setColExcel('${k}', this.checked)"> ${l}</label>`).join('')}
+                    <input type="checkbox" ${sel[k] !== false ? 'checked' : ''} onchange="Consumo.setColExcel('${k}', this.checked); Consumo._corpo()"> ${l}</label>`).join('')}
             </div>
         </div>
-        <div id="csCorpo"><div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Calculando...</div></div>`;
+        <div id="csCorpo"></div>`;
+        await Consumo._recalcular();
+    },
+
+    // Recalcula SO o corpo (cards + tabela). O filtro nao e redesenhado, assim
+    // a lista de semanas continua aberta enquanto o usuario marca.
+    async _recalcular() {
+        const corpo = document.getElementById('csCorpo'); if (!corpo) return;
+        const p = Consumo._sub === 'mensal' ? Consumo._periodoMes(Consumo._ym) : Consumo._periodoSemanal();
+        corpo.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Calculando...</div>';
         try {
             const r = await Consumo.calcular(p.de, p.ate);
             Consumo._periodo = p; Consumo._linhas = r.linhas; Consumo._tot = r.tot; Consumo._res = r;
             Consumo._corpo();
         } catch (e) {
             console.error('[Consumo]', e);
-            document.getElementById('csCorpo').innerHTML = `<div style="color:var(--ind-red); padding:20px;">Erro no calculo: ${Security.sanitize(e.message)}</div>`;
+            corpo.innerHTML = `<div style="color:var(--ind-red); padding:20px;">Erro no calculo: ${Security.sanitize(e.message)}</div>`;
         }
     },
 
@@ -429,24 +528,32 @@ const Consumo = {
             <div style="font-size:1.35rem; font-weight:900; color:${cor}; font-family:'Roboto Mono',monospace;">${valor}</div></div>`;
     },
 
+    // Cards na ordem: Est. Inicial · Est. Final · Consumo · Valor do uso · % geral
+    _cards(t) {
+        const Q = Consumo._fmtQ;
+        return `
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:14px;">
+            ${Consumo._kpi('Est. Inicial', Q(t.ini), '#475569')}
+            ${Consumo._kpi('Est. Final', Q(t.fim), 'var(--tpv-dark-blue)')}
+            ${Consumo._kpi('Consumo (pecas)', Q(t.uso), 'var(--tpv-blue)')}
+            ${Consumo._kpi('Valor do uso', Consumo._fmtR(t.valor), 'var(--ind-green)')}
+            ${Consumo._kpi('% Uso geral', Consumo._fmtP(t.pct), '#C08A1E')}
+        </div>`;
+    },
+
     _corpo() {
-        const r = Consumo._res, t = r.tot, p = Consumo._periodo, S = Security.sanitize;
-        const top5 = r.linhas.filter(x => x.pct != null && x.status !== 'USO NEGATIVO').sort((a, b) => b.pct - a.pct).slice(0, 5);
-        document.getElementById('csCorpo').innerHTML = `
+        const r = Consumo._res, p = Consumo._periodo, S = Security.sanitize;
+        const corpo = document.getElementById('csCorpo'); if (!r || !corpo) return;
+        const cols = Consumo._colsVisiveis();
+        corpo.innerHTML = `
         <div style="font-size:0.78rem; color:#334155; margin-bottom:10px;">
             Periodo: <b>${Consumo._br(p.de)} a ${Consumo._br(p.ate)}</b> · Est. Inicio: ${S(r.fonteIni)} · Est. Final: ${S(r.fonteFim)}
             ${r.exato ? '' : ' · <b style="color:#b45309;">saldo aproximado: faltou foto em algum dia do periodo</b>'}
         </div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:14px;">
-            ${Consumo._kpi('% geral do periodo', Consumo._fmtP(t.pct), 'var(--tpv-blue)')}
-            ${Consumo._kpi('Uso total (pecas)', Consumo._fmtQ(t.uso), 'var(--tpv-dark-blue)')}
-            ${Consumo._kpi('Valor do uso', Consumo._fmtR(t.valor), 'var(--ind-green)')}
-            ${Consumo._kpi('Itens em alerta', t.alertas, 'var(--ind-red)')}
-        </div>
-        ${top5.length ? `<div style="font-size:0.78rem; color:#334155; margin-bottom:12px;"><b>Maior % de uso:</b> ${top5.map(x => `${S(x.code)} <b>${Consumo._fmtP(x.pct)}</b>`).join(' · ')}</div>` : ''}
+        ${Consumo._cards(r.tot)}
         <div id="csCount" class="oa-lbl" style="margin-bottom:6px;"></div>
         <div style="background:#fff; border:1px solid var(--ind-border); border-radius:6px; overflow:auto; max-height:600px;">
-            <table class="oa-table"><thead><tr>${Consumo.COLS.map(c => `<th onclick="Consumo.ordenar('${c[0]}')" style="${c[2] ? 'text-align:right;' : ''}">${c[1]}${Consumo._ord.k === c[0] ? (Consumo._ord.dir > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('')}</tr></thead>
+            <table class="oa-table"><thead><tr>${cols.map(c => `<th onclick="Consumo.ordenar('${c[0]}')" style="${c[2] ? 'text-align:right;' : ''}">${c[1]}${Consumo._ord.k === c[0] ? (Consumo._ord.dir > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('')}</tr></thead>
             <tbody id="csBody"></tbody></table>
         </div>`;
         Consumo._tabela();
@@ -455,6 +562,7 @@ const Consumo = {
     COLS: [['code', 'Componente'], ['desc', 'Descricao'], ['ini', 'Est. Inicio', 1], ['ent', 'Entradas (SAP 315)', 1], ['fim', 'Est. Final', 1],
            ['uso', 'Uso', 1], ['apo', 'Apontamento (SAP 261)', 1], ['pct', '% Uso', 1], ['preco', 'Preco unit.', 1], ['valor', 'Valor do uso (R$)', 1], ['status', 'Status']],
     COR_STATUS: { 'OK': '#4A6B3A', 'USO NEGATIVO': '#B42318', 'SEM APONTAMENTO': '#C08A1E', 'SEM PRECO': '#64748b' },
+    _colsVisiveis() { const sel = Consumo._colsExcel(); return Consumo.COLS.filter(c => sel[c[0]] !== false); },
 
     ordenar(k) {
         Consumo._ord = { k, dir: Consumo._ord.k === k ? -Consumo._ord.dir : (k === 'code' || k === 'desc' || k === 'status' ? 1 : -1) };
@@ -474,20 +582,28 @@ const Consumo = {
             });
     },
 
+    _celula(k, r) {
+        const S = Security.sanitize, Q = Consumo._fmtQ, dir = 'text-align:right;';
+        switch (k) {
+            case 'code':   return `<td style="font-weight:900; color:var(--tpv-dark-blue); font-family:'Roboto Mono',monospace;">${S(r.code)}</td>`;
+            case 'desc':   return `<td>${S(r.desc || '-')}</td>`;
+            case 'uso':    return `<td style="${dir} font-weight:900;">${Q(r.uso)}</td>`;
+            case 'pct':    return `<td style="${dir} font-weight:900;">${Consumo._fmtP(r.pct)}</td>`;
+            case 'preco':  return `<td style="${dir}">${Consumo._fmtR(r.preco)}</td>`;
+            case 'valor':  return `<td style="${dir}">${Consumo._fmtR(r.valor)}</td>`;
+            case 'status': return `<td><span class="oa-tag" style="background:${Consumo.COR_STATUS[r.status]};">${r.status}</span></td>`;
+            default:       return `<td style="${dir}">${Q(r[k])}</td>`;
+        }
+    },
+
     _tabela() {
         const body = document.getElementById('csBody'); if (!body) return;
-        const S = Security.sanitize, rows = Consumo._filtradas();
+        const rows = Consumo._filtradas(), cols = Consumo._colsVisiveis();
         const cnt = document.getElementById('csCount');
         if (cnt) cnt.textContent = `${rows.length} componente(s)`;
-        body.innerHTML = rows.length ? rows.slice(0, 1500).map(r => `<tr>
-            <td style="font-weight:900; color:var(--tpv-dark-blue); font-family:'Roboto Mono',monospace;">${S(r.code)}</td>
-            <td>${S(r.desc || '-')}</td>
-            <td style="text-align:right;">${Consumo._fmtQ(r.ini)}</td><td style="text-align:right;">${Consumo._fmtQ(r.ent)}</td>
-            <td style="text-align:right;">${Consumo._fmtQ(r.fim)}</td><td style="text-align:right; font-weight:900;">${Consumo._fmtQ(r.uso)}</td>
-            <td style="text-align:right;">${Consumo._fmtQ(r.apo)}</td><td style="text-align:right; font-weight:900;">${Consumo._fmtP(r.pct)}</td>
-            <td style="text-align:right;">${Consumo._fmtR(r.preco)}</td><td style="text-align:right;">${Consumo._fmtR(r.valor)}</td>
-            <td><span class="oa-tag" style="background:${Consumo.COR_STATUS[r.status]};">${r.status}</span></td></tr>`).join('')
-            : '<tr><td colspan="11" style="text-align:center; color:#94a3b8; padding:24px;">Nenhum componente com movimento no periodo.</td></tr>';
+        body.innerHTML = rows.length
+            ? rows.slice(0, 1500).map(r => '<tr>' + cols.map(c => Consumo._celula(c[0], r)).join('') + '</tr>').join('')
+            : `<tr><td colspan="${cols.length}" style="text-align:center; color:#94a3b8; padding:24px;">Nenhum componente com movimento no periodo.</td></tr>`;
     },
 
     // --------------------------------------------------- alertas e compras
@@ -635,50 +751,70 @@ const Consumo = {
         const t = mes.tot, Q = Consumo._fmtQ;
         const validas = mes.linhas.filter(r => r.status !== 'USO NEGATIVO' && r.uso > 0);
         const top5 = validas.slice().sort((x, y) => y.uso - x.uso).slice(0, 5);
-        const topEst = mes.linhas.slice().sort((x, y) => Math.max(y.ini, y.fim) - Math.max(x.ini, x.fim)).slice(0, 10);
-        const varEst = t.ini ? (t.fim - t.ini) / t.ini : null;
+        const top5pct = validas.filter(r => r.pct != null).sort((x, y) => y.pct - x.pct).slice(0, 5);
 
-        document.getElementById('csDash').innerHTML = `
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:14px;">
-            ${Consumo._kpi('Uso no mes (pecas)', Q(t.uso), 'var(--tpv-dark-blue)')}
-            ${Consumo._kpi('% geral do mes', Consumo._fmtP(t.pct), 'var(--tpv-blue)')}
-            ${Consumo._kpi('Estoque inicial', Q(t.ini), '#475569')}
-            ${Consumo._kpi('Estoque final', Q(t.fim) + (varEst == null ? '' : ` <span style="font-size:0.8rem;">(${varEst >= 0 ? '+' : ''}${(varEst * 100).toFixed(1).replace('.', ',')}%)</span>`), varEst != null && varEst < 0 ? 'var(--ind-red)' : 'var(--ind-green)')}
-        </div>
+        document.getElementById('csDash').innerHTML = Consumo._cards(t) + `
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:16px;">
-            ${card('Tendencia de uso por semana', 'Barras: uso (pecas) de cada semana do mes · Linha: % de uso da semana', 'csChSemana')}
-            ${card('Top 5 itens mais usados no mes', 'Uso em pecas (itens com uso negativo ficam fora)', 'csChTop')}
-        </div>
-        <div style="margin-top:16px;">${card('Estoque inicial x estoque final', 'Os 10 componentes com maior estoque no periodo', 'csChEst', 320)}</div>`;
+            ${card('Tendencia de uso por semana', 'Consumo (pecas) em cada semana do mes · linha tracejada = tendencia', 'csChSemana')}
+            ${card('Top 5 itens mais usados no mes', 'Consumo em pecas (itens com uso negativo ficam fora)', 'csChTop')}
+            ${card('Estoque inicial x estoque final', 'Total de pecas no inicio e no fim do periodo', 'csChEst')}
+            ${card('Top 5 maior % de uso', 'Consumo ÷ Apontamento (SAP 261) de cada componente', 'csChPct')}
+        </div>`;
 
-        const azul = '#0066A1', escuro = '#004065', amarelo = '#fbbf24', cinza = '#94a3b8';
+        const azul = '#0066A1', escuro = '#004065', amarelo = '#C08A1E', cinza = '#94a3b8';
+        const fmtN = v => Number(v || 0).toLocaleString('pt-BR');
+        const eixoN = { beginAtZero: true, ticks: { callback: v => fmtN(v) } };
+
+        // Tendencia: linha do consumo semanal + reta de tendencia (minimos quadrados)
+        const ys = porSemana.map(r => Math.round(r.tot.uso));
+        const n = ys.length, xm = (n - 1) / 2, ym = ys.reduce((a2, v) => a2 + v, 0) / (n || 1);
+        let num = 0, den = 0;
+        ys.forEach((v, i) => { num += (i - xm) * (v - ym); den += (i - xm) * (i - xm); });
+        const incl = den ? num / den : 0;
+        const tend = ys.map((_, i) => Math.round(ym + incl * (i - xm)));
         Consumo._novoGrafico('csChSemana', {
-            data: {
-                labels: semanas.map(s => s.rot),
-                datasets: [
-                    { type: 'bar',  label: 'Uso (pecas)', data: porSemana.map(r => Math.round(r.tot.uso)), backgroundColor: azul, borderRadius: 4, yAxisID: 'y' },
-                    { type: 'line', label: '% de uso', data: porSemana.map(r => r.tot.pct == null ? null : +(r.tot.pct * 100).toFixed(2)),
-                      borderColor: amarelo, backgroundColor: amarelo, tension: 0.3, pointRadius: 4, yAxisID: 'y1' },
-                ],
-            },
+            type: 'line',
+            data: { labels: semanas.map(s2 => s2.rot), datasets: [
+                { label: 'Consumo (pecas)', data: ys, borderColor: azul, backgroundColor: azul + '22', fill: true,
+                  borderWidth: 3, tension: 0.3, pointRadius: 5, pointHoverRadius: 7 },
+                { label: n > 1 ? `Tendencia (${incl >= 0 ? 'subindo' : 'caindo'})` : 'Tendencia', data: n > 1 ? tend : [],
+                  borderColor: amarelo, borderDash: [6, 5], borderWidth: 2, pointRadius: 0, fill: false },
+            ] },
             options: { maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-                scales: { y: { beginAtZero: true, title: { display: true, text: 'Pecas' } },
-                          y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: '%' } } } },
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true } },
+                    tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmtN(c.parsed.y)}`,
+                        afterBody: it => { const r = porSemana[it[0].dataIndex]; return r ? '% de uso: ' + Consumo._fmtP(r.tot.pct) : ''; } } } },
+                scales: { x: { grid: { display: false } }, y: eixoN } },
         });
+
         Consumo._novoGrafico('csChTop', {
             type: 'bar',
-            data: { labels: top5.map(r => r.code), datasets: [{ label: 'Uso (pecas)', data: top5.map(r => Math.round(r.uso)), backgroundColor: escuro, borderRadius: 4 }] },
+            data: { labels: top5.map(r => r.code), datasets: [{ label: 'Consumo (pecas)', data: top5.map(r => Math.round(r.uso)), backgroundColor: escuro, borderRadius: 4 }] },
             options: { maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false },
-                tooltip: { callbacks: { afterLabel: c => { const r = top5[c.dataIndex]; return (r.desc ? r.desc + ' · ' : '') + '% uso: ' + Consumo._fmtP(r.pct); } } } },
-                scales: { x: { beginAtZero: true } } },
+                tooltip: { callbacks: { label: c => fmtN(c.parsed.x) + ' pecas',
+                    afterLabel: c => { const r = top5[c.dataIndex]; return (r.desc ? r.desc + ' · ' : '') + '% uso: ' + Consumo._fmtP(r.pct); } } } },
+                scales: { x: eixoN, y: { grid: { display: false } } } },
         });
+
         Consumo._novoGrafico('csChEst', {
+            type: 'pie',
+            data: { labels: ['Estoque inicial', 'Estoque final'],
+                    datasets: [{ data: [Math.round(t.ini), Math.round(t.fim)], backgroundColor: [cinza, azul], borderColor: '#fff', borderWidth: 2 }] },
+            options: { maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 16 } },
+                    tooltip: { callbacks: { label: c => {
+                        const tot = c.dataset.data.reduce((a2, b2) => a2 + b2, 0) || 1;
+                        return `${c.label}: ${fmtN(c.parsed)} pecas (${(c.parsed / tot * 100).toFixed(1).replace('.', ',')}%)`;
+                    }, afterBody: () => t.ini ? 'Variacao: ' + ((t.fim - t.ini) / t.ini * 100).toFixed(1).replace('.', ',') + '%' : '' } } } },
+        });
+
+        Consumo._novoGrafico('csChPct', {
             type: 'bar',
-            data: { labels: topEst.map(r => r.code), datasets: [
-                { label: 'Estoque inicial', data: topEst.map(r => Math.round(r.ini)), backgroundColor: cinza, borderRadius: 4 },
-                { label: 'Estoque final',   data: topEst.map(r => Math.round(r.fim)), backgroundColor: azul,  borderRadius: 4 },
-            ] },
-            options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } },
+            data: { labels: top5pct.map(r => r.code), datasets: [{ label: '% de uso', data: top5pct.map(r => +(r.pct * 100).toFixed(2)), backgroundColor: amarelo, borderRadius: 4 }] },
+            options: { maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false },
+                tooltip: { callbacks: { label: c => c.parsed.x.toFixed(2).replace('.', ',') + '%',
+                    afterLabel: c => { const r = top5pct[c.dataIndex]; return (r.desc ? r.desc + ' · ' : '') + fmtN(Math.round(r.uso)) + ' de ' + fmtN(Math.round(r.apo)); } } } },
+                scales: { x: { beginAtZero: true, ticks: { callback: v => String(v).replace('.', ',') + '%' } }, y: { grid: { display: false } } } },
         });
     },
 
