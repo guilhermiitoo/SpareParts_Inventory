@@ -858,6 +858,7 @@ const DB = {
             if (!dh) { if (reconnBtn) reconnBtn.style.display = 'none'; return; }
             State.dbDirHandle = dh;
             await DB._abrirPasta(dh, DB._optsPasta);
+            DB._seloTeste();
 
             State.isConnected     = true;
             State._syncErrorCount = 0;
@@ -934,6 +935,7 @@ const DB = {
         DB.startAutoSync();
         DB._setSyncStatus('ok', 'Conectado');
         if (!(opts && opts.demo)) Store.lembrarPasta(State.dbDirHandle);   // memoriza para a proxima vez
+        DB._seloTeste();
         DB._reconnBtnLoginUI(false);
         try { AutoBackup.reconectar(); } catch (_) {}
         // v17.07: foto diaria do saldo por componente (base da aba Consumo)
@@ -994,6 +996,7 @@ const DB = {
             if (!dh) return;
             // pasta ja validada pela trava; agora conecta e termina o boot
             await DB._finishInitialConnect(DB._optsPasta);
+            if (msg) msg.textContent = '';
         } catch (e) {
             if (e.name !== 'AbortError') {
                 console.error(e);
@@ -1022,7 +1025,7 @@ const DB = {
             }
             const v = await Store.verificarPasta(dh);
             const idAnt = Store._idLembrado();
-            if (v.ok && !(v.marca && idAnt && v.marca.id !== idAnt)) {
+            if (v.ok && !(v.marca && v.marca.tipo !== 'teste' && idAnt && v.marca.id !== idAnt)) {
                 State.dbDirHandle = dh;
                 return dh;
             }
@@ -1037,18 +1040,54 @@ const DB = {
             } else {
                 const msg = document.getElementById('dbErrorMsg');
                 if (msg) msg.textContent = `Pasta errada: "${dh.name}". Tente novamente.`;
-                const again = await Modal.confirm('Pasta errada',
+                const op = await Modal.escolher('Pasta errada',
                     `A pasta "${dh.name}" NAO e a pasta do sistema Spare Parts.\n\n` +
                     `A pasta correta tem o arquivo ${Store.MARCA} e a subpasta "dados".\n` +
                     'Nada foi criado nem alterado na pasta escolhida.\n\n' +
-                    'Clique em TENTAR NOVAMENTE e selecione a pasta oficial na rede.',
-                    'Tentar novamente', true);
-                if (!again) return null;
+                    'TENTAR NOVAMENTE: escolher a pasta oficial na rede.\n' +
+                    'USAR PARA TESTE: criar um banco de teste vazio nesta pasta (o banco oficial nao e tocado).',
+                    [{ valor: null, rotulo: 'Cancelar', classe: 'btn-gray' },
+                     { valor: 'teste', rotulo: 'Usar para teste', classe: 'btn-yellow' },
+                     { valor: 'tentar', rotulo: 'Tentar novamente', classe: 'btn-blue' }], true);
+                if (op === 'teste') {
+                    const conf = await Modal.prompt('Criar banco de TESTE',
+                        `Sera criado um banco de dados de TESTE, vazio, na pasta "${dh.name}".\n` +
+                        'Enquanto estiver nele, o sistema mostra a etiqueta "BANCO DE TESTE" no topo.\n' +
+                        'Para confirmar, digite TESTE:', 'TESTE');
+                    if (String(conf || '').trim().toUpperCase() === 'TESTE') {
+                        DB._optsPasta = { criar: true, teste: true, aceitarOutra: true };
+                        State.dbDirHandle = dh;
+                        return dh;
+                    }
+                    Toast.info('Banco de teste nao criado.');
+                    continue;
+                }
+                if (op !== 'tentar') return null;
                 continue;
             }
             const again = await Modal.confirm('Escolher outra pasta?', 'Deseja selecionar outra pasta?', 'Tentar novamente');
             if (!again) return null;
         }
+    },
+
+    // v17.12: etiqueta vermelha no topo enquanto o banco aberto for de TESTE,
+    // para ninguem trabalhar nele achando que e o oficial.
+    _seloTeste() {
+        const teste = !!(Store._marca && Store._marca.tipo === 'teste');
+        let tag = document.getElementById('seloBancoTeste');
+        if (!teste) { if (tag) tag.remove(); return; }
+        if (tag) return;
+        tag = document.createElement('div');
+        tag.id = 'seloBancoTeste';
+        tag.className = 'no-print';
+        tag.title = 'Este banco e so para testes. Os dados nao sao os do estoque real.';
+        tag.style.cssText = 'display:inline-block; margin-top:6px; background:var(--ind-red); color:#fff; font-weight:900; ' +
+            'font-size:0.7rem; letter-spacing:1px; padding:4px 10px; border-radius:4px;';
+        tag.innerHTML = '<i class="fas fa-flask"></i> BANCO DE TESTE';
+        const alvo = document.querySelector('header .header-right') || document.getElementById('dbStepContainer');
+        if (alvo) alvo.appendChild(tag);
+        const login = document.getElementById('dbStepContainer');
+        if (login && alvo !== login) login.appendChild(tag.cloneNode(true)).id = 'seloBancoTesteLogin';
     },
 
     // ============================================================

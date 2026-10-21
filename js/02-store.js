@@ -314,9 +314,10 @@ const Store = {
         } catch (e) { return false; }
     },
 
-    async _gravarMarca(dh, origem) {
+    async _gravarMarca(dh, origem, tipo) {
         const m = {
             sistema: Store.MARCA_SISTEMA,
+            tipo: tipo || 'oficial',          // 'oficial' ou 'teste'
             id: 'SP-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase(),
             criadoEm: new Date().toISOString(),
             criadoPor: Store.pcId(),
@@ -351,14 +352,16 @@ const Store = {
                 'Selecione a pasta oficial do Spare Parts na rede.');
         }
         // Pasta de outro sistema Spare Parts (ex.: uma COPIA de backup): so com confirmacao.
+        // Pasta de TESTE nao entra nessa conta: ela nunca vira a "habitual" do PC.
         const idAnt = Store._idLembrado();
-        if (v.marca && idAnt && v.marca.id !== idAnt && !opts.aceitarOutra) {
+        if (v.marca && v.marca.tipo !== 'teste' && idAnt && v.marca.id !== idAnt && !opts.aceitarOutra) {
             throw Store._erroPasta('PASTA_DIFERENTE',
                 `A pasta "${dirHandle.name}" e uma pasta do sistema, mas NAO e a mesma que este PC usava ` +
                 '(pode ser uma copia ou um backup).');
         }
-        const marca = v.marca || await Store._gravarMarca(dirHandle, v.criarMarca || 'banco novo');
-        if (!opts.demo) Store._lembrarId(marca.id);   // demo nao vira a pasta 'habitual'
+        const marca = v.marca || await Store._gravarMarca(dirHandle, v.criarMarca || (opts.teste ? 'banco de teste' : 'banco novo'),
+                                                          opts.teste ? 'teste' : 'oficial');
+        if (!opts.demo && marca.tipo !== 'teste') Store._lembrarId(marca.id);   // demo/teste nao viram a pasta 'habitual'
         Store._marca = marca;
 
         Store._raiz  = dirHandle;
