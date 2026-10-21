@@ -277,35 +277,7 @@ const Store = {
     // ======================================================================
     // CONEXAO E MIGRACAO
     // ======================================================================
-    // ======================================================================
-    // v17.06 — TRAVA DA PASTA DO SISTEMA
-    //
-    // Antes, QUALQUER pasta escolhida era aceita: o conectar() criava "dados/"
-    // dentro dela e o colaborador passava a trabalhar num banco vazio, sem
-    // perceber, enquanto o banco verdadeiro ficava parado na rede.
-    //
-    // Agora a pasta oficial tem um ARQUIVO DE IDENTIDADE na raiz
-    // (SPARE_PARTS_PASTA_DO_SISTEMA.json). Sem ele, a pasta e recusada e o
-    // sistema pede para escolher de novo. Excecoes, para nao travar quem ja usa:
-    //   - pasta que ja tem dados/indice.json (instalacao anterior a trava)
-    //   - pasta com o JSON do formato antigo (sera migrada)
-    // Nesses dois casos o arquivo de identidade e criado na hora.
-    // Banco NOVO so e criado quando pedido explicitamente (opts.criar).
-    // ======================================================================
-    MARCA:        'SPARE_PARTS_PASTA_DO_SISTEMA.json',
-    MARCA_SISTEMA: 'SPARE_PARTS_MMT',
-    _CHAVE_ID:    'sp_pasta_sistema_id',
-
-    _erroPasta(codigo, msg) { const e = new Error(msg); e.codigo = codigo; return e; },
-
-    async _lerMarca(dh) {
-        try {
-            const txt = await (await (await dh.getFileHandle(Store.MARCA)).getFile()).text();
-            const m = JSON.parse(txt);
-            return m && m.sistema === Store.MARCA_SISTEMA && m.id ? m : null;
-        } catch (e) { return null; }
-    },
-
+    // Diz se a pasta ja tem um banco (dados/indice.json). NAO cria nada.
     async _temIndiceAntigo(dh) {
         try {
             const dados = await dh.getDirectoryHandle(Store.PASTA_DADOS);   // SEM create
@@ -314,53 +286,7 @@ const Store = {
         } catch (e) { return false; }
     },
 
-    async _gravarMarca(dh, origem) {
-        const m = {
-            sistema: Store.MARCA_SISTEMA,
-            id: 'SP-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase(),
-            criadoEm: new Date().toISOString(),
-            criadoPor: Store.pcId(),
-            origem,
-            aviso: 'NAO APAGUE NEM MOVA ESTE ARQUIVO. Ele identifica a pasta oficial do sistema Spare Parts. ' +
-                   'Sem ele o sistema recusa a pasta.',
-        };
-        const fh = await dh.getFileHandle(Store.MARCA, { create: true });
-        const w = await fh.createWritable();
-        await w.write(JSON.stringify(m, null, 2));
-        await w.close();
-        return m;
-    },
-
-    // Confere se a pasta escolhida e a do sistema. NAO cria nada.
-    async verificarPasta(dh) {
-        const marca = await Store._lerMarca(dh);
-        if (marca) return { ok: true, marca };
-        if (await Store._temIndiceAntigo(dh)) return { ok: true, criarMarca: 'instalacao anterior a trava' };
-        if (await Store._acharLegado([dh])) return { ok: true, criarMarca: 'migracao do JSON antigo' };
-        return { ok: false };
-    },
-
-    _idLembrado()  { try { return localStorage.getItem(Store._CHAVE_ID); } catch (e) { return null; } },
-    _lembrarId(id) { try { localStorage.setItem(Store._CHAVE_ID, id); } catch (e) {} },
-
-    async conectar(dirHandle, opts = {}) {
-        const v = await Store.verificarPasta(dirHandle);
-        if (!v.ok && !opts.criar) {
-            throw Store._erroPasta('PASTA_ERRADA',
-                `Esta NAO e a pasta do sistema "${dirHandle.name}": nela nao existe o arquivo ${Store.MARCA}. ` +
-                'Selecione a pasta oficial do Spare Parts na rede.');
-        }
-        // Pasta de outro sistema Spare Parts (ex.: uma COPIA de backup): so com confirmacao.
-        const idAnt = Store._idLembrado();
-        if (v.marca && idAnt && v.marca.id !== idAnt && !opts.aceitarOutra) {
-            throw Store._erroPasta('PASTA_DIFERENTE',
-                `A pasta "${dirHandle.name}" e uma pasta do sistema, mas NAO e a mesma que este PC usava ` +
-                '(pode ser uma copia ou um backup).');
-        }
-        const marca = v.marca || await Store._gravarMarca(dirHandle, v.criarMarca || 'banco novo');
-        if (!opts.demo) Store._lembrarId(marca.id);   // demo nao vira a pasta 'habitual'
-        Store._marca = marca;
-
+    async conectar(dirHandle) {
         Store._raiz  = dirHandle;
         Store._dados = await dirHandle.getDirectoryHandle(Store.PASTA_DADOS, { create: true });
         Store._mov   = await Store._dados.getDirectoryHandle(Store.PASTA_MOV,  { create: true });

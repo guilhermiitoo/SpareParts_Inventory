@@ -188,7 +188,9 @@ const Modal = {
 
             document.getElementById('genericModal').style.display = 'flex';
 
-            const onConfirm = () => { this._cleanup(); resolve(input.value.trim()); };
+            // v17.12: le o valor ANTES de limpar — antes o _cleanup() apagava o campo
+            // primeiro e o prompt sempre devolvia vazio.
+            const onConfirm = () => { const v = input.value.trim(); this._cleanup(); resolve(v); };
             const onCancel  = () => { this._cleanup(); resolve(null); };
 
             document.getElementById('genericModalConfirm').onclick = onConfirm;
