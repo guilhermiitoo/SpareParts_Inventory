@@ -854,11 +854,9 @@ const DB = {
 
             clearTimeout(State._syncTimer);   // para o sync antes de trocar o handle
 
-            const dh = await DB._escolherPastaValida();
-            if (!dh) { if (reconnBtn) reconnBtn.style.display = 'none'; return; }
+            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
             State.dbDirHandle = dh;
-            await DB._abrirPasta(dh, DB._optsPasta);
-            DB._seloTeste();
+            await DB._abrirPasta(dh);
 
             State.isConnected     = true;
             State._syncErrorCount = 0;
@@ -896,8 +894,8 @@ const DB = {
     // _abrirPasta: conecta o Store na pasta, migra o formato antigo se for
     // o caso, e carrega TUDO para a memoria no mesmo formato de sempre.
     // ============================================================
-    async _abrirPasta(dh, opts) {
-        const r = await Store.conectar(dh, opts);
+    async _abrirPasta(dh) {
+        const r = await Store.conectar(dh);
 
         if (r.estado === 'migrado') {
             Toast.success(
@@ -929,13 +927,12 @@ const DB = {
 
     // Logica comum a 1a conexao e a reconexao, com a pasta ja escolhida.
     async _finishInitialConnect(opts) {
-        await DB._abrirPasta(State.dbDirHandle, opts);
+        await DB._abrirPasta(State.dbDirHandle);
 
         State.isConnected = true;
         DB.startAutoSync();
         DB._setSyncStatus('ok', 'Conectado');
         if (!(opts && opts.demo)) Store.lembrarPasta(State.dbDirHandle);   // memoriza para a proxima vez
-        DB._seloTeste();
         DB._reconnBtnLoginUI(false);
         try { AutoBackup.reconectar(); } catch (_) {}
         // v17.07: foto diaria do saldo por componente (base da aba Consumo)
@@ -990,140 +987,24 @@ const DB = {
                 Toast.error('Seu navegador nao suporta a File System Access API. Use Chrome ou Edge.');
                 return;
             }
-            const msg = document.getElementById('dbErrorMsg');
-            if (msg) msg.textContent = '';
-            const dh = await DB._escolherPastaValida();
-            if (!dh) return;
-            // pasta ja validada pela trava; agora conecta e termina o boot
-            await DB._finishInitialConnect(DB._optsPasta);
-            if (msg) msg.textContent = '';
+
+            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
+
+            const perm = await dh.requestPermission({ mode: 'readwrite' });
+            if (perm !== 'granted') {
+                const msg = document.getElementById('dbErrorMsg');
+                if (msg) msg.textContent = 'Permissao de gravacao negada para a pasta.';
+                return;
+            }
+
+            State.dbDirHandle = dh;
+            await DB._finishInitialConnect();
+
         } catch (e) {
             if (e.name !== 'AbortError') {
                 console.error(e);
                 const msg = document.getElementById('dbErrorMsg');
                 if (msg) msg.textContent = 'Erro ao abrir a pasta: ' + e.message;
-            }
-        }
-    },
-
-    // ============================================================
-    // v17.06 — ESCOLHA DA PASTA COM TRAVA
-    // Abre o seletor, confere se a pasta e a do sistema (arquivo de
-    // identidade na raiz) e, se nao for, explica e pede para tentar de
-    // novo — quantas vezes for preciso, ate o colaborador acertar ou
-    // desistir. Retorna o handle validado ou null.
-    // ============================================================
-    _optsPasta: null,
-    async _escolherPastaValida() {
-        DB._optsPasta = null;
-        while (true) {
-            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
-            const perm = await dh.requestPermission({ mode: 'readwrite' });
-            if (perm !== 'granted') {
-                Toast.error('Permissao de gravacao negada para a pasta.');
-                return null;
-            }
-            const v = await Store.verificarPasta(dh);
-            const idAnt = Store._idLembrado();
-            if (v.ok && !(v.marca && v.marca.tipo !== 'teste' && idAnt && v.marca.id !== idAnt)) {
-                State.dbDirHandle = dh;
-                return dh;
-            }
-            if (v.ok) {
-                // e uma pasta do sistema, mas nao a que este PC usava
-                const aceitar = await Modal.confirm('Pasta diferente da habitual',
-                    `A pasta "${dh.name}" e do sistema Spare Parts, mas NAO e a mesma que este PC usava.\n` +
-                    'Pode ser uma COPIA ou um BACKUP — trabalhar nela separa os dados dos outros PCs.\n\n' +
-                    'Use esta pasta somente se o banco oficial mudou de lugar.',
-                    'Usar esta pasta mesmo assim', true);
-                if (aceitar) { DB._optsPasta = { aceitarOutra: true }; State.dbDirHandle = dh; return dh; }
-            } else {
-                const msg = document.getElementById('dbErrorMsg');
-                if (msg) msg.textContent = `Pasta errada: "${dh.name}". Tente novamente.`;
-                const op = await Modal.escolher('Pasta errada',
-                    `A pasta "${dh.name}" NAO e a pasta do sistema Spare Parts.\n\n` +
-                    `A pasta correta tem o arquivo ${Store.MARCA} e a subpasta "dados".\n` +
-                    'Nada foi criado nem alterado na pasta escolhida.\n\n' +
-                    'TENTAR NOVAMENTE: escolher a pasta oficial na rede.\n' +
-                    'USAR PARA TESTE: criar um banco de teste vazio nesta pasta (o banco oficial nao e tocado).',
-                    [{ valor: null, rotulo: 'Cancelar', classe: 'btn-gray' },
-                     { valor: 'teste', rotulo: 'Usar para teste', classe: 'btn-yellow' },
-                     { valor: 'tentar', rotulo: 'Tentar novamente', classe: 'btn-blue' }], true);
-                if (op === 'teste') {
-                    const conf = await Modal.prompt('Criar banco de TESTE',
-                        `Sera criado um banco de dados de TESTE, vazio, na pasta "${dh.name}".\n` +
-                        'Enquanto estiver nele, o sistema mostra a etiqueta "BANCO DE TESTE" no topo.\n' +
-                        'Para confirmar, digite TESTE:', 'TESTE');
-                    if (String(conf || '').trim().toUpperCase() === 'TESTE') {
-                        DB._optsPasta = { criar: true, teste: true, aceitarOutra: true };
-                        State.dbDirHandle = dh;
-                        return dh;
-                    }
-                    Toast.info('Banco de teste nao criado.');
-                    continue;
-                }
-                if (op !== 'tentar') return null;
-                continue;
-            }
-            const again = await Modal.confirm('Escolher outra pasta?', 'Deseja selecionar outra pasta?', 'Tentar novamente');
-            if (!again) return null;
-        }
-    },
-
-    // v17.12: etiqueta vermelha no topo enquanto o banco aberto for de TESTE,
-    // para ninguem trabalhar nele achando que e o oficial.
-    _seloTeste() {
-        const teste = !!(Store._marca && Store._marca.tipo === 'teste');
-        let tag = document.getElementById('seloBancoTeste');
-        if (!teste) { if (tag) tag.remove(); return; }
-        if (tag) return;
-        tag = document.createElement('div');
-        tag.id = 'seloBancoTeste';
-        tag.className = 'no-print';
-        tag.title = 'Este banco e so para testes. Os dados nao sao os do estoque real.';
-        tag.style.cssText = 'display:inline-block; margin-top:6px; background:var(--ind-red); color:#fff; font-weight:900; ' +
-            'font-size:0.7rem; letter-spacing:1px; padding:4px 10px; border-radius:4px;';
-        tag.innerHTML = '<i class="fas fa-flask"></i> BANCO DE TESTE';
-        const alvo = document.querySelector('header .header-right') || document.getElementById('dbStepContainer');
-        if (alvo) alvo.appendChild(tag);
-        const login = document.getElementById('dbStepContainer');
-        if (login && alvo !== login) login.appendChild(tag.cloneNode(true)).id = 'seloBancoTesteLogin';
-    },
-
-    // ============================================================
-    // BANCO NOVO — cria a estrutura dentro de uma pasta vazia.
-    // (Se a pasta ja tiver um JSON antigo, _abrirPasta migra em vez de criar.)
-    // ============================================================
-    async createNew() {
-        try {
-            if (!window.showDirectoryPicker) {
-                Toast.error('Seu navegador nao suporta a File System Access API. Use Chrome ou Edge.');
-                return;
-            }
-
-            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
-            const perm = await dh.requestPermission({ mode: 'readwrite' });
-            if (perm !== 'granted') { Toast.error('Permissao de gravacao negada para a pasta.'); return; }
-
-            // v17.06: criar banco novo e uma decisao consciente — pede confirmacao escrita
-            const v = await Store.verificarPasta(dh);
-            if (v.ok) { Toast.warn('Esta pasta ja e uma pasta do sistema. Use "Selecionar pasta do sistema".', 7000); return; }
-            const conf = await Modal.prompt('Criar banco NOVO',
-                `Sera criado um banco de dados VAZIO na pasta "${dh.name}", e ela passara a ser uma pasta do sistema.\n` +
-                'So faca isso na instalacao inicial. Para confirmar, digite CRIAR:', 'CRIAR');
-            if (String(conf || '').trim().toUpperCase() !== 'CRIAR') { Toast.info('Criacao cancelada.'); return; }
-
-            State.dbDirHandle = dh;
-            State.inventory = []; State.validLocations = [];
-            State.logs = [];      State.checkoutHistory = [];
-
-            await DB._finishInitialConnect({ criar: true, aceitarOutra: true });
-            Toast.success('Estrutura do banco criada na pasta escolhida.', 6000);
-
-        } catch (e) {
-            if (e.name !== 'AbortError') {
-                console.error(e);
-                Toast.error('Erro ao criar o banco: ' + e.message);
             }
         }
     },

@@ -173,35 +173,6 @@ const Modal = {
         });
     },
 
-    // v17.12: dialogo com varios botoes. botoes = [{ valor, rotulo, classe }]
-    // Retorna o `valor` do botao clicado (null se fechar pelo Cancelar).
-    escolher(title, body, botoes, isDanger = false) {
-        return new Promise(resolve => {
-            const box = document.getElementById('genericModalBox');
-            box.classList.toggle('modal-danger', !!isDanger);
-            document.getElementById('genericModalTitle').textContent = title;
-            document.getElementById('genericModalBody').textContent = body;
-            document.getElementById('genericModalInput').style.display = 'none';
-            const acoes = document.getElementById('genericModalActions');
-            const originais = [...acoes.children];
-            originais.forEach(b => { b.style.display = 'none'; });
-            const fim = v => {
-                acoes.querySelectorAll('.modal-extra').forEach(b => b.remove());
-                originais.forEach(b => { b.style.display = ''; });
-                document.getElementById('genericModal').style.display = 'none';
-                resolve(v);
-            };
-            botoes.forEach(b => {
-                const el = document.createElement('button');
-                el.className = 'btn-3d modal-extra ' + (b.classe || 'btn-blue');
-                el.textContent = b.rotulo;
-                el.onclick = () => fim(b.valor);
-                acoes.appendChild(el);
-            });
-            document.getElementById('genericModal').style.display = 'flex';
-        });
-    },
-
     // Exibe um dialogo de input (substitui prompt())
     prompt(title, body, placeholder = '', defaultValue = '') {
         return new Promise(resolve => {

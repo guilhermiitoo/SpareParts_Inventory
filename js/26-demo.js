@@ -32,10 +32,10 @@ const Demo = {
         try {
             const root = await navigator.storage.getDirectory();
             const dh = await root.getDirectoryHandle(Demo.PASTA, { create: true });
-            const nova = !(await Store.verificarPasta(dh)).ok;
+            const nova = !(await Store._temIndiceAntigo(dh));
             State.dbDirHandle = dh;
             Demo.ativo = true;
-            await DB._finishInitialConnect({ criar: true, aceitarOutra: true, demo: true });
+            await DB._finishInitialConnect({ demo: true });
             if (nova) await Demo._semear();
             else {
                 // demo criada por uma versao anterior: refaz so os dados do Consumo
