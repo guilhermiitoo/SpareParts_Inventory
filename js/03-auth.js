@@ -197,11 +197,12 @@ const Perms = {
             { key: 'tab:estoque',       label: 'Busca Avulsa',          desc: 'Consulta rapida de posicoes' },
             { key: 'tab:dashboard',     label: 'Historico',             desc: 'Historico de movimentacoes' },
             { key: 'tab:confirmacao',  label: 'Confirmacao',           desc: 'Confirmacao de conclusao das listas' },
+            { key: 'tab:etiquetas',    label: 'Etiquetas',             desc: 'Impressao de etiquetas com o codigo da lista do MES' },
             { key: 'tab:ranking',       label: 'Ranking',               desc: 'Ranking / gamificacao' },
             { key: 'tab:stock_manage',  label: 'Estoque',               desc: 'Gestao de estoque (mapa dos carros)' },
             { key: 'tab:users',         label: 'Sistema',               desc: 'Usuarios, backups e manutencao' },
             { key: 'tab:adm-stockdash', label: 'Dashboard',             desc: 'Graficos de estoque' },
-            { key: 'tab:dashboard_adm', label: 'Rendimento',            desc: 'Dashboard de produtividade' },
+            { key: 'tab:dashboard_adm', label: 'ALERTA',   desc: 'Codigos sem movimentacao (obsoletos)' },
         ]},
         { group: 'Aba Estoque — coluna "Acoes"', icon: 'fa-pen-to-square', items: [
             { key: 'act:stock_edit',    label: 'Editar item (lapis)',   desc: 'Alterar codigo e quantidade da posicao' },
@@ -226,6 +227,7 @@ const Perms = {
         'tab:feeder': true, 'tab:devolucao': true, 'tab:estoque': true,
         'tab:dashboard': true, 'tab:ranking': true, 'tab:stock_manage': true,
         'tab:confirmacao': true,
+        'tab:etiquetas': true,
         'act:stock_clear': true,
     },
 

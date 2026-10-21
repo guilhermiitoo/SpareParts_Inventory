@@ -13,11 +13,12 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.00</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.06</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
@@ -32,6 +33,7 @@
     <link rel="stylesheet" href="css/02-componentes.css">
     <link rel="stylesheet" href="css/03-impressao.css">
     <link rel="stylesheet" href="css/04-telas.css">
+    <link rel="stylesheet" href="css/05-menu-lateral.css">
 </head>
 <body>
 
@@ -72,9 +74,14 @@
                 <i class="fas fa-folder-open"></i> SELECIONAR PASTA DO SISTEMA
             </button>
             <div style="font-size:0.72rem; color:#64748b; margin-top:8px; line-height:1.4;">
-                <i class="fas fa-circle-info"></i> Selecione a <b>pasta</b> do sistema (a que contem <code>dados</code>).
+                <i class="fas fa-circle-info"></i> Selecione a <b>pasta</b> do sistema (a que contem <code>dados</code> e o arquivo
+                <code>SPARE_PARTS_PASTA_DO_SISTEMA.json</code>). Se escolher outra pasta, o sistema recusa e pede para tentar de novo.
                 A autorizacao e pedida <b>uma unica vez</b> e vale para todos os arquivos dentro dela —
                 deste PC em diante, o sistema reconecta sozinho.
+            </div>
+            <div style="text-align:right; margin-top:6px;">
+                <a href="#" onclick="DB.createNew(); return false;" style="font-size:0.68rem; color:#94a3b8; text-decoration:underline;"
+                   title="Somente na instalacao inicial: cria um banco vazio numa pasta nova">Instalacao inicial: criar banco novo</a>
             </div>
             <div id="dbErrorMsg" style="color:var(--ind-red); margin-top:10px; font-weight:bold; font-size:0.8rem; text-align:center;"></div>
         </div>
@@ -697,6 +704,12 @@
             </div>
         </div>
 
+        <!-- ==================== ETIQUETAS (v16.37) ==================== -->
+        <div id="tab-etiquetas" class="section">
+            <h2>Impressao de Etiquetas</h2>
+            <div id="etqContent"><div style="color:#94a3b8; text-align:center; padding:30px;">Carregando...</div></div>
+        </div>
+
         <!-- MEU RENDIMENTO (operador) -->
         <!-- ==================== RANKING ==================== -->
         <div id="tab-ranking" class="section">
@@ -1038,71 +1051,68 @@
 
         </div>
 
-        <!-- DASHBOARD ADM -->
+        <!-- DASHBOARD ADM — ALERTAS DE PROCESSO (codigos sem movimentacao) -->
         <div id="adm-dashboard" class="section">
-            <h2 style="color:var(--ind-red); border-color:var(--ind-red);">Rendimento e Auditoria</h2>
-            <!-- ===== PAINEL RENDIMENTO (KPIs + Ranking Devolucoes / Busca Avulsa) ===== -->
-            <div id="rendPanel" style="background:#F6F4EF; border:1px solid #C9C3B6; border-radius:10px; padding:0; margin-bottom:25px; overflow:hidden;">
-                <div style="background:#12161C; color:#F6F4EF; padding:16px 22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <h2 style="color:var(--tpv-dark-blue); border-color:var(--ind-yellow);">Alerta</h2>
+            <div style="background:#fff; border:1px solid var(--ind-border); border-radius:8px; overflow:hidden;">
+                <div style="background:var(--tpv-dark-blue); color:#fff; padding:16px 22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                     <div>
-                        <div style="font-size:1.05rem; font-weight:900; letter-spacing:0.5px; text-transform:uppercase;">Painel de Rendimento</div>
-                        <div style="font-size:0.72rem; color:#C9C3B6; margin-top:2px;">TPV VISION · MANAUS — MMT / SPARE PARTS</div>
+                        <div style="font-size:1.05rem; font-weight:900; letter-spacing:0.5px; text-transform:uppercase;"><i class="fas fa-exclamation-triangle" style="color:var(--ind-yellow);"></i> Codigos sem Movimentacao</div>
+                        <div id="oaSub" style="font-size:0.72rem; color:#cbd5e1; margin-top:2px;">Analise por CODIGO — se qualquer posicao do codigo mexeu, o codigo esta ativo</div>
                     </div>
-                    <div style="text-align:right;">
-                        <div id="rendPeriodLabel" style="font-size:0.85rem; font-weight:800;">SEMANA ATUAL</div>
-                        <div id="rendPeriodSub" style="font-size:0.7rem; color:#C9C3B6;">--</div>
-                    </div>
-                </div>
-
-                <div style="padding:20px 22px;">
-                    <div id="rendKpiRow" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:14px; margin-bottom:20px;"></div>
-
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:18px;">
-                        <div style="background:#fff; border:1px solid #C9C3B6; border-radius:8px; padding:16px;">
-                            <div style="font-weight:900; font-size:0.85rem; color:#12161C; text-transform:uppercase; letter-spacing:0.6px;">Devolucoes por Operador</div>
-                            <div style="font-size:0.72rem; color:#8a8579; margin-bottom:10px;">Do maior para o menor · lancamentos na semana</div>
-                            <div style="height:290px; position:relative;"><canvas id="rendChartDev"></canvas></div>
-                        </div>
-                        <div style="background:#fff; border:1px solid #C9C3B6; border-radius:8px; padding:16px;">
-                            <div style="font-weight:900; font-size:0.85rem; color:#12161C; text-transform:uppercase; letter-spacing:0.6px;">Busca Avulsa por Operador</div>
-                            <div style="font-size:0.72rem; color:#8a8579; margin-bottom:10px;">Do maior para o menor · lancamentos na semana</div>
-                            <div style="height:290px; position:relative;"><canvas id="rendChartBusca"></canvas></div>
-                        </div>
-                    </div>
-
-                    <div style="display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:0.7rem; color:#5c5850; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
-                        <span><span style="display:inline-block;width:12px;height:12px;background:#8A5A2B;border-radius:2px;vertical-align:-1px;margin-right:6px;"></span>Devolucoes</span>
-                        <span><span style="display:inline-block;width:12px;height:12px;background:#1F4E5F;border-radius:2px;vertical-align:-1px;margin-right:6px;"></span>Busca Avulsa</span>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn-3d btn-blue" style="padding:8px 16px; font-size:0.8rem;" onclick="AdminDash.update()"><i class="fas fa-sync-alt"></i> ATUALIZAR</button>
+                        <button class="btn-3d btn-green" style="padding:8px 16px; font-size:0.8rem;" onclick="ObsAlerts.exportXlsx()"><i class="fas fa-file-excel"></i> BAIXAR EXCEL</button>
                     </div>
                 </div>
-            </div>
-
-            <!-- ===== RESUMO OPERACIONAL (mesma paleta do Painel de Rendimento) ===== -->
-            <div style="background:#F6F4EF; border:1px solid #C9C3B6; border-radius:10px; padding:0; margin-bottom:25px; overflow:hidden;">
-                <div style="background:#12161C; color:#F6F4EF; padding:16px 22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                    <div>
-                        <div style="font-size:1.05rem; font-weight:900; letter-spacing:0.5px; text-transform:uppercase;">Resumo Operacional</div>
-                        <div id="dashWeekLabel" style="font-size:0.72rem; color:#C9C3B6; margin-top:2px;">Semana atual</div>
+                <div style="padding:18px 22px;">
+                    <div id="oaKpis" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:16px;"></div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; background:#f8fafc; border:1px solid var(--ind-border); border-radius:6px; padding:12px 14px; margin-bottom:12px;">
+                        <div style="flex:2; min-width:200px;"><div class="oa-lbl">Buscar codigo / descricao</div>
+                            <input id="oaSearch" class="big-input" style="padding:8px 10px; margin:0;" placeholder="Ex.: 065G0805..." oninput="ObsAlerts.render()"></div>
+                        <div><div class="oa-lbl">Parado ha pelo menos</div>
+                            <select id="oaMinDays" class="big-input" style="padding:8px 10px; margin:0; width:auto;" onchange="ObsAlerts.render()">
+                                <option value="0">Todos</option><option value="31">+30 dias (atencao)</option><option value="61">+60 dias (lento)</option><option value="91" selected>+90 dias (obsoleto)</option><option value="121">+120 dias</option></select></div>
+                        <div><div class="oa-lbl">Tipo de carro</div>
+                            <select id="oaType" class="big-input" style="padding:8px 10px; margin:0; width:auto;" onchange="ObsAlerts.render()"><option value="">Todos</option></select></div>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.8rem; font-weight:700; color:var(--tpv-dark-blue); padding-bottom:8px; cursor:pointer;">
+                            <input type="checkbox" id="oaOnlyInit" onchange="ObsAlerts.render()"> So nunca movidos desde a carga inicial</label>
                     </div>
-                    <button class="btn-3d" style="padding:8px 18px; font-size:0.8rem; background:#1F4E5F; box-shadow:0 3px 0 #143843; color:#F6F4EF; text-transform:uppercase; letter-spacing:0.5px;" onclick="AdminDash.update()"><i class="fas fa-sync-alt"></i> Atualizar</button>
-                </div>
-                <div style="padding:20px 22px;">
-                    <div id="dashUserCards" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:15px;"></div>
-                </div>
-            </div>
-
-            <div style="display:flex; gap:20px; height:400px;">
-                <div style="flex:2; border:1px solid #e2e8f0; padding:15px; background:white; display:flex; flex-direction:column; border-radius:6px;">
-                    <h3 style="margin:0; border-bottom:1px solid #e2e8f0; padding-bottom:10px; font-size:1rem; color:#475569;">Atividade Principal</h3>
-                    <div style="flex:1; position:relative;"><canvas id="chartActivity"></canvas></div>
-                </div>
-                <div style="flex:1; display:flex; flex-direction:column;">
-                    <div style="flex:1; border:2px solid var(--ind-red); background:#fef2f2; display:flex; flex-direction:column; border-radius:6px; overflow:hidden;">
-                        <h3 style="margin:0; background:var(--ind-red); color:white; padding:12px; font-size:0.9rem; text-transform:uppercase;"><i class="fas fa-exclamation-triangle"></i> Alertas de Processo</h3>
-                        <div id="alertBoxContent" style="padding:15px; overflow-y:auto; flex:1;"></div>
+                    <div id="oaCount" style="font-size:0.75rem; color:#475569; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;"></div>
+                    <div style="background:#fff; border:1px solid var(--ind-border); border-radius:6px; overflow:auto; max-height:600px;">
+                        <table class="oa-table">
+                            <thead><tr>
+                                <th data-k="code" onclick="ObsAlerts.sort('code')">Codigo</th>
+                                <th data-k="desc" onclick="ObsAlerts.sort('desc')">Descricao</th>
+                                <th data-k="tipo" onclick="ObsAlerts.sort('tipo')">Tipo</th>
+                                <th data-k="n" onclick="ObsAlerts.sort('n')" style="text-align:center;">Posicoes</th>
+                                <th data-k="qty" onclick="ObsAlerts.sort('qty')" style="text-align:right;">Qtd total</th>
+                                <th data-k="last" onclick="ObsAlerts.sort('last')">Ultima mov.</th>
+                                <th data-k="days" onclick="ObsAlerts.sort('days')" style="text-align:center;">Dias parado</th>
+                                <th>Faixa</th>
+                            </tr></thead>
+                            <tbody id="oaBody"></tbody>
+                        </table>
+                    </div>
+                    <div style="text-align:center; margin-top:10px;"><button id="oaMore" class="btn-3d btn-gray" style="padding:7px 18px; font-size:0.8rem; display:none;" onclick="ObsAlerts.more()">MOSTRAR MAIS</button></div>
+                    <div style="font-size:0.7rem; color:#64748b; margin-top:10px; line-height:1.5;">
+                        Ultima movimentacao = data mais recente entre a entrada nas posicoes do codigo e as baixas/devolucoes do historico.
+                        Clique na linha para ver as posicoes (carro-local). Faixas: <b style="color:#4A6B3A">ATIVO</b> ate 30d ·
+                        <b style="color:#C08A1E">ATENCAO</b> 31–60d · <b style="color:#8A5A2B">LENTO</b> 61–90d · <b style="color:#B42318">OBSOLETO</b> &gt;90d.
                     </div>
                 </div>
             </div>
+            <style>
+                .oa-lbl{font-size:0.66rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;}
+                .oa-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+                .oa-table th{position:sticky;top:0;background:var(--tpv-dark-blue);color:#fff;padding:9px 10px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;white-space:nowrap;user-select:none;}
+                .oa-table td{padding:8px 10px;border-bottom:1px solid #e2e8f0;}
+                .oa-table tr.oa-row{cursor:pointer;} .oa-table tr.oa-row:hover td{background:#eff6ff;}
+                .oa-table tr.oa-det td{background:#f8fafc;font-family:'Roboto Mono',monospace;font-size:0.75rem;color:#475569;}
+                .oa-tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:0.66rem;font-weight:900;letter-spacing:0.5px;color:#fff;}
+                .oa-kpi{background:#fff;border:1px solid var(--ind-border);border-radius:6px;padding:12px 14px;cursor:pointer;transition:transform .1s;}
+                .oa-kpi:hover{transform:translateY(-2px);} .oa-kpi.on{box-shadow:0 0 0 2px var(--tpv-blue);}
+            </style>
         </div>
 
         <!-- HISTORICO ADM -->
@@ -1278,6 +1288,8 @@
 <script src="js/19-familias-ui.js"></script>
 <script src="js/22-dashmmt.js"></script>
 <script src="js/21-dashboards.js"></script>
+<script src="js/23-etiquetas.js"></script>
+<script src="js/24-alertas.js"></script>
 <script src="js/30-admin.js"></script>
 <script src="js/40-backup.js"></script>
 <script src="js/99-boot.js"></script>

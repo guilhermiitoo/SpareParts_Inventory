@@ -405,6 +405,9 @@ const UI = {
         if (tab === 'confirmacao') {
             setTimeout(function() { if (typeof ListConfirm !== 'undefined') ListConfirm.render(); }, 80);
         }
+        if (tab === 'etiquetas') {
+            setTimeout(function() { if (typeof Etiquetas !== 'undefined') Etiquetas.render(); }, 80);
+        }
         if (tab === 'dashboard_adm') {
             setTimeout(function() { if (typeof AdminDash !== 'undefined') AdminDash.update(); }, 80);
         }
@@ -428,6 +431,7 @@ const UI = {
         const isViewer = State.currentUser && State.currentUser.isViewer;
         const nav = document.getElementById('mainNav');
         if (!nav) return;
+        UI._menuLateral();   // v17.06: abas na barra lateral
 
         // Modo viewer: apenas a aba Gestao Estoque
         if (isViewer) {
@@ -449,19 +453,30 @@ const UI = {
             { tab: 'estoque',       icon: 'fa-search-location', label: 'Busca Avulsa',   admin: false },
             { tab: 'dashboard',     icon: 'fa-chart-pie',       label: 'Historico',      admin: false },
             { tab: 'confirmacao',   icon: 'fa-clipboard-check', label: 'Confirmacao',    admin: false },
+            { tab: 'etiquetas',     icon: 'fa-barcode',         label: 'Etiquetas',      admin: false },
             { tab: 'ranking',       icon: 'fa-trophy',           label: 'Ranking',        admin: false },
             { tab: 'stock_manage',  icon: 'fa-boxes',           label: 'Estoque',        admin: false },
             { tab: 'users',         icon: 'fa-users-cog',       label: 'Sistema',        admin: true  },
             { tab: 'adm-stockdash', icon: 'fa-chart-bar',       label: 'Dashboard',      admin: true  },
-            { tab: 'dashboard_adm', icon: 'fa-chart-line',      label: 'Rendimento',     admin: true  },
+            { tab: 'dashboard_adm', icon: 'fa-exclamation-triangle', label: 'ALERTA', admin: true  },
         ];
         nav.innerHTML = '';
         const visible = tabs.filter(function(t) { return Perms.can('tab:' + t.tab); });
         nav.style.gridTemplateColumns = 'repeat(' + visible.length + ', 1fr)';
         var firstTab = null;
+        var temSep = false;
         visible.forEach(function(t) {
             if (!firstTab) firstTab = t.tab;
+            // v17.06: rotulo separando as abas de administrador
+            if (t.admin && !temSep) {
+                temSep = true;
+                const sep = document.createElement('div');
+                sep.className = 'nav-sep';
+                sep.textContent = 'Administracao';
+                nav.appendChild(sep);
+            }
             const div = document.createElement('div');
+            div.title = t.label;   // com o menu recolhido, o nome aparece no mouse
             div.className = 'nav-item' + (t.admin ? ' admin-only' : '');
             div.dataset.tab = t.tab;
             div.innerHTML = '<i class="fas ' + t.icon + '"></i><span>' + t.label + '</span>';
@@ -469,6 +484,31 @@ const UI = {
             nav.appendChild(div);
         });
         UI.navMain(firstTab || 'feeder');
+    },
+
+    // ==================================================================
+    // v17.06 — MENU LATERAL (css/05-menu-lateral.css)
+    // Liga a barra lateral e cria, uma unica vez, o botao redondo que
+    // recolhe/expande. F9 faz o mesmo. A escolha fica lembrada neste PC.
+    // ==================================================================
+    _menuLateral() {
+        document.body.classList.add('com-menu');
+        if (document.getElementById('btnRecolherMenu')) return;
+        const CHAVE = 'sp_menu_recolhido';
+        const btn = document.createElement('button');
+        btn.id = 'btnRecolherMenu'; btn.type = 'button'; btn.className = 'no-print';
+        const aplicar = (recolhido) => {
+            document.body.classList.toggle('menu-recolhido', recolhido);
+            btn.innerHTML = '<i class="fas fa-chevron-' + (recolhido ? 'right' : 'left') + '"></i>';
+            btn.title = recolhido ? 'Mostrar o menu (F9)' : 'Recolher o menu (F9)';
+            try { localStorage.setItem(CHAVE, recolhido ? '1' : '0'); } catch (e) {}
+        };
+        btn.onclick = () => aplicar(!document.body.classList.contains('menu-recolhido'));
+        document.addEventListener('keydown', e => { if (e.key === 'F9') { e.preventDefault(); btn.onclick(); } });
+        let recolhido = window.innerWidth <= 768;
+        try { const v = localStorage.getItem(CHAVE); if (v !== null && window.innerWidth > 768) recolhido = v === '1'; } catch (e) {}
+        aplicar(recolhido);
+        document.body.appendChild(btn);
     },
 
     showCard(id) {

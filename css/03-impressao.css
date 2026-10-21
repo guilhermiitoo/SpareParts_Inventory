@@ -1,0 +1,83 @@
+/* ======================================================================
+   SPARE PARTS - 03-impressao.css
+   Extraido do arquivo unico v16.32. A ORDEM de carga destes arquivos
+   importa: veja o comentario no <head> do SPARE_PARTS.html.
+   ====================================================================== */
+
+        @media print {
+            @page { margin: 0.5cm; size: A4 portrait; }
+
+            /* REGRA MESTRE: esconde TUDO por padrao */
+            body > * { display: none !important; }
+
+            /* Mostra apenas o app */
+            body > #app { display: block !important; }
+
+            body {
+                background: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                font-size: 8pt !important;
+            }
+
+            /* Esconde elementos de UI dentro do app */
+            .no-print,
+            header,
+            .nav-grid,
+            .btn-3d,
+            .drop-zone,
+            .rules-bar,
+            #feederMapper,
+            #loginWrapper,
+            #saveIndicator,
+            #toastContainer,
+            #genericModal,
+            #commitmentModal,
+            #userDetailModal,
+            #auditModal,
+            #devVoiceBadge,
+            #dragOverlay,
+            #feederProcessSuccess,
+            #feederRulesBar,
+            details { display: none !important; }
+
+            /* ======= MODO FEEDER (padrao) ======= */
+            #app          { display: block !important; margin: 0 !important; padding: 0 !important; max-width: none !important; }
+            #mainApp      { display: block !important; }
+
+            /* Esconde tudo por padrao; feeder mostra apenas #tab-feeder */
+            #tab-devolucao, #tab-estoque, #tab-dashboard { display: none !important; }
+            #tab-feeder   { display: block !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+            #feederResults { display: block !important; margin: 0 !important; width: 100% !important; }
+
+            /* ======= MODO KITTING (body.print-kitting) ======= */
+            /* Esconde tudo, mostra apenas a aba estoque com print-only */
+            body.print-kitting #tab-feeder    { display: none !important; }
+            body.print-kitting #tab-estoque   { display: block !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+            body.print-kitting #tab-estoque > *            { display: none !important; }
+            body.print-kitting #kittingPrintHeader         { display: flex !important; }
+            body.print-kitting #kittingPrintTable          { display: table !important; }
+
+            /* Tabela kitting */
+            #kittingPrintTable { width: 100% !important; border-collapse: collapse !important; margin-top: 8px !important; }
+            #kittingPrintTable th { background-color: #e7e6e6 !important; color: #000 !important; padding: 4px 6px !important; border: 1px solid #000 !important; font-weight: bold !important; text-align: center !important; font-size: 9pt !important; }
+            #kittingPrintTable td { border: 1px solid #000 !important; padding: 3px 6px !important; text-align: center !important; color: #000 !important; font-size: 9pt !important; }
+
+            /* Cabecalho de impressao */
+            .print-header {
+                display: flex !important; align-items: center !important; justify-content: space-between !important;
+                background-color: #f2f2f2 !important; border: 1px solid #000 !important;
+                padding: 5px 10px !important; margin-bottom: 5px !important;
+            }
+
+            /* Tabela estilo Excel */
+            #resTable { width: 100% !important; border-collapse: collapse !important; font-size: 8pt !important; margin-top: 0 !important; }
+            #resTable th { background-color: #e7e6e6 !important; color: #000 !important; padding: 3px 2px !important; border: 1px solid #000 !important; text-align: center !important; font-weight: bold !important; }
+            #resTable td { border: 1px solid #000 !important; padding: 2px !important; text-align: center !important; color: #000 !important; }
+            .badge { display: block !important; width: 100% !important; padding: 4px 0 !important; border-radius: 0 !important; font-size: 8pt !important; font-weight: bold !important; border: none !important; }
+            .bg-ok  { background-color: #92D050 !important; color: #000 !important; }
+            .bg-err { background-color: #FFC7CE !important; color: #9C0006 !important; }
+
+            /* Print-only: aparece so na impressao (cabecalho kitting) */
+            .print-only { display: block !important; }
+        }

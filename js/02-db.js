@@ -454,7 +454,7 @@ const DB = {
     // fazia a devolucao aguardar auto-saves de outras telas). Agora aguarda
     // apenas a propria gravacao e, se ela falhar, tenta 3x rapido.
     // Se as 3 falharem, LANCA o erro — o chamador tem que avisar o operador.
-    async saveNow(tentativas = 3) {
+    async saveNow(tentativas = 6) {   // v16.35: 6 tentativas (conflito de rede entre PCs)
         if (!State.dbFileHandle) return;
         clearTimeout(State._saveTimer); // cancela auto-save agendado
         let ultimoErro = null;
@@ -465,7 +465,7 @@ const DB = {
             } catch (e) {
                 ultimoErro = e;
                 console.warn(`[saveNow] tentativa ${i}/${tentativas} falhou:`, e.message);
-                if (i < tentativas) await new Promise(r => setTimeout(r, 150 * i));
+                if (i < tentativas) await new Promise(r => setTimeout(r, 150 * i + Math.random() * 350));   // v16.35: espera aleatoria
             }
         }
         throw ultimoErro || new Error('Falha ao gravar no banco de dados');
@@ -569,6 +569,17 @@ const DB = {
             // Detecta erros de permissao/cache do FileSystem Access API
             // Esses erros NAO se resolvem com retry — exigem reconexao manual
             const msg = (e.message || '').toLowerCase();
+            // v16.35: "InvalidStateError ... state had changed since it was read from disk"
+            // NAO e permissao: e outro PC gravando o mesmo arquivo no mesmo instante (rede).
+            // Antes era tratado como permissao expirada e entrava em loop. Agora: espera um
+            // tempo aleatorio (para os PCs nao baterem de novo) e regrava, relendo o disco.
+            const isConflito = e.name === 'InvalidStateError' || msg.includes('state had changed');
+            if (isConflito) {
+                State._saveErrorCount = Math.max(0, State._saveErrorCount - 1);   // conflito nao conta como falha de rede
+                DB._setSyncStatus('syncing', 'Outro PC gravando — regravando...');
+                if (silent) setTimeout(() => DB.save(true), 150 + Math.random() * 450);
+                throw e;
+            }
             const isPermissionError = msg.includes('state cache')
                 || msg.includes('permission')
                 || msg.includes('not allowed')
@@ -843,9 +854,10 @@ const DB = {
 
             clearTimeout(State._syncTimer);   // para o sync antes de trocar o handle
 
-            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
+            const dh = await DB._escolherPastaValida();
+            if (!dh) { if (reconnBtn) reconnBtn.style.display = 'none'; return; }
             State.dbDirHandle = dh;
-            await DB._abrirPasta(dh);
+            await DB._abrirPasta(dh, DB._optsPasta);
 
             State.isConnected     = true;
             State._syncErrorCount = 0;
@@ -883,8 +895,8 @@ const DB = {
     // _abrirPasta: conecta o Store na pasta, migra o formato antigo se for
     // o caso, e carrega TUDO para a memoria no mesmo formato de sempre.
     // ============================================================
-    async _abrirPasta(dh) {
-        const r = await Store.conectar(dh);
+    async _abrirPasta(dh, opts) {
+        const r = await Store.conectar(dh, opts);
 
         if (r.estado === 'migrado') {
             Toast.success(
@@ -915,8 +927,8 @@ const DB = {
     },
 
     // Logica comum a 1a conexao e a reconexao, com a pasta ja escolhida.
-    async _finishInitialConnect() {
-        await DB._abrirPasta(State.dbDirHandle);
+    async _finishInitialConnect(opts) {
+        await DB._abrirPasta(State.dbDirHandle, opts);
 
         State.isConnected = true;
         DB.startAutoSync();
@@ -974,25 +986,66 @@ const DB = {
                 Toast.error('Seu navegador nao suporta a File System Access API. Use Chrome ou Edge.');
                 return;
             }
-
-            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
-
-            const perm = await dh.requestPermission({ mode: 'readwrite' });
-            if (perm !== 'granted') {
-                const msg = document.getElementById('dbErrorMsg');
-                if (msg) msg.textContent = 'Permissao de gravacao negada para a pasta.';
-                return;
-            }
-
-            State.dbDirHandle = dh;
-            await DB._finishInitialConnect();
-
+            const msg = document.getElementById('dbErrorMsg');
+            if (msg) msg.textContent = '';
+            const dh = await DB._escolherPastaValida();
+            if (!dh) return;
+            // pasta ja validada pela trava; agora conecta e termina o boot
+            await DB._finishInitialConnect(DB._optsPasta);
         } catch (e) {
             if (e.name !== 'AbortError') {
                 console.error(e);
                 const msg = document.getElementById('dbErrorMsg');
                 if (msg) msg.textContent = 'Erro ao abrir a pasta: ' + e.message;
             }
+        }
+    },
+
+    // ============================================================
+    // v17.06 — ESCOLHA DA PASTA COM TRAVA
+    // Abre o seletor, confere se a pasta e a do sistema (arquivo de
+    // identidade na raiz) e, se nao for, explica e pede para tentar de
+    // novo — quantas vezes for preciso, ate o colaborador acertar ou
+    // desistir. Retorna o handle validado ou null.
+    // ============================================================
+    _optsPasta: null,
+    async _escolherPastaValida() {
+        DB._optsPasta = null;
+        while (true) {
+            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
+            const perm = await dh.requestPermission({ mode: 'readwrite' });
+            if (perm !== 'granted') {
+                Toast.error('Permissao de gravacao negada para a pasta.');
+                return null;
+            }
+            const v = await Store.verificarPasta(dh);
+            const idAnt = Store._idLembrado();
+            if (v.ok && !(v.marca && idAnt && v.marca.id !== idAnt)) {
+                State.dbDirHandle = dh;
+                return dh;
+            }
+            if (v.ok) {
+                // e uma pasta do sistema, mas nao a que este PC usava
+                const aceitar = await Modal.confirm('Pasta diferente da habitual',
+                    `A pasta "${dh.name}" e do sistema Spare Parts, mas NAO e a mesma que este PC usava.\n` +
+                    'Pode ser uma COPIA ou um BACKUP — trabalhar nela separa os dados dos outros PCs.\n\n' +
+                    'Use esta pasta somente se o banco oficial mudou de lugar.',
+                    'Usar esta pasta mesmo assim', true);
+                if (aceitar) { DB._optsPasta = { aceitarOutra: true }; State.dbDirHandle = dh; return dh; }
+            } else {
+                const msg = document.getElementById('dbErrorMsg');
+                if (msg) msg.textContent = `Pasta errada: "${dh.name}". Tente novamente.`;
+                const again = await Modal.confirm('Pasta errada',
+                    `A pasta "${dh.name}" NAO e a pasta do sistema Spare Parts.\n\n` +
+                    `A pasta correta tem o arquivo ${Store.MARCA} e a subpasta "dados".\n` +
+                    'Nada foi criado nem alterado na pasta escolhida.\n\n' +
+                    'Clique em TENTAR NOVAMENTE e selecione a pasta oficial na rede.',
+                    'Tentar novamente', true);
+                if (!again) return null;
+                continue;
+            }
+            const again = await Modal.confirm('Escolher outra pasta?', 'Deseja selecionar outra pasta?', 'Tentar novamente');
+            if (!again) return null;
         }
     },
 
@@ -1011,11 +1064,19 @@ const DB = {
             const perm = await dh.requestPermission({ mode: 'readwrite' });
             if (perm !== 'granted') { Toast.error('Permissao de gravacao negada para a pasta.'); return; }
 
+            // v17.06: criar banco novo e uma decisao consciente — pede confirmacao escrita
+            const v = await Store.verificarPasta(dh);
+            if (v.ok) { Toast.warn('Esta pasta ja e uma pasta do sistema. Use "Selecionar pasta do sistema".', 7000); return; }
+            const conf = await Modal.prompt('Criar banco NOVO',
+                `Sera criado um banco de dados VAZIO na pasta "${dh.name}", e ela passara a ser uma pasta do sistema.\n` +
+                'So faca isso na instalacao inicial. Para confirmar, digite CRIAR:', 'CRIAR');
+            if (String(conf || '').trim().toUpperCase() !== 'CRIAR') { Toast.info('Criacao cancelada.'); return; }
+
             State.dbDirHandle = dh;
             State.inventory = []; State.validLocations = [];
             State.logs = [];      State.checkoutHistory = [];
 
-            await DB._finishInitialConnect();
+            await DB._finishInitialConnect({ criar: true, aceitarOutra: true });
             Toast.success('Estrutura do banco criada na pasta escolhida.', 6000);
 
         } catch (e) {

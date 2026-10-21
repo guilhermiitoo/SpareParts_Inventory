@@ -111,88 +111,9 @@ const AdminDash = {
     },
 
     update() {
-        const weekStart = AdminDash._weekStart();
-        const weekEnd   = Date.now();
-        const now       = new Date();
-
-        // Determina semana para label
-        const wStartFmt = new Date(weekStart).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
-        const wEndFmt   = now.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
-
-        // Label de periodo no titulo (se existir)
-        const dashPeriodEl = document.getElementById('dashWeekLabel');
-        if (dashPeriodEl) dashPeriodEl.textContent = `Semana: ${wStartFmt} a ${wEndFmt}`;
-
-        // ---- Resumo Operacional por usuario (baseado em checkoutHistory) ----
-        const cardContainer = document.getElementById('dashUserCards');
-        if (cardContainer) {
-            // Agrega por funcionario usando checkoutHistory como fonte de verdade
-            const userStats = {};
-
-            (State.checkoutHistory || []).filter(h => h.timestamp >= weekStart && h.timestamp <= weekEnd).forEach(h => {
-                const mat  = h.matricula || '?';
-                const nome = h.user || h.printUser || mat;
-                if (!userStats[mat]) userStats[mat] = { nome, buscasAvulsas: 0, listasTiradas: 0, devolucoes: 0, events: [] };
-
-                if (h.type === 'MANUAL_KITTING') userStats[mat].buscasAvulsas++;
-                if (h.type === 'CHECKOUT')       userStats[mat].listasTiradas++;
-                if (h.type === 'RETURN')         userStats[mat].devolucoes++;
-                userStats[mat].events.push(h);
-            });
-
-            const entries = Object.entries(userStats);
-            if (entries.length === 0) {
-                cardContainer.innerHTML = '<div style="color:#8a8579; font-style:italic; padding:20px; text-align:center; grid-column:1/-1;">Nenhuma atividade nesta semana.</div>';
-            } else {
-                cardContainer.innerHTML = entries.sort((a,b) => {
-                    const totA = a[1].buscasAvulsas + a[1].listasTiradas + a[1].devolucoes;
-                    const totB = b[1].buscasAvulsas + b[1].listasTiradas + b[1].devolucoes;
-                    return totB - totA;
-                }).map(([mat, s]) => `
-                <div style="background:#fff;border:1px solid #C9C3B6;border-radius:8px;padding:18px;border-top:4px solid #12161C;">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
-                        <div>
-                            <div style="font-weight:900;color:#12161C;font-size:1rem;">${Security.sanitize(s.nome)}</div>
-                            <div style="font-size:0.72rem;color:#8a8579;margin-top:1px;letter-spacing:0.5px;">${Security.sanitize(mat)}</div>
-                        </div>
-                        <button class="btn-3d" style="padding:6px 13px;font-size:0.73rem;background:#1F4E5F;box-shadow:0 3px 0 #143843;color:#F6F4EF;text-transform:uppercase;letter-spacing:0.5px;" onclick="AdminDash.openDetail('${Security.sanitize(mat)}')">
-                            <i class="fas fa-list-alt"></i> Detalhe
-                        </button>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-                        <div style="background:#F6F4EF;border:1px solid #EDEAE3;border-left:4px solid #1F4E5F;border-radius:5px;padding:9px 6px;text-align:center;">
-                            <div style="font-size:1.4rem;font-weight:900;color:#1F4E5F;font-family:'Roboto Mono',monospace;">${s.buscasAvulsas}</div>
-                            <div style="font-size:0.64rem;font-weight:800;color:#8a8579;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Busca Avulsa</div>
-                        </div>
-                        <div style="background:#F6F4EF;border:1px solid #EDEAE3;border-left:4px solid #4A6B3A;border-radius:5px;padding:9px 6px;text-align:center;">
-                            <div style="font-size:1.4rem;font-weight:900;color:#4A6B3A;font-family:'Roboto Mono',monospace;">${s.listasTiradas}</div>
-                            <div style="font-size:0.64rem;font-weight:800;color:#8a8579;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Listas Tiradas</div>
-                        </div>
-                        <div style="background:#F6F4EF;border:1px solid #EDEAE3;border-left:4px solid #8A5A2B;border-radius:5px;padding:9px 6px;text-align:center;">
-                            <div style="font-size:1.4rem;font-weight:900;color:#8A5A2B;font-family:'Roboto Mono',monospace;">${s.devolucoes}</div>
-                            <div style="font-size:0.64rem;font-weight:800;color:#8a8579;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Devolucoes</div>
-                        </div>
-                    </div>
-                </div>`).join('');
-            }
-        }
-
-        // Alertas: posicoes sem movimentacao ha mais de 72h
-        const alertBox = document.getElementById('alertBoxContent');
-        if (alertBox) {
-            const nowTs = Date.now();
-            const longAbsent = State.inventory.filter(i => i.timestamp && (nowTs - i.timestamp) > 72 * 3600 * 1000);
-            alertBox.innerHTML = longAbsent.length === 0
-                ? '<div style="color:#64748b; text-align:center; font-style:italic; padding:20px;">Nenhum alerta ativo.</div>'
-                : longAbsent.slice(0, 20).map(i => `<div class="alert-item"><i class="fas fa-clock"></i> ${Security.sanitize(i.car)}-${Security.sanitize(i.loc)}: ${Security.sanitize(i.code)} (${Math.floor((nowTs - i.timestamp) / 3600000)}h sem movimentacao)</div>`).join('');
-        }
-
-        // Grafico de atividade (usa todos os logs da semana)
-        const weekLogs = (State.logs || []).filter(l => l.timestamp >= weekStart);
-        AdminDash._renderChart(weekLogs);
-
-        // Painel de Rendimento (KPIs + ranking devolucoes / busca avulsa)
-        try { RendPanel.update(weekStart, weekEnd); } catch (e) { console.warn('RendPanel:', e); }
+        // v16.33: aba dedicada aos Alertas de Processo (codigos sem movimentacao).
+        // O Painel de Rendimento saiu desta aba; o RendPanel continua no codigo.
+        try { ObsAlerts.build(); ObsAlerts.render(); } catch (e) { console.warn('ObsAlerts:', e); }
     },
 
     _renderChart(logs) {

@@ -253,6 +253,15 @@ const ListConfirm = {
               ? `<button class="btn-3d" style="background:#8b5cf6;" onclick="ListConfirm.abrirPausa('${esc(h.id)}')"><i class="fas fa-pause"></i> PAUSAR LISTA</button>`
               : `<span class="lc-lock" style="background:#f5f3ff;border-color:#ddd6fe;color:#6d28d9;"><i class="fas fa-pause"></i> Lista pausada — a linha esta liberada para uma nova lista</span>`}
             <button class="btn-3d" style="background:#f59e0b;" onclick="ListConfirm.abrirPendencia('${esc(h.id)}')"><i class="fas fa-right-left"></i> DEIXAR PARA O PROXIMO TURNO</button>
+            <button class="btn-3d" style="background:#0ea5e9;" onclick="ListConfirm.abrirVoltar('${esc(h.id)}')"><i class="fas fa-rotate-left"></i> VOLTAR PARA LEITURA</button>
+          </div>
+          <div id="lc-volta-${esc(h.id)}" style="display:none;" class="lc-form">
+            <label>A lista volta SEM baixar o estoque de novo. O que deseja fazer?</label>
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn-3d btn-blue" onclick="ListConfirm.voltarLeitura('${esc(h.id)}')"><i class="fas fa-box-open"></i> LER AS CAIXAS</button>
+              <button class="btn-3d btn-gray" onclick="ListConfirm.reimprimirLista('${esc(h.id)}')"><i class="fas fa-print"></i> SO IMPRIMIR A LISTA</button>
+              <button class="btn-3d" style="background:#94a3b8;" onclick="document.getElementById('lc-volta-${esc(h.id)}').style.display='none'">Cancelar</button>
+            </div>
           </div>
           <div id="lc-pause-${esc(h.id)}" style="display:none;" class="lc-form">
             <label>Motivo da pausa (obrigatorio)</label>
@@ -624,6 +633,46 @@ const ListConfirm = {
             + (falta ? ` — havia ${falta} item(ns) pendente(s)` : ''), h.id);
         Toast.success('Lista finalizada como administrador. A linha esta liberada.', 6000);
         ListConfirm.render();
+    },
+
+    // ---------- v16.39: VOLTAR PARA LEITURA (sem baixar estoque) ----------
+    abrirVoltar(id) {
+        const el = document.getElementById('lc-volta-' + id);
+        if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    },
+    _hist(id) { return (State.checkoutHistory || []).find(x => String(x.id) === String(id)); },
+
+    async voltarLeitura(id) {
+        const h = ListConfirm._hist(id); if (!h) { Toast.error('Lista nao encontrada.'); return; }
+        const rows = h.config?.listRows;
+        if (!rows || !rows.length) { Toast.error('Esta lista foi baixada antes da v16.39 e nao guardou os materiais. Use "So imprimir a lista".', 7000); return; }
+        State.rawFeederData = [['Equip. Name', 'Part No.', 'Position']].concat(rows.map(r => [r[0], r[1], r[2]]));
+        State.feederConfig  = { startRow: 0, cMach: 0, cCode: 1, cPos: 2, cTray: null,
+            line: h.config.line, wo: h.config.wo, machine: h.config.machine || '' };
+        if (h.config.mode) State.feederMode = h.config.mode;
+        State._semBaixa = h.id;
+        await BoxScan.startFromFeeder();
+        if (State._boxActiveId) { h.config.boxSession = State._boxActiveId; try { DB.scheduleSave(); } catch (e) {} }
+        Logs.log('LIST_BACK_READ', `Voltou a lista OP ${h.config.wo || '--'} para leitura de caixas (sem baixa)`, h.id);
+    },
+
+    reimprimirLista(id) {
+        const h = ListConfirm._hist(id); if (!h) { Toast.error('Lista nao encontrada.'); return; }
+        if (!h.tableHTML) {
+            const rows = h.config?.listRows;
+            if (!rows || !rows.length) { Toast.error('Esta lista foi baixada antes da v16.39 e o espelho para reimpressao ja expirou.', 7000); return; }
+            const S = Security.sanitize, locs = (h.config.listLocs || []).slice();
+            h.tableHTML = rows.map(r => {
+                const k = locs.findIndex(l => l[0] === r[1]);
+                const l = k >= 0 ? locs.splice(k, 1)[0] : null;
+                return `<tr><td>${S(r[0])}</td><td><b>${S(r[2])}</b></td><td>${S(r[1])}</td>
+                    <td>${l ? `<span style="color:var(--tpv-blue);font-weight:bold;font-size:1.1rem;">${S(l[1])} - ${S(l[2])}</span>` : '-'}</td>
+                    <td style="text-align:center;">${l ? '<span class="badge bg-ok">BAIXADO</span>' : '<span class="badge bg-err">NAO ENCONTRADO</span>'}</td></tr>`;
+            }).join('');
+            h.tableHead = h.tableHead || `<tr><th>${h.config.mode === 'IA' ? 'Trk' : 'Maquina'}</th><th>${h.config.mode === 'IA' ? 'Spec' : 'Posicao'}</th><th>Codigo</th><th>LOCAL ESTOQUE</th><th style="text-align:center;">Status</th></tr>`;
+        }
+        Logs.log('LIST_REPRINT', `Reimprimiu a lista OP ${h.config?.wo || '--'} pela Confirmacao (sem baixa)`, h.id);
+        HistoryModule.reprint(h.id);
     },
 
     // Devolve para andamento uma lista ja CONCLUIDA
