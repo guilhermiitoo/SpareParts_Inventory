@@ -48,6 +48,7 @@ const Consumo = {
         if (typeof v === 'number') return v;
         let s = String(v == null ? '' : v).trim().replace(/[R$\s]/g, '');
         if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+        else if (/^-?[1-9]\d{0,2}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');   // "1.200" = mil e duzentos
         const n = parseFloat(s);
         return isFinite(n) ? n : NaN;
     },
@@ -254,68 +255,86 @@ const Consumo = {
         return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: true });
     },
 
+    // Colunas do relatorio do SAP (procuradas pelo NOME do cabecalho).
+    // O 261 traz tambem o preco unitario na coluna "Montante em MI".
+    COLUNAS_SAP: {
+        s261: { code: 'material', qtd: 'quantidade', data: 'data do documento', preco: 'montante em mi' },
+        s315: { code: 'material', qtd: 'quantidade', data: 'data do documento' },
+    },
+    _cab(v) { return String(v == null ? '' : v).normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase().replace(/\s+/g, ' '); },
+
+    // Acha a linha de cabecalho (nas 30 primeiras) e o indice de cada coluna.
+    _mapaColunas(rows, tipo) {
+        const alvo = Consumo.COLUNAS_SAP[tipo];
+        for (let i = 0; i < Math.min(rows.length, 30); i++) {
+            const cab = (rows[i] || []).map(Consumo._cab);
+            const idx = {};
+            Object.keys(alvo).forEach(k => { idx[k] = cab.indexOf(alvo[k]); });
+            if (Object.values(idx).every(v => v >= 0)) return { linha: i, idx };
+        }
+        return null;
+    },
+
     async importar(tipo, input) {
         const file = input && input.files && input.files[0];
         if (input) input.value = '';
         if (!file) return;
         if (!DB.guard('Importar dados do SAP')) return;
+        const nome = tipo === 's261' ? 'Apontamento (SAP 261)' : 'Entradas (SAP 315)';
         try {
             const rows = await Consumo._lerPlanilha(file);
-            const saldo = Consumo.saldoAtual();
-            const novos = [], precos = {};
-            let ignoradas = 0;
-            rows.forEach(r => {
-                const c = Consumo.norm(r[0]);
-                const q = Consumo._num(r[1]);
-                if (!c || isNaN(q)) { ignoradas++; return; }       // cabecalho / linha vazia
-                if (tipo === 'precos') { precos[c] = q; return; }
-                const d = Consumo._data(r[2]);
-                if (!d) { ignoradas++; return; }
-                novos.push([c, q, d]);
-            });
-
-            await Consumo._carregarSap();
-            const S = Security.sanitize;
-            let ok;
-            if (tipo === 'precos') {
-                const n = Object.keys(precos).length;
-                if (!n) { Toast.error('Nenhum preco valido. Formato: Coluna A = Componente, Coluna B = Preco unitario.'); return; }
-                const fora = Object.keys(precos).filter(c => !(c in saldo)).length;
-                ok = await Modal.confirm('Importar tabela de precos',
-                    `Arquivo: ${file.name}\n${n} componente(s) com preco${ignoradas ? ` · ${ignoradas} linha(s) ignorada(s)` : ''}\n` +
-                    `${fora} componente(s) nao estao no estoque hoje.\n\nOs precos destes componentes serao atualizados.`, 'Importar');
-                if (!ok) return;
-            } else {
-                if (!novos.length) { Toast.error('Nenhuma linha valida. Formato: Coluna A = Componente, B = Quantidade, C = Data.'); return; }
-                const datas = novos.map(r => r[2]).sort();
-                const de = datas[0], ate = datas[datas.length - 1];
-                const cods = new Set(novos.map(r => r[0]));
-                const fora = [...cods].filter(c => !(c in saldo)).length;
-                const nome = tipo === 's261' ? 'Apontamento (SAP 261)' : 'Entradas (SAP 315)';
-                ok = await Modal.confirm('Importar ' + nome,
-                    `Arquivo: ${file.name}\n${novos.length} linha(s) · ${cods.size} componente(s)` +
-                    `${ignoradas ? ` · ${ignoradas} linha(s) ignorada(s)` : ''}\n` +
-                    `Periodo coberto: ${Consumo._br(de)} a ${Consumo._br(ate)}\n` +
-                    `${fora} componente(s) nao encontrados no estoque.\n\n` +
-                    `Os registros de ${nome} entre essas datas serao SUBSTITUIDOS por este arquivo (sem duplicar).`, 'Importar');
-                if (!ok) return;
+            const mapa = Consumo._mapaColunas(rows, tipo);
+            if (!mapa) {
+                const faltam = tipo === 's261' ? '"Material", "Quantidade", "Data do documento" e "Montante em MI"' : '"Material", "Quantidade" e "Data do documento"';
+                Toast.error(`Nao achei as colunas do ${nome} neste Excel. O arquivo precisa ter: ${faltam}.`, 10000);
+                return;
             }
+            const { idx } = mapa, saldo = Consumo.saldoAtual();
+            const novos = [], precoDe = {};   // codigo -> { d, p } (preco da data mais recente)
+            let ignoradas = 0;
+            rows.slice(mapa.linha + 1).forEach(r => {
+                if (!r || r.every(v => v === '' || v == null)) return;
+                const c = Consumo.norm(r[idx.code]);
+                const q = Consumo._num(r[idx.qtd]);
+                const d = Consumo._data(r[idx.data]);
+                if (!c || isNaN(q) || !d) { ignoradas++; return; }
+                // O SAP lanca o 261 (saida) com sinal negativo: o que importa e a quantidade.
+                novos.push([c, Math.abs(q), d]);
+                if (idx.preco !== undefined) {
+                    const pr = Math.abs(Consumo._num(r[idx.preco]));
+                    if (isFinite(pr) && pr > 0 && (!precoDe[c] || d >= precoDe[c].d)) precoDe[c] = { d, p: pr };
+                }
+            });
+            if (!novos.length) { Toast.error('Nenhuma linha valida no arquivo.'); return; }
 
-            // Relê do disco logo antes de gravar: se outro admin importou no meio, nao perde.
+            const datas = novos.map(r => r[2]).sort();
+            const de = datas[0], ate = datas[datas.length - 1];
+            const cods = new Set(novos.map(r => r[0]));
+            const fora = [...cods].filter(c => !(c in saldo)).length;
+            const nPreco = Object.keys(precoDe).length;
+            const ex = Object.keys(precoDe)[0];
+            const ok = await Modal.confirm('Importar ' + nome,
+                `Arquivo: ${file.name}\n${novos.length} linha(s) · ${cods.size} componente(s)` +
+                `${ignoradas ? ` · ${ignoradas} linha(s) ignorada(s)` : ''}\n` +
+                `Periodo coberto: ${Consumo._br(de)} a ${Consumo._br(ate)}\n` +
+                `${fora} componente(s) nao encontrados no estoque.\n` +
+                (tipo === 's261' ? `${nPreco} componente(s) com preco unitario (coluna "Montante em MI")` +
+                    (ex ? ` — ex.: ${ex} = ${Consumo._fmtR(precoDe[ex].p)}` : '') + '\n' : '') +
+                `\nOs registros de ${nome} entre essas datas serao SUBSTITUIDOS por este arquivo (sem duplicar).`, 'Importar');
+            if (!ok) return;
+
+            // Rele do disco logo antes de gravar: se outro admin importou no meio, nao perde.
             const sap = await Consumo._carregarSap();
-            const info = { em: Date.now(), por: State.currentUser ? State.currentUser.nome : '', arquivo: file.name };
-            if (tipo === 'precos') {
-                Object.assign(sap.precos, precos);
-                info.n = Object.keys(precos).length;
-            } else {
-                const datas = novos.map(r => r[2]).sort();
-                info.de = datas[0]; info.ate = datas[datas.length - 1]; info.n = novos.length;
-                sap[tipo] = sap[tipo].filter(r => r[2] < info.de || r[2] > info.ate).concat(novos);
+            const info = { em: Date.now(), por: State.currentUser ? State.currentUser.nome : '', arquivo: file.name, de, ate, n: novos.length };
+            sap[tipo] = sap[tipo].filter(r => r[2] < de || r[2] > ate).concat(novos);
+            if (tipo === 's261') {
+                Object.keys(precoDe).forEach(c => { sap.precos[c] = precoDe[c].p; });
+                info.precos = nPreco;
             }
             sap.imp[tipo] = info;
             await Store._gravarTexto(await Consumo._pasta(), Consumo.ARQ_SAP, JSON.stringify(sap));
             Consumo._sap = sap;
-            Logs.log('CONSUMO_IMPORT', `Importou ${tipo === 'precos' ? 'precos' : tipo.toUpperCase()} (${info.n} linhas) — ${S(file.name)}`);
+            Logs.log('CONSUMO_IMPORT', `Importou ${tipo.toUpperCase()} (${info.n} linhas) — ${Security.sanitize(file.name)}`);
             Toast.success('Importacao concluida.');
             Consumo.render();
         } catch (e) {
@@ -357,7 +376,8 @@ const Consumo = {
         const card = (tipo, titulo, cor, formato) => {
             const i = imp[tipo];
             const ult = i ? `Ultima importacao: <b>${new Date(i.em).toLocaleString('pt-BR')}</b> por ${S(i.por || '-')}<br>` +
-                (i.de ? `Periodo coberto: <b>${Consumo._br(i.de)} a ${Consumo._br(i.ate)}</b> · ${Consumo._fmtQ(i.n)} linhas` : `${Consumo._fmtQ(i.n)} componentes com preco`)
+                `Periodo coberto: <b>${Consumo._br(i.de)} a ${Consumo._br(i.ate)}</b> · ${Consumo._fmtQ(i.n)} linhas` +
+                (i.precos != null ? ` · ${Consumo._fmtQ(i.precos)} com preco` : '')
                 : 'Nenhuma importacao ainda.';
             return `
             <div style="background:#fff; border:1px solid var(--ind-border); border-top:4px solid ${cor}; border-radius:8px; padding:18px;">
@@ -370,13 +390,14 @@ const Consumo = {
         };
         box.innerHTML = `
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;">
-            ${card('s261', 'Apontamento (SAP 261)', 'var(--tpv-blue)', 'A = Componente · B = Quantidade · C = Data')}
-            ${card('s315', 'Entradas (SAP 315)', 'var(--ind-green)', 'A = Componente · B = Quantidade · C = Data')}
-            ${card('precos', 'Tabela de precos (opcional)', 'var(--ind-yellow)', 'A = Componente · B = Preco unitario (R$)')}
+            ${card('s261', 'Apontamento (SAP 261)', 'var(--tpv-blue)', 'Material · Quantidade · Data do documento · Montante em MI (preco unit.)')}
+            ${card('s315', 'Entradas (SAP 315)', 'var(--ind-green)', 'Material · Quantidade · Data do documento')}
         </div>
         <div style="font-size:0.75rem; color:#475569; margin-top:14px; line-height:1.6;">
             Pode importar varias vezes no mes: os registros do mesmo tipo dentro das datas do arquivo sao substituidos, nunca duplicados.
-            Datas aceitas: data do Excel ou texto dd/mm/aaaa. O codigo do componente e normalizado como no resto do sistema (maiusculas, sem espacos, 18 caracteres).
+            Use o Excel exportado do SAP como ele vem: as colunas sao achadas pelo nome do cabecalho, em qualquer ordem, e as demais colunas sao ignoradas.
+            Quantidade e preco negativos (saida no SAP) sao lidos como positivos. O preco unitario de cada componente vem do 261 (o da data mais recente).
+            O codigo do componente e normalizado como no resto do sistema (maiusculas, sem espacos, 18 caracteres).
         </div>`;
     },
 
@@ -754,12 +775,13 @@ const Consumo = {
         const top5pct = validas.filter(r => r.pct != null).sort((x, y) => y.pct - x.pct).slice(0, 5);
 
         document.getElementById('csDash').innerHTML = Consumo._cards(t) + `
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:16px;">
-            ${card('Tendencia de uso por semana', 'Consumo (pecas) em cada semana do mes · linha tracejada = tendencia', 'csChSemana')}
-            ${card('Top 5 itens mais usados no mes', 'Consumo em pecas (itens com uso negativo ficam fora)', 'csChTop')}
-            ${card('Estoque inicial x estoque final', 'Total de pecas no inicio e no fim do periodo', 'csChEst')}
-            ${card('Top 5 maior % de uso', 'Consumo ÷ Apontamento (SAP 261) de cada componente', 'csChPct')}
-        </div>`;
+        <div class="cs-dash-grade" style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px;">
+            ${card('Tendencia de uso por semana', 'Consumo (pecas) em cada semana do mes · linha tracejada = tendencia', 'csChSemana', 380)}
+            ${card('Estoque inicial x estoque final', 'Total de pecas no inicio e no fim do periodo', 'csChEst', 380)}
+            ${card('Top 5 itens mais usados no mes', 'Consumo em pecas (itens com uso negativo ficam fora)', 'csChTop', 380)}
+            ${card('Top 5 maior % de uso', 'Consumo ÷ Apontamento (SAP 261) de cada componente', 'csChPct', 380)}
+        </div>
+        <style>@media (max-width: 1000px) { .cs-dash-grade { grid-template-columns: 1fr !important; } }</style>`;
 
         const azul = '#0066A1', escuro = '#004065', amarelo = '#C08A1E', cinza = '#94a3b8';
         const fmtN = v => Number(v || 0).toLocaleString('pt-BR');
