@@ -333,7 +333,8 @@ const Consumo = {
         catch (e) { el.innerHTML = `<div style="color:var(--ind-red);padding:20px;">Erro ao ler os dados do Consumo: ${Security.sanitize(e.message)}</div>`; return; }
 
         const subs = [['importar', 'fa-file-import', 'Importar SAP'], ['mensal', 'fa-calendar', 'Mensal'],
-                      ['semanal', 'fa-calendar-week', 'Semanal'], ['alertas', 'fa-triangle-exclamation', 'Alertas e Compras']];
+                      ['semanal', 'fa-calendar-week', 'Semanal'], ['alertas', 'fa-triangle-exclamation', 'Alertas e Compras'],
+                      ['dash', 'fa-chart-column', 'Dashboards']];
         el.innerHTML = `
         <div style="display:flex; gap:0; border-bottom:2px solid #e2e8f0; margin-bottom:18px; flex-wrap:wrap;">
             ${subs.map(([k, i, l]) => `<button class="gs-tab-btn" onclick="Consumo.sub('${k}')"
@@ -344,6 +345,7 @@ const Consumo = {
         const box = document.getElementById('consumoSub');
         if (Consumo._sub === 'importar') return Consumo._telaImportar(box);
         if (Consumo._sub === 'alertas')  return Consumo._telaAlertas(box);
+        if (Consumo._sub === 'dash')     return Consumo._telaDash(box);
         return Consumo._telaPeriodo(box);
     },
 
@@ -405,6 +407,11 @@ const Consumo = {
             <div style="flex:2; min-width:200px;"><div class="oa-lbl">Buscar codigo / descricao</div>
                 <input id="csBusca" class="big-input" style="padding:8px 10px; margin:0;" placeholder="Ex.: 065G0805..." oninput="Consumo._tabela()"></div>
             <button class="btn-3d btn-green" style="padding:9px 16px; font-size:0.8rem;" onclick="Consumo.exportar()"><i class="fas fa-file-excel"></i> EXPORTAR EXCEL</button>
+            <div style="flex-basis:100%; display:flex; gap:16px; align-items:center; flex-wrap:wrap; font-size:0.78rem; font-weight:700; color:var(--tpv-dark-blue);">
+                <span class="oa-lbl" style="margin:0;">Colunas no Excel:</span>
+                ${Consumo.OPCIONAIS.map(([k, l]) => `<label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                    <input type="checkbox" ${Consumo._colsExcel()[k] !== false ? 'checked' : ''} onchange="Consumo.setColExcel('${k}', this.checked)"> ${l}</label>`).join('')}
+            </div>
         </div>
         <div id="csCorpo"><div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Calculando...</div></div>`;
         try {
@@ -542,23 +549,137 @@ const Consumo = {
         }
     },
 
+    // v17.07: colunas que o usuario escolhe levar (ou nao) para o Excel.
+    // A escolha fica lembrada neste PC; a tela continua mostrando tudo.
+    OPCIONAIS: [['preco', 'Preco unit.'], ['valor', 'Valor do uso (R$)'], ['status', 'Status']],
+    _colsExcel() { try { return JSON.parse(localStorage.getItem('consumo_cols_excel') || '{}'); } catch (e) { return {}; } },
+    setColExcel(k, v) {
+        const c = Consumo._colsExcel(); c[k] = !!v;
+        try { localStorage.setItem('consumo_cols_excel', JSON.stringify(c)); } catch (e) {}
+    },
+
     exportar() {
         if (!Consumo._res || !Consumo._periodo) { Toast.warn('Nada para exportar.'); return; }
-        const p = Consumo._periodo, t = Consumo._res.tot;
+        const p = Consumo._periodo, t = Consumo._res.tot, sel = Consumo._colsExcel();
+        // [chave, titulo, valor(linha), valor(TOTAL), formato]
+        const cols = [
+            ['code',   'Componente',            r => r.code,             'TOTAL'],
+            ['desc',   'Descricao',             r => r.desc || '',       ''],
+            ['ini',    'Est. Inicio',           r => Math.round(r.ini),  Math.round(t.ini), 'q'],
+            ['ent',    'Entradas (SAP 315)',    r => Math.round(r.ent),  Math.round(t.ent), 'q'],
+            ['fim',    'Est. Final',            r => Math.round(r.fim),  Math.round(t.fim), 'q'],
+            ['uso',    'Uso',                   r => Math.round(r.uso),  Math.round(t.uso), 'q'],
+            ['apo',    'Apontamento (SAP 261)', r => Math.round(r.apo),  Math.round(t.apo), 'q'],
+            ['pct',    '% Uso',                 r => r.pct,              t.pct,   'p'],
+            ['preco',  'Preco unit.',           r => r.preco,            null,    'r'],
+            ['valor',  'Valor do uso (R$)',     r => r.valor,            t.valor, 'r'],
+            ['status', 'Status',                r => r.status,           '% geral = soma do Uso / soma do Apontamento (itens validos)'],
+        ].filter(c => sel[c[0]] !== false);
         const aoa = Consumo._cabecalho(p);
-        aoa.push(Consumo.COLS.map(c => c[1]));
-        const lin = Consumo._filtradas();
-        lin.forEach(r => aoa.push([r.code, r.desc || '', Math.round(r.ini), Math.round(r.ent), Math.round(r.fim), Math.round(r.uso), Math.round(r.apo),
-                                   r.pct, r.preco, r.valor, r.status]));
-        aoa.push(['TOTAL', '', Math.round(t.ini), Math.round(t.ent), Math.round(t.fim), Math.round(t.uso), Math.round(t.apo), t.pct, null, t.valor,
-                  '% geral = soma do Uso / soma do Apontamento (itens validos)']);
+        aoa.push(cols.map(c => c[1]));
+        Consumo._filtradas().forEach(r => aoa.push(cols.map(c => c[2](r))));
+        aoa.push(cols.map(c => c[3]));
         const ws = XLSX.utils.aoa_to_sheet(aoa);
-        Consumo._formatar(ws, 5, aoa.length - 1, [2, 3, 4, 5, 6], [7], [8, 9]);
-        ws['!cols'] = [{ wch: 20 }, { wch: 36 }, ...Array(8).fill({ wch: 14 }), { wch: 18 }];
+        const idx = f => cols.map((c, i) => c[4] === f ? i : -1).filter(i => i >= 0);
+        Consumo._formatar(ws, 5, aoa.length - 1, idx('q'), idx('p'), idx('r'));
+        ws['!cols'] = cols.map(c => ({ wch: c[0] === 'desc' ? 36 : c[0] === 'code' || c[0] === 'status' ? 20 : 14 }));
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, Consumo._sub === 'semanal' ? 'Semanal' : 'Mensal');
         XLSX.writeFile(wb, p.arquivo);
         Logs.log('CONSUMO_EXPORT', `Exportou ${p.arquivo}`);
+    },
+
+    // ------------------------------------------------------- dashboards
+    _charts: [],
+    _novoGrafico(id, cfg) {
+        const cv = document.getElementById(id);
+        if (!cv) return;
+        Consumo._charts.push(new Chart(cv, cfg));
+    },
+
+    async _telaDash(box) {
+        Consumo._charts.forEach(c => { try { c.destroy(); } catch (e) {} });
+        Consumo._charts = [];
+        if (!Consumo._ym) Consumo._ym = Consumo._hoje().slice(0, 7);
+        const p = Consumo._periodoMes(Consumo._ym);
+        const card = (titulo, sub, id, alt) => `
+            <div style="background:#fff; border:1px solid var(--ind-border); border-radius:8px; padding:16px;">
+                <div style="font-weight:900; color:var(--tpv-dark-blue); text-transform:uppercase; letter-spacing:0.5px; font-size:0.88rem;">${titulo}</div>
+                <div style="font-size:0.72rem; color:#475569; margin-bottom:10px;">${sub}</div>
+                <div style="height:${alt || 300}px; position:relative;"><canvas id="${id}"></canvas></div>
+            </div>`;
+        box.innerHTML = `
+        <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; background:#f8fafc; border:1px solid var(--ind-border); border-radius:6px; padding:12px 14px; margin-bottom:14px;">
+            <div><div class="oa-lbl">Mes</div><input type="month" class="big-input" style="padding:8px 10px; margin:0; width:auto;" value="${Consumo._ym}" onchange="Consumo._ym=this.value; Consumo.render()"></div>
+            <div style="font-size:0.78rem; color:#334155; padding-bottom:8px;">Periodo: <b>${Consumo._br(p.de)} a ${Consumo._br(p.ate)}</b></div>
+        </div>
+        <div id="csDash"><div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Calculando...</div></div>`;
+
+        if (typeof Chart === 'undefined') {
+            document.getElementById('csDash').innerHTML = '<div style="color:var(--ind-red); padding:20px;">Os graficos nao carregaram: a biblioteca vem da internet e este PC parece sem acesso.</div>';
+            return;
+        }
+
+        // Semanas do mes (segunda a domingo, cortadas nas bordas do periodo)
+        const semanas = [];
+        let a = p.de;
+        while (a <= p.ate) {
+            const seg = Consumo._iso(Consumo._segunda(new Date(a + 'T12:00:00')));
+            let b = Consumo._maisDias(seg, 6);
+            if (b > p.ate) b = p.ate;
+            const w = Consumo._numSemana(new Date(a + 'T12:00:00'));
+            semanas.push({ de: a, ate: b, rot: `S${String(w.n).padStart(2, '0')} (${a.slice(8)}–${b.slice(8)}/${b.slice(5, 7)})` });
+            a = Consumo._maisDias(b, 1);
+        }
+        const [mes, ...porSemana] = await Promise.all([Consumo.calcular(p.de, p.ate)].concat(semanas.map(s => Consumo.calcular(s.de, s.ate))));
+        const t = mes.tot, Q = Consumo._fmtQ;
+        const validas = mes.linhas.filter(r => r.status !== 'USO NEGATIVO' && r.uso > 0);
+        const top5 = validas.slice().sort((x, y) => y.uso - x.uso).slice(0, 5);
+        const topEst = mes.linhas.slice().sort((x, y) => Math.max(y.ini, y.fim) - Math.max(x.ini, x.fim)).slice(0, 10);
+        const varEst = t.ini ? (t.fim - t.ini) / t.ini : null;
+
+        document.getElementById('csDash').innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:14px;">
+            ${Consumo._kpi('Uso no mes (pecas)', Q(t.uso), 'var(--tpv-dark-blue)')}
+            ${Consumo._kpi('% geral do mes', Consumo._fmtP(t.pct), 'var(--tpv-blue)')}
+            ${Consumo._kpi('Estoque inicial', Q(t.ini), '#475569')}
+            ${Consumo._kpi('Estoque final', Q(t.fim) + (varEst == null ? '' : ` <span style="font-size:0.8rem;">(${varEst >= 0 ? '+' : ''}${(varEst * 100).toFixed(1).replace('.', ',')}%)</span>`), varEst != null && varEst < 0 ? 'var(--ind-red)' : 'var(--ind-green)')}
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:16px;">
+            ${card('Tendencia de uso por semana', 'Barras: uso (pecas) de cada semana do mes · Linha: % de uso da semana', 'csChSemana')}
+            ${card('Top 5 itens mais usados no mes', 'Uso em pecas (itens com uso negativo ficam fora)', 'csChTop')}
+        </div>
+        <div style="margin-top:16px;">${card('Estoque inicial x estoque final', 'Os 10 componentes com maior estoque no periodo', 'csChEst', 320)}</div>`;
+
+        const azul = '#0066A1', escuro = '#004065', amarelo = '#fbbf24', cinza = '#94a3b8';
+        Consumo._novoGrafico('csChSemana', {
+            data: {
+                labels: semanas.map(s => s.rot),
+                datasets: [
+                    { type: 'bar',  label: 'Uso (pecas)', data: porSemana.map(r => Math.round(r.tot.uso)), backgroundColor: azul, borderRadius: 4, yAxisID: 'y' },
+                    { type: 'line', label: '% de uso', data: porSemana.map(r => r.tot.pct == null ? null : +(r.tot.pct * 100).toFixed(2)),
+                      borderColor: amarelo, backgroundColor: amarelo, tension: 0.3, pointRadius: 4, yAxisID: 'y1' },
+                ],
+            },
+            options: { maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'Pecas' } },
+                          y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: '%' } } } },
+        });
+        Consumo._novoGrafico('csChTop', {
+            type: 'bar',
+            data: { labels: top5.map(r => r.code), datasets: [{ label: 'Uso (pecas)', data: top5.map(r => Math.round(r.uso)), backgroundColor: escuro, borderRadius: 4 }] },
+            options: { maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false },
+                tooltip: { callbacks: { afterLabel: c => { const r = top5[c.dataIndex]; return (r.desc ? r.desc + ' · ' : '') + '% uso: ' + Consumo._fmtP(r.pct); } } } },
+                scales: { x: { beginAtZero: true } } },
+        });
+        Consumo._novoGrafico('csChEst', {
+            type: 'bar',
+            data: { labels: topEst.map(r => r.code), datasets: [
+                { label: 'Estoque inicial', data: topEst.map(r => Math.round(r.ini)), backgroundColor: cinza, borderRadius: 4 },
+                { label: 'Estoque final',   data: topEst.map(r => Math.round(r.fim)), backgroundColor: azul,  borderRadius: 4 },
+            ] },
+            options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } },
+        });
     },
 
     exportarAlertas() {

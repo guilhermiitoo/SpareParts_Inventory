@@ -37,6 +37,11 @@ const Demo = {
             Demo.ativo = true;
             await DB._finishInitialConnect({ criar: true, aceitarOutra: true, demo: true });
             if (nova) await Demo._semear();
+            else {
+                // demo criada por uma versao anterior: refaz so os dados do Consumo
+                let v = null; try { v = localStorage.getItem('sp_demo_semente'); } catch (e) {}
+                if (v !== Demo.SEMENTE_CONSUMO) await Demo._semearConsumo();
+            }
             const m = document.getElementById('userMatricula');
             if (m) m.focus();
         } catch (e) {
@@ -107,24 +112,53 @@ const Demo = {
         }
         await DB.saveNow();
 
-        // Consumo: foto do inicio do mes + dados do SAP do mes
+        await Demo._semearConsumo();
+    },
+
+    // Consumo do mes: uma foto de saldo POR DIA (como o sistema real faz) e
+    // apontamentos espalhados nos dias, com ritmo diferente em cada semana —
+    // assim os graficos de tendencia mostram algo parecido com a realidade.
+    SEMENTE_CONSUMO: '2',
+    async _semearConsumo() {
         try {
-            const ym = Consumo._hoje().slice(0, 7), d1 = ym + '-01', hj = Consumo._hoje();
-            const saldo = Consumo.saldoAtual(), ini = {}, s261 = [], s315 = [];
+            const hj = Consumo._hoje(), ym = hj.slice(0, 7), d1 = ym + '-01', agora = Date.now();
+            const dias = [];
+            for (let d = d1; d <= hj; d = Consumo._maisDias(d, 1)) dias.push(d);
+            const peso = dias.map((d, k) => { const dw = new Date(d + 'T12:00:00').getDay(); return dw === 0 ? 0.1 : dw === 6 ? 0.4 : 1 + 0.6 * Math.sin(k / 2); });
+            const acum = []; peso.reduce((a, p, k) => (acum[k] = a + p, a + p), 0);
+            const totPeso = acum[acum.length - 1] || 1;
+
+            const saldo = Consumo.saldoAtual(), ini = {}, ent = {}, s261 = [], s315 = [];
             Object.keys(saldo).forEach((c, i) => {
-                ini[c] = saldo[c] + (i % 4) * 1000;                   // havia mais no inicio do mes
-                if (i % 5 !== 4) { s261.push([c, (i + 2) * 20000, d1]); s261.push([c, (i + 2) * 20000, hj]); }  // um sem apontamento a cada 5
-                if (i % 3 === 0) s315.push([c, 2000, d1]);
+                ini[c] = saldo[c] + (i % 4 + 1) * 1500;               // havia mais no inicio do mes
+                if (i % 3 === 0) { ent[c] = 2000; s315.push([c, 2000, d1]); }
+            });
+            ini['AO3401A'] = 0; ent['AO3401A'] = 0;                   // forca um uso negativo
+            const fotos = { dias: {} };
+            dias.forEach((d, k) => {
+                const frac = k === 0 ? 0 : acum[k - 1] / totPeso;     // consumo ate o INICIO do dia
+                const sd = {};
+                Object.keys(ini).forEach(c => {
+                    const uso = ini[c] + (ent[c] || 0) - saldo[c];
+                    sd[c] = Math.round(ini[c] + (k > 0 ? (ent[c] || 0) : 0) - (uso > 0 ? uso * frac : 0));
+                });
+                fotos.dias[d] = { t: agora, pc: 'DEMO', s: sd };
+            });
+            Object.keys(saldo).forEach((c, i) => {
+                if (i % 5 === 4) return;                              // um sem apontamento a cada 5
+                const total = (i + 2) * 40000;
+                dias.forEach((d, k) => { const q = Math.round(total * peso[k] / totPeso); if (q > 0) s261.push([c, q, d]); });
             });
             s261.push(['XC7A35T-1CSG324C', 15000, hj]);               // usado e sem estoque
-            ini['AO3401A'] = 0; s315.push(['AO3401A', 0, d1]);         // forca um uso negativo
-            const fotos = await Consumo._pastaFotos();
-            await Store._gravarTexto(fotos, ym + '.json', JSON.stringify({ dias: { [d1]: { t: agora, pc: 'DEMO', s: ini } } }));
+
+            await Store._gravarTexto(await Consumo._pastaFotos(), ym + '.json', JSON.stringify(fotos));
             const precos = {};
             Object.keys(saldo).forEach((c, i) => { if (i % 6) precos[c] = +(0.002 + i * 0.013).toFixed(4); });
             const imp = { em: agora, por: 'Demonstracao', arquivo: 'dados_ficticios.xlsx', de: d1, ate: hj };
             await Store._gravarTexto(await Consumo._pasta(), Consumo.ARQ_SAP, JSON.stringify({ s261, s315, precos,
                 imp: { s261: { ...imp, n: s261.length }, s315: { ...imp, n: s315.length }, precos: { em: agora, por: 'Demonstracao', n: Object.keys(precos).length } } }));
+            Consumo._fotoFeitaEm = hj;   // a foto de hoje ja esta no arquivo
+            try { localStorage.setItem('sp_demo_semente', Demo.SEMENTE_CONSUMO); } catch (e) {}
         } catch (e) { console.warn('[Demo] consumo:', e.message); }
     },
 };
