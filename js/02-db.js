@@ -933,7 +933,7 @@ const DB = {
         State.isConnected = true;
         DB.startAutoSync();
         DB._setSyncStatus('ok', 'Conectado');
-        Store.lembrarPasta(State.dbDirHandle);   // memoriza para a proxima vez
+        if (!(opts && opts.demo)) Store.lembrarPasta(State.dbDirHandle);   // memoriza para a proxima vez
         DB._reconnBtnLoginUI(false);
         try { AutoBackup.reconectar(); } catch (_) {}
         // v17.07: foto diaria do saldo por componente (base da aba Consumo)

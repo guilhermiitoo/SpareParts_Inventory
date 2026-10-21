@@ -358,7 +358,7 @@ const Store = {
                 '(pode ser uma copia ou um backup).');
         }
         const marca = v.marca || await Store._gravarMarca(dirHandle, v.criarMarca || 'banco novo');
-        Store._lembrarId(marca.id);
+        if (!opts.demo) Store._lembrarId(marca.id);   // demo nao vira a pasta 'habitual'
         Store._marca = marca;
 
         Store._raiz  = dirHandle;
