@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.28**
+**Versão atual: v17.29**
 
 ---
 
@@ -30,6 +30,22 @@ Desenvolvido por Guilherme Fernandes.
     ├── estoque_diario/       ← estoque salvo no 1º acesso de cada dia
     └── backups_import/       ← cópias feitas antes de um "Importar Banco"
 ```
+### O que fica guardado (e por quanto tempo)
+| O que | Tempo | Onde |
+|---|---|---|
+| Estoque, catálogo, usuários | sempre | `dados/banco/` |
+| Histórico (listas com códigos, posições e OP) | **90 dias** | `dados/movimentos/` (1 arquivo por PC por dia) |
+| Histórico enxuto (código, qtd, OP) após 90 dias | sempre | `dados/movimentos/arquivo/AAAA-MM.jsonl` (usado no gráfico de 12 meses) |
+| Logs | **90 dias** | `dados/logs/` |
+| Ranking | 45 dias | `dados/banco/ranking.json` |
+| Caixas finalizadas / abertas | 3 / 15 dias | `dados/banco/caixas.json` |
+| Estoque do dia | sempre | `dados/estoque_diario/` |
+
+- **Reimpressão:** a lista é montada **na hora** a partir dos códigos guardados. Nenhum HTML/PDF fica salvo. Funciona para qualquer lista dos últimos 90 dias.
+- **Histórico na tela:** filtro **Período** (7 / 30 / 60 / 90 dias). 7 dias fica em memória; os outros são lidos da pasta só quando escolhidos.
+- **Logs:** botão **EXCEL DOS LOGS** no Histórico (usa o mesmo período). O backup diário também leva 90 dias de logs.
+- **Limpeza automática:** 1x por dia, 20 s depois de abrir, cada PC apaga o que passou de 90 dias.
+
 - **Duas versões no GitHub:**
   - `main` → **fábrica** (sistema real, pede a pasta do banco).
   - `claude/brave-allen-9k8wup` → **testes** (site do GitHub Pages, abre com dados fictícios; login `ADMIN` / `admin123`).
@@ -68,7 +84,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.28** | Versão aparece na tela de login. Escolher a pasta `dados` mostra "escolha a pasta de CIMA". |
+| **v17.29** | Histórico e logs guardados por **90 dias** (limpeza automática). Reimpressão montada na hora para qualquer lista dos 90 dias. Filtro de Período no Histórico e botão Excel dos Logs. |
+| v17.28 | Versão aparece na tela de login. Escolher a pasta `dados` mostra "escolha a pasta de CIMA". |
 | v17.27 | Removido o botão de atalho da tela de login (a janela de salvar podia sobrescrever o `SPARE_PARTS.html`). Atalho só pelo `.bat`. |
 | v17.26 | Trava também no núcleo (abertura do banco): sem o arquivo de confirmação, nada é lido nem gravado, por qualquer caminho. Aviso **PASTA BLOQUEADA** na tela de login. |
 | v17.25 | Trava pelo arquivo `SPARE_PARTS_PASTA_DO_SISTEMA.json` na pasta oficial (colocado à mão; o sistema não cria). Sem ele, a pasta é recusada. |

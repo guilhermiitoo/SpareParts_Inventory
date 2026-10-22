@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.28</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.29</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1343,6 +1343,15 @@ body.menu-recolhido #menuRodape .rodape-sair { display: block; text-align: cente
                             <option value="AUDIT_CLEAR">Auditoria de Carro (Limpeza)</option>
                         </select>
                     </div>
+                    <div style="min-width:180px;">
+                        <label style="font-weight:bold; color:#0369a1; display:block; margin-bottom:5px;"><i class="fas fa-calendar"></i> Periodo:</label>
+                        <select id="histPeriodo" class="big-input" onchange="HistoryModule.setPeriodo(this.value)" style="border-color:#7dd3fc;">
+                            <option value="7" selected>Ultimos 7 dias</option>
+                            <option value="30">Ultimos 30 dias</option>
+                            <option value="60">Ultimos 60 dias</option>
+                            <option value="90">Ultimos 90 dias</option>
+                        </select>
+                    </div>
                 </div>
                 <div id="histReturnFilters" style="display:none; gap:10px; margin-top:15px; flex-wrap:wrap; padding-top:15px; border-top:1px dashed #7dd3fc;">
                     <div style="flex:1; min-width:140px;"><label>Carro:</label><select id="histFilterCar" class="big-input" onchange="HistoryModule.render()"></select></div>
@@ -1352,6 +1361,7 @@ body.menu-recolhido #menuRodape .rodape-sair { display: block; text-align: cente
                 </div>
                 <div style="margin-top:15px; padding-top:15px; border-top:1px dashed #7dd3fc; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                     <button class="btn-3d btn-green" onclick="HistoryModule.exportToExcel()"><i class="fas fa-file-excel"></i> EXPORTAR PARA EXCEL</button>
+                    <button class="btn-3d btn-gray" onclick="HistoryModule.exportarLogs()"><i class="fas fa-clipboard-list"></i> EXCEL DOS LOGS</button>
                     <span style="font-size:0.78rem; color:#0369a1; font-style:italic;"><i class="fas fa-info-circle"></i> Exporta exatamente o que esta filtrado na tela &mdash; 1 linha por item movimentado.</span>
                 </div>
             </div>
@@ -2853,6 +2863,14 @@ const Store = {
     // maior usa Store.lerHistoricoPeriodo(), sem mexer neste numero.
     DIAS_MEMORIA: 7,
 
+    // v17.29: GUARDA NA PASTA. Historico (movimentos) e logs ficam 90 dias.
+    // Passou disso, o arquivo do dia e apagado. Antes de apagar, o historico
+    // vira uma linha enxuta (codigo, quantidade, OP) em
+    // dados/movimentos/arquivo/AAAA-MM.jsonl — e o que mantem o grafico de
+    // 12 meses do Dashboard funcionando sem guardar o peso das listas.
+    RETENCAO_DIAS: 90,
+    PASTA_ARQUIVO: 'arquivo',
+
     // ---- handles ----
     _raiz:  null,   // pasta escolhida pelo usuario (SPARE_PARTS)
     _dados: null,   // dados/
@@ -3487,8 +3505,11 @@ const Store = {
 
     async _lerLogs(limite) {
         const todos = [];
+        // v17.29: na abertura so os ultimos 3 dias (antes lia TODOS os arquivos)
+        const desde = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
         for await (const [nome, h] of Store._logs.entries()) {
             if (h.kind !== 'file' || !nome.endsWith('.jsonl')) continue;
+            if (nome.slice(0, 10) < desde) continue;
             const txt = await (await h.getFile()).text();
             for (const linha of txt.split('\n')) {
                 if (!linha.trim()) continue;
@@ -3525,8 +3546,136 @@ const Store = {
                 } catch (e) {}
             }
         }
+        // v17.29: meses que ja sairam dos 90 dias vem do arquivo enxuto
+        await Store._lerArquivoMeses(dDe.slice(0, 7), dAte.slice(0, 7), porId);
         const out = [];
         porId.forEach(v => { if (v.rec.timestamp >= de && v.rec.timestamp <= ate) out.push(v.rec); });
+        return out.sort((a, b) => b.timestamp - a.timestamp);
+    },
+
+    // Registro completo de UM movimento, direto do arquivo (a memoria tira a
+    // lista de itens depois de 1h). Le so o dia em que ele foi criado e o seguinte.
+    async lerRegistro(id, ts) {
+        if (!Store._mov) return null;
+        const t = Number(ts) || Number(id) || Date.now();
+        const lista = await Store.lerHistoricoPeriodo(t - 86400000, Math.max(t + 2 * 86400000, Date.now()));
+        return lista.find(h => String(h.id) === String(id)) || null;
+    },
+
+    async _lerArquivoMeses(mDe, mAte, porId) {
+        let dir;
+        try { dir = await Store._mov.getDirectoryHandle(Store.PASTA_ARQUIVO); } catch (e) { return; }
+        for await (const [nome, h] of dir.entries()) {
+            if (h.kind !== 'file' || !nome.endsWith('.jsonl')) continue;
+            const mes = nome.slice(0, 7);
+            if (mes < mDe || mes > mAte) continue;
+            const txt = await (await h.getFile()).text();
+            for (const linha of txt.split('\n')) {
+                if (!linha.trim()) continue;
+                try {
+                    const rec = JSON.parse(linha);
+                    if (!rec || !rec.id) continue;
+                    const id = String(rec.id);
+                    // o que ainda esta nos arquivos do dia (mais rico) tem prioridade
+                    if (!porId.has(id)) porId.set(id, { _s: rec._s || rec.timestamp || 0, rec });
+                } catch (e) {}
+            }
+        }
+    },
+
+    // Versao enxuta de um movimento para o arquivo permanente.
+    _enxuto(h) {
+        const it = (lst) => Array.isArray(lst) && lst.length
+            ? lst.map(i => ({ code: i.code, qty: Number(i.qty) || 0, car: i.car, loc: i.loc })) : undefined;
+        const c = h.config || {};
+        return {
+            id: h.id, type: h.type, timestamp: h.timestamp, user: h.user, matricula: h.matricula,
+            config: (c.wo || c.line || c.machine) ? { wo: c.wo, line: c.line, machine: c.machine, mode: c.mode } : undefined,
+            removedItems: it(h.removedItems), returnedItems: it(h.returnedItems),
+            auditRange: h.auditRange, undoRef: h.undoRef, undoType: h.undoType, _s: h._s,
+        };
+    },
+
+    // ----------------------------------------------------------------------
+    // v17.29: LIMPEZA DOS 90 DIAS. Roda 1x por dia em cada PC, ao conectar.
+    // Apagar e idempotente: dois PCs limpando juntos nao estragam nada (no
+    // pior caso uma linha vai duas vezes para o arquivo e a leitura descarta
+    // a repetida pelo id).
+    // ----------------------------------------------------------------------
+    async limparAntigos(forcar) {
+        if (!Store._mov || !Store._logs) return null;
+        const hoje = Store._hoje();
+        try { if (!forcar && localStorage.getItem('sp_limpeza_dia') === hoje) return null; } catch (e) {}
+        const corte = Store._diaCorte();
+        const res = { movimentos: 0, logs: 0 };
+
+        // historico: guarda o enxuto e apaga o arquivo do dia
+        const velhos = [];
+        for await (const [nome, h] of Store._mov.entries()) {
+            if (h.kind === 'file' && nome.endsWith('.jsonl') && nome.slice(0, 10) < corte) velhos.push([nome, h]);
+        }
+        if (velhos.length) {
+            const arq = await Store._mov.getDirectoryHandle(Store.PASTA_ARQUIVO, { create: true });
+            for (const [nome, h] of velhos) {
+                try {
+                    const porId = new Map();
+                    const txt = await (await h.getFile()).text();
+                    for (const linha of txt.split('\n')) {
+                        if (!linha.trim()) continue;
+                        try {
+                            const rec = JSON.parse(linha);
+                            if (!rec || !rec.id) continue;
+                            const ja = porId.get(String(rec.id));
+                            porId.set(String(rec.id), ja ? Store._enriquecer(rec, ja) : rec);
+                        } catch (e) {}
+                    }
+                    const linhas = [...porId.values()].map(r => JSON.stringify(Store._enxuto(r)));
+                    if (linhas.length) await Store._anexar(arq, nome.slice(0, 7) + '.jsonl', linhas.join('\n') + '\n');
+                    await Store._mov.removeEntry(nome);
+                    res.movimentos++;
+                } catch (e) { console.warn('[Limpeza] movimentos', nome, e.message); }
+            }
+        }
+
+        // logs: apaga direto
+        const logsVelhos = [];
+        for await (const [nome, h] of Store._logs.entries()) {
+            if (h.kind === 'file' && nome.endsWith('.jsonl') && nome.slice(0, 10) < corte) logsVelhos.push(nome);
+        }
+        for (const nome of logsVelhos) {
+            try { await Store._logs.removeEntry(nome); res.logs++; } catch (e) {}
+        }
+
+        try { localStorage.setItem('sp_limpeza_dia', hoje); } catch (e) {}
+        if (res.movimentos || res.logs) console.info('[Limpeza] mais de 90 dias:', res);
+        return res;
+    },
+
+    _diaCorte() {
+        const d = new Date(Date.now() - Store.RETENCAO_DIAS * 86400000), p = (n) => String(n).padStart(2, '0');
+        return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    },
+
+    // Logs de um periodo (para o Excel de logs e o backup diario)
+    async lerLogsPeriodo(de, ate) {
+        if (!Store._logs) return [];
+        const p = (n) => String(n).padStart(2, '0');
+        const dia = (t) => { const d = new Date(t); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); };
+        const dDe = dia(de), dAte = dia(ate), out = [], vistos = new Set();
+        for await (const [nome, h] of Store._logs.entries()) {
+            if (h.kind !== 'file' || !nome.endsWith('.jsonl')) continue;
+            if (nome.slice(0, 10) < dDe || nome.slice(0, 10) > dAte) continue;
+            const txt = await (await h.getFile()).text();
+            for (const linha of txt.split('\n')) {
+                if (!linha.trim()) continue;
+                try {
+                    const l = JSON.parse(linha);
+                    const k = l.timestamp + '_' + l.matricula + '_' + l.action;
+                    if (vistos.has(k) || l.timestamp < de || l.timestamp > ate) continue;
+                    vistos.add(k); out.push(l);
+                } catch (e) {}
+            }
+        }
         return out.sort((a, b) => b.timestamp - a.timestamp);
     },
 
@@ -3802,6 +3951,10 @@ const Store = {
             idx.logs[nome] = fim;
             escritos.push('logs(' + novosLogs.length + ')');
         }
+
+        // v17.29: arquivos com mais de 90 dias saem do indice (a limpeza apaga)
+        const corteIdx = Store._diaCorte();
+        [idx.movimentos, idx.logs].forEach(m => Object.keys(m).forEach(n => { if (n.slice(0, 10) < corteIdx) delete m[n]; }));
 
         // ---- flags globais + indice (SEMPRE por ultimo) ----
         idx.schema = Store.ESQUEMA;
@@ -4854,6 +5007,9 @@ const DB = {
         State.dbFileHandle     = await Store._banco.getFileHandle(Store.INDICE, { create: true });
         State.lastModifiedTime = (await State.dbFileHandle.getFile()).lastModified;
         Store._idxMtime        = State.lastModifiedTime;
+
+        // v17.29: limpeza dos 90 dias em segundo plano (nao atrasa a abertura)
+        setTimeout(() => { Store.limparAntigos().catch(e => console.warn('[Limpeza]', e.message)); }, 20000);
     },
 
     // Logica comum a 1a conexao e a reconexao, com a pasta ja escolhida.
@@ -7291,8 +7447,8 @@ const Kitting = {
         document.querySelector('.dynamic-search-input')?.focus();
     },
 
-    print(histId) {
-        const hist = State.checkoutHistory.find(h => String(h.id) === String(histId));
+    print(histId, obj) {
+        const hist = obj || State.checkoutHistory.find(h => String(h.id) === String(histId));
         if (!hist) { Toast.warn('Historico nao encontrado.'); return; }
 
         const printBody   = document.getElementById('kittingPrintBody');
@@ -8278,6 +8434,98 @@ const AuditModule = {
 // MODULO: HISTORICO DE BAIXAS
 // ============================================================
 const HistoryModule = {
+    // v17.29: periodo maior que 7 dias e lido da pasta (guarda 90 dias)
+    _antigos: null,
+
+    async setPeriodo(v) {
+        const dias = Number(v) || 7;
+        if (dias <= 7 || typeof Store === 'undefined' || !Store._mov) { HistoryModule._antigos = null; HistoryModule.render(); return; }
+        const el = document.getElementById('checkoutHistoryList');
+        if (el) el.innerHTML = '<div style="color:#94a3b8; text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Lendo ' + dias + ' dias da pasta...</div>';
+        try {
+            HistoryModule._antigos = await Store.lerHistoricoPeriodo(Date.now() - dias * 86400000, Date.now());
+        } catch (e) { HistoryModule._antigos = null; Toast.error('Nao foi possivel ler o historico: ' + e.message); }
+        HistoryModule.render();
+    },
+
+    // Memoria (7 dias, tempo real) + o que veio da pasta. Estornados saem.
+    _fonte() {
+        const mem = State.checkoutHistory || [];
+        if (!HistoryModule._antigos) return [...mem];
+        const porId = new Map();
+        HistoryModule._antigos.forEach(h => porId.set(String(h.id), h));
+        mem.forEach(h => { const id = String(h.id); porId.set(id, Store._enriquecer(h, porId.get(id))); });
+        const estornados = new Set();
+        porId.forEach(h => { if (h.type === 'UNDO' && h.undoRef) estornados.add(String(h.undoRef)); });
+        return [...porId.values()].filter(h => !estornados.has(String(h.id))).sort((a, b) => b.timestamp - a.timestamp);
+    },
+
+    _achar(id) {
+        return (State.checkoutHistory || []).find(h => String(h.id) === String(id))
+            || (HistoryModule._antigos || []).find(h => String(h.id) === String(id)) || null;
+    },
+
+    // Monta a tabela de impressao NA HORA, a partir dos codigos guardados.
+    // Nada de HTML pesado no arquivo: so codigos, posicoes e a OP.
+    async _garantirTabela(h) {
+        if (h.tableHTML) return true;
+        const S = Security.sanitize;
+        let itens = h.removedItems;
+        const rows = h.config?.listRows;
+        if ((!itens || !itens.length) && !(rows && rows.length) && typeof Store !== 'undefined') {
+            try { const full = await Store.lerRegistro(h.id, h.timestamp); if (full) { itens = full.removedItems; if (full.config) h.config = Object.assign({}, full.config, h.config); } } catch (e) {}
+        }
+        if (h.type === 'MANUAL_KITTING') {
+            if (!itens || !itens.length) return false;
+            h.tableHTML = Picking.ordenar(itens).map(m => `
+                <tr>
+                    <td style="font-weight:bold; text-align:left;">${S(m.code)}</td>
+                    <td style="text-align:center; font-weight:900;">${m.qty || 1}</td>
+                    <td style="text-align:center; color:var(--tpv-blue); font-weight:bold;">${S(m.car)}</td>
+                    <td style="text-align:center; font-weight:900; font-size:1.1rem;">${S(m.loc)}</td>
+                    <td style="text-align:center;"><span class="badge bg-ok">BAIXADO</span></td>
+                </tr>`).join('');
+            return true;
+        }
+        const cfg = h.config || {};
+        const ia = cfg.mode === 'IA';
+        h.tableHead = h.tableHead || `<tr><th>${ia ? 'Trk' : 'Maquina'}</th><th>${ia ? 'Spec' : 'Posicao'}</th><th>Codigo</th><th>LOCAL ESTOQUE</th><th style="text-align:center;">Status</th></tr>`;
+        if (cfg.listRows && cfg.listRows.length) {
+            const locs = (cfg.listLocs || []).slice();
+            h.tableHTML = cfg.listRows.map(r => {
+                const k = locs.findIndex(l => l[0] === r[1]);
+                const l = k >= 0 ? locs.splice(k, 1)[0] : null;
+                return `<tr><td>${S(r[0])}</td><td><b>${S(r[2])}</b></td><td>${S(r[1])}</td>
+                    <td>${l ? `<span style="color:var(--tpv-blue);font-weight:bold;font-size:1.1rem;">${S(l[1])} - ${S(l[2])}</span>` : '-'}</td>
+                    <td style="text-align:center;">${l ? '<span class="badge bg-ok">BAIXADO</span>' : '<span class="badge bg-err">NAO ENCONTRADO</span>'}</td></tr>`;
+            }).join('');
+            return true;
+        }
+        if (!itens || !itens.length) return false;
+        h.tableHTML = Picking.ordenar(itens).map(m => `<tr><td>-</td><td>-</td><td>${S(m.code)}</td>
+            <td><span style="color:var(--tpv-blue);font-weight:bold;font-size:1.1rem;">${S(m.car)} - ${S(m.loc)}</span></td>
+            <td style="text-align:center;"><span class="badge bg-ok">BAIXADO</span></td></tr>`).join('');
+        return true;
+    },
+
+    async exportarLogs() {
+        if (typeof Store === 'undefined' || !Store._logs) { Toast.warn('Conecte o banco de dados primeiro.'); return; }
+        const dias = Math.max(Number(document.getElementById('histPeriodo')?.value) || 7, 7);
+        Toast.info('Lendo os logs de ' + dias + ' dias...', 3000);
+        const logs = await Store.lerLogsPeriodo(Date.now() - dias * 86400000, Date.now());
+        if (!logs.length) { Toast.warn('Nenhum log no periodo.'); return; }
+        const rows = logs.map(l => ({
+            'DATA/HORA': new Date(l.timestamp).toLocaleString('pt-BR'), 'MATRICULA': l.matricula || '',
+            'NOME': l.nome || '', 'ACAO': l.action || '', 'DETALHES': l.details || '',
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws['!cols'] = [{wch:20},{wch:12},{wch:28},{wch:20},{wch:70}];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Logs');
+        XLSX.writeFile(wb, `TPV_Logs_${dias}dias_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.xlsx`);
+        Toast.success(`Excel com ${rows.length} log(s).`);
+    },
+
     applyFilters() {
         const type      = document.getElementById('histFilterType')?.value;
         const filterDiv = document.getElementById('histReturnFilters');
@@ -8299,7 +8547,7 @@ const HistoryModule = {
         const user  = document.getElementById('histFilterUser')?.value || '';
         const start = document.getElementById('histFilterStart')?.value || '';
         const end   = document.getElementById('histFilterEnd')?.value   || '';
-        let h       = [...State.checkoutHistory];
+        let h       = HistoryModule._fonte();
 
         if (type !== 'ALL') {
             if (type === 'CHECKOUT')       h = h.filter(x => x.type !== 'MANUAL_KITTING' && x.type !== 'RETURN' && x.type !== 'AUDIT_CLEAR');
@@ -8438,6 +8686,7 @@ const HistoryModule = {
         const pag  = Paginador.fatiar('historico', data);
         const barra = Paginador.controles('historico', pag, 'HistoryModule.render');
 
+        const naMemoria = new Set((State.checkoutHistory || []).map(x => String(x.id)));
         const html = pag.itens.map(h => {
             // Label e cor por tipo
             let label, color, icon;
@@ -8478,7 +8727,7 @@ const HistoryModule = {
             }
 
             const showReprint = h.type !== 'RETURN' && h.type !== 'AUDIT_CLEAR' && h.type !== 'UNDO' && h.type !== 'DELETE_CAR';
-            const showUndo    = isAdmin && h.type !== 'UNDO' && h.type !== 'DELETE_CAR';
+            const showUndo    = isAdmin && h.type !== 'UNDO' && h.type !== 'DELETE_CAR' && naMemoria.has(String(h.id));
 
             return `
             <div class="history-item">
@@ -8562,17 +8811,20 @@ const HistoryModule = {
         Toast.success('Estorno realizado e registrado na auditoria!');
     },
 
-    reprint(histId) {
-        const hist = State.checkoutHistory.find(h => String(h.id) === String(histId));
+    async reprint(histId) {
+        const hist = HistoryModule._achar(histId);
         if (!hist) { Toast.error('Historico nao encontrado.'); return; }
+
+        // v17.29: a lista e montada agora, com os codigos guardados (90 dias)
+        if (!(await HistoryModule._garantirTabela(hist))) {
+            Toast.error('Esta lista nao tem os codigos guardados para reimprimir.', 6000); return;
+        }
 
         // Kitting: usa o print dedicado da aba estoque (mais limpo)
         if (hist.type === 'MANUAL_KITTING') {
-            Kitting.print(histId);
+            Kitting.print(histId, hist);
             return;
         }
-
-        if (!hist.tableHTML) { Toast.error('Reimpressao disponivel por ate 1 hora apos a baixa. Este snapshot ja expirou.', 6000); return; }
 
         // LOCK: impede que triggerRefresh/recalcMatches sobrescreva o HTML injetado
         State._reprintMode = true;
@@ -9323,9 +9575,9 @@ const ListConfirm = {
 
     reimprimirLista(id) {
         const h = ListConfirm._hist(id); if (!h) { Toast.error('Lista nao encontrada.'); return; }
+        if (!h.tableHTML && !(h.config?.listRows?.length)) { HistoryModule.reprint(h.id); return; }
         if (!h.tableHTML) {
             const rows = h.config?.listRows;
-            if (!rows || !rows.length) { Toast.error('Esta lista foi baixada antes da v16.39 e o espelho para reimpressao ja expirou.', 7000); return; }
             const S = Security.sanitize, locs = (h.config.listLocs || []).slice();
             h.tableHTML = rows.map(r => {
                 const k = locs.findIndex(l => l[0] === r[1]);
@@ -15375,7 +15627,7 @@ const AutoBackup = {
         }));
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(histRows.length ? histRows : [{ info: 'Sem historico' }]), 'Historico');
 
-        const logRows = (State.logs || []).map(l => ({
+        const logRows = ((AutoBackup._logsPasta && AutoBackup._logsPasta.length) ? AutoBackup._logsPasta : (State.logs || [])).map(l => ({
             Matricula: l.matricula, Nome: l.nome, Acao: l.action,
             DataHora: new Date(l.timestamp).toLocaleString('pt-BR'), Detalhes: l.details || '',
         }));
@@ -15432,10 +15684,14 @@ const AutoBackup = {
             let histCompleto = null;
             try {
                 if (typeof Store !== 'undefined' && Store._mov) {
-                    histCompleto = await Store.lerHistoricoPeriodo(0, Date.now());
+                    histCompleto = await Store.lerHistoricoPeriodo(Date.now() - Store.RETENCAO_DIAS * 86400000, Date.now());
                 }
             } catch (e) { console.warn('[AutoBackup] historico completo indisponivel:', e.message); }
 
+            // v17.29: logs dos 90 dias guardados (antes: so os 50 da memoria)
+            let logsPasta = null;
+            try { if (typeof Store !== 'undefined' && Store._logs) logsPasta = await Store.lerLogsPeriodo(Date.now() - Store.RETENCAO_DIAS * 86400000, Date.now()); } catch (e) {}
+            AutoBackup._logsPasta = logsPasta;
             const wb       = AutoBackup._montarWorkbook(histCompleto);
             const xlsxData = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
             const blob     = new Blob([xlsxData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
