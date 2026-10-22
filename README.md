@@ -3,14 +3,32 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.19**
+**Versão atual: v17.20**
 
 ---
 
 ## Como está o sistema hoje
 
 - **Um arquivo só:** `index.html` (HTML + CSS + JavaScript juntos). Basta copiar para o PC e abrir no **Chrome ou Edge**.
-- **Banco de dados:** uma pasta na rede. Na primeira vez, clique em **SELECIONAR PASTA DO SISTEMA**; depois o PC reconecta sozinho.
+- **Pasta fixa do sistema:** `S:\MMT\49. JOÃO - ARQUIVOS HTML\GUILHERME FERNANDES\02 - SpareParts_Inventory`.
+  O endereço aparece na tela de login (botão de copiar). Outra pasta é recusada sem criar nada.
+  Como o navegador não informa o caminho completo, a conferência é pelo **nome da pasta** + existência do banco dentro dela.
+- **Atalho:** botão **CRIAR ATALHO NA ÁREA DE TRABALHO** na tela de login.
+
+### Estrutura da pasta
+```
+02 - SpareParts_Inventory/
+├── SPARE_PARTS.html          ← o sistema
+├── backups/                  ← Excel do backup diário
+└── dados/
+    ├── banco/                ← catalogo, estoque, sistema, ranking, caixas, indice
+    │   └── bak/              ← cópias .bak desses arquivos
+    ├── movimentos/           ← histórico
+    ├── logs/                 ← logs
+    ├── consumo/              ← dados do SAP
+    ├── estoque_diario/       ← estoque salvo no 1º acesso de cada dia
+    └── backups_import/       ← cópias feitas antes de um "Importar Banco"
+```
 - **Duas versões no GitHub:**
   - `main` → **fábrica** (sistema real, pede a pasta do banco).
   - `claude/brave-allen-9k8wup` → **testes** (site do GitHub Pages, abre com dados fictícios; login `ADMIN` / `admin123`).
@@ -49,7 +67,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.19** | Cabeçalho das tabelas do Consumo fica **fixo** ao rolar. Filtros (mês, período, busca, colunas) ficam **acima** das sub-abas. Este README. |
+| **v17.20** | Pasta fixa `02 - SpareParts_Inventory` (recusa outra pasta). Pasta `dados` organizada em subpastas (arquivos soltos movidos sozinhos). Botão de atalho na área de trabalho. |
+| v17.19 | Cabeçalho das tabelas do Consumo fica **fixo** ao rolar. Filtros (mês, período, busca, colunas) ficam **acima** das sub-abas. Este README. |
 | v17.18 | Sem estoque salvo no **dia de início** do período → aviso, sem calcular (não troca a data sozinho). |
 | v17.17 | Tela mostra de onde vem o Est. Inicial / Final e os dias com estoque salvo. |
 | v17.16 | Coluna e card **"Est. Final (atual)"** = estoque atual do sistema; o mês atual vai sempre até hoje. |
