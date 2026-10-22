@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.30**
+**Versão atual: v17.31**
 
 ---
 
@@ -82,6 +82,7 @@ Desenvolvido por Guilherme Fernandes.
   - o **apontamento 261** dela fica fora (coluna "261 fora"; precisa da coluna `Ordem` no SAP);
   - o componente aparece com a etiqueta **EM LINHA**.
   - Quando a OP fecha e o material volta, o admin tira a OP da lista (×) e ela entra no cálculo.
+- **Aguardando apontamento:** % Uso acima de **110%** (uso mais de 10% acima do apontado) ganha a etiqueta **AGUARDANDO APONTAMENTO** na tabela e a observação no Excel. Botão para mostrar/ocultar (lembrado por PC).
 - **OP = 7 números.** `1234567`, `1234567-SMT`, `-SMT-T` e `-SMT-B` são a mesma OP (lista do MES, busca avulsa e coluna Ordem do SAP).
 - **Sub-aba OPs:** por OP, itens/peças que saíram pela **lista MES**, pela **busca avulsa (completar lista)** e **(requisição/retrabalho)**, e o apontamento 261. Exporta Excel.
 
@@ -95,7 +96,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.30** | Busca Avulsa com **OP obrigatória** + destino (completar lista / requisição). Consumo: **OPs em linha** (material volta como estoque de antes da saída e o 261 da OP fica fora), coluna **Ordem** do SAP 261, sub-aba **OPs**. |
+| **v17.31** | Etiqueta **AGUARDANDO APONTAMENTO** quando o % Uso passa de 110%, com botão para mostrar/ocultar; coluna Observação no Excel. |
+| v17.30 | Busca Avulsa com **OP obrigatória** + destino (completar lista / requisição). Consumo: **OPs em linha** (material volta como estoque de antes da saída e o 261 da OP fica fora), coluna **Ordem** do SAP 261, sub-aba **OPs**. |
 | v17.29 | Histórico e logs guardados por **90 dias** (limpeza automática). Reimpressão montada na hora para qualquer lista dos 90 dias. Filtro de Período no Histórico e botão Excel dos Logs. |
 | v17.28 | Versão aparece na tela de login. Escolher a pasta `dados` mostra "escolha a pasta de CIMA". |
 | v17.27 | Removido o botão de atalho da tela de login (a janela de salvar podia sobrescrever o `SPARE_PARTS.html`). Atalho só pelo `.bat`. |
