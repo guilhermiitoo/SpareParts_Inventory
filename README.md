@@ -3,21 +3,21 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.22**
+**Versão atual: v17.23**
 
 ---
 
 ## Como está o sistema hoje
 
 - **Um arquivo só:** `index.html` (HTML + CSS + JavaScript juntos). Basta copiar para o PC e abrir no **Chrome ou Edge**.
-- **Pasta fixa do sistema:** `S:\MMT\49. JOÃO - ARQUIVOS HTML\GUILHERME FERNANDES\02 - SpareParts_Inventory`.
+- **Pasta fixa do sistema:** `S:\MMT\49. JOÃO - ARQUIVOS HTML\GUILHERME FERNANDES\2 - SpareParts_Inventory`.
   O endereço aparece na tela de login (botão de copiar). Outra pasta é recusada sem criar nada.
   Como o navegador não informa o caminho completo, a conferência é pelo **nome da pasta** + existência do banco dentro dela.
 - **Atalho:** botão **CRIAR ATALHO NA ÁREA DE TRABALHO** na tela de login.
 
 ### Estrutura da pasta
 ```
-02 - SpareParts_Inventory/
+2 - SpareParts_Inventory/
 ├── SPARE_PARTS.html          ← o sistema
 ├── backups/                  ← Excel do backup diário
 └── dados/
@@ -67,9 +67,10 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.22** | Cartão **BD CONECTADO** sozinho no canto superior direito. |
+| **v17.23** | Pasta do sistema renomeada para `2 - SpareParts_Inventory`. |
+| v17.22 | Cartão **BD CONECTADO** sozinho no canto superior direito. |
 | v17.21 | Sai o cabeçalho de cima das abas; nome do usuário, status do banco e **SAIR** ficam no rodapé da barra lateral. |
-| v17.20 | Pasta fixa `02 - SpareParts_Inventory` (recusa outra pasta). Pasta `dados` organizada em subpastas (arquivos soltos movidos sozinhos). Botão de atalho na área de trabalho. |
+| v17.20 | Pasta fixa `2 - SpareParts_Inventory` (recusa outra pasta). Pasta `dados` organizada em subpastas (arquivos soltos movidos sozinhos). Botão de atalho na área de trabalho. |
 | v17.19 | Cabeçalho das tabelas do Consumo fica **fixo** ao rolar. Filtros (mês, período, busca, colunas) ficam **acima** das sub-abas. Este README. |
 | v17.18 | Sem estoque salvo no **dia de início** do período → aviso, sem calcular (não troca a data sozinho). |
 | v17.17 | Tela mostra de onde vem o Est. Inicial / Final e os dias com estoque salvo. |
