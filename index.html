@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.29</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.30</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1229,6 +1229,20 @@ body.menu-recolhido #menuRodape .rodape-sair { display: block; text-align: cente
                     </div>
                     <button class="btn-3d btn-blue" style="height:46px;" onclick="Kitting.execute()"><i class="fas fa-search"></i> PROCESSAR BUSCA</button>
                     <button class="btn-3d btn-gray" style="height:46px;" onclick="Kitting.reset()"><i class="fas fa-redo"></i> LIMPAR</button>
+                    <!-- v17.30: OP obrigatoria na busca avulsa -->
+                    <div style="display:flex; flex-direction:column;">
+                        <label style="font-weight:bold; color:#475569; display:block; margin-bottom:5px; font-size:0.85rem;">OP (Ordem):</label>
+                        <input type="text" id="kWoInput" class="big-input" maxlength="13" placeholder="1234567" autocomplete="off"
+                               style="width:170px; font-family:'Roboto Mono',monospace; font-weight:900; letter-spacing:1px;" oninput="Kitting.validarOp()">
+                    </div>
+                    <div style="display:flex; flex-direction:column;">
+                        <label style="font-weight:bold; color:#475569; display:block; margin-bottom:5px; font-size:0.85rem;">Para:</label>
+                        <div style="display:flex; gap:6px;">
+                            <button type="button" id="kDestLISTA" class="btn-3d btn-gray" style="height:46px; padding:6px 12px; font-size:0.78rem;" onclick="Kitting.setDestino('LISTA')">COMPLETAR LISTA</button>
+                            <button type="button" id="kDestREQUISICAO" class="btn-3d btn-gray" style="height:46px; padding:6px 12px; font-size:0.78rem;" onclick="Kitting.setDestino('REQUISICAO')">REQUISICAO / RETRABALHO</button>
+                        </div>
+                    </div>
+                    <div id="kWoMsg" style="align-self:center; font-weight:900; font-size:0.85rem; color:var(--ind-red);"></div>
                 </div>
 
                 <!-- Modos de busca: tabs -->
@@ -2305,6 +2319,21 @@ const Modal = {
 // ============================================================
 // MODULO: LOGS E HISTORICO
 // ============================================================
+// v17.30: chave unica de OP. Lista do MES ("1234567-SMT-T"), busca avulsa e
+// coluna "Ordem" do SAP viram so os numeros, sem zeros a esquerda.
+const OP = {
+    valida(txt) {
+        const m = String(txt || '').trim().toUpperCase().match(/^(\d{7})(-SMT(-[TB])?)?$/);
+        return m ? m[1] : null;
+    },
+    norm(v) {
+        const m = String(v == null ? '' : v).match(/\d+/);
+        return m ? m[0].replace(/^0+/, '') : '';
+    },
+    DESTINOS: { LISTA: 'Completar lista', REQUISICAO: 'Requisicao / Retrabalho' },
+};
+window.OP = OP;
+
 const Logs = {
     async log(action, details, refId = null) {
         const entry = {
@@ -7193,6 +7222,36 @@ const Kitting = {
     },
 
     // -------------------------------------------------------
+    // v17.30: OP obrigatoria. Aceita 1234567, 1234567-SMT, -SMT-T, -SMT-B.
+    // O sistema guarda so os 7 numeros (mesma chave da lista do MES).
+    // -------------------------------------------------------
+    _destino: '',
+    setDestino(d) {
+        Kitting._destino = d;
+        ['LISTA', 'REQUISICAO'].forEach(k => {
+            const b = document.getElementById('kDest' + k); if (!b) return;
+            b.classList.toggle('btn-blue', k === d); b.classList.toggle('btn-gray', k !== d);
+        });
+        Kitting.validarOp();
+    },
+    validarOp() {
+        const inp = document.getElementById('kWoInput');
+        const txt = (inp?.value || '').trim().toUpperCase();
+        const op  = OP.valida(txt);
+        const msg = document.getElementById('kWoMsg');
+        if (msg) msg.textContent = (txt && !op) ? 'OP nao existe' : (op && !Kitting._destino ? 'Escolha: completar lista ou requisicao' : '');
+        if (msg) msg.style.color = (txt && !op) ? 'var(--ind-red)' : '#b45309';
+        if (inp) inp.style.borderColor = !txt ? '' : op ? 'var(--ind-green)' : 'var(--ind-red)';
+        const ok = !!op && !!Kitting._destino;
+        document.querySelectorAll('#searchActionsContainer button').forEach(b => {
+            if (!b.getAttribute('onclick')?.includes('releaseAndCheckout')) return;
+            b.disabled = !ok; b.style.opacity = ok ? '' : '0.45'; b.style.cursor = ok ? '' : 'not-allowed';
+            b.title = ok ? '' : 'Informe a OP (7 numeros) e para onde vai o material';
+        });
+        return ok ? op : null;
+    },
+
+    // -------------------------------------------------------
     // execute: ponto de entrada unificado
     // -------------------------------------------------------
     async execute(silent = false) {
@@ -7240,6 +7299,7 @@ const Kitting = {
 
         const actionsContainer = document.getElementById('searchActionsContainer');
         if (actionsContainer) actionsContainer.innerHTML = `<button class="btn-3d btn-red" onclick="Kitting.releaseAndCheckout()"><i class="fas fa-unlock"></i> LIBERAR POSICOES E BAIXAR</button>`;
+        Kitting.validarOp();
         const sit = document.getElementById('searchInstructionText');
         if (sit) sit.innerHTML = 'Selecione os itens e clique em <b>Liberar</b>.';
 
@@ -7302,6 +7362,11 @@ const Kitting = {
     },
 
     async releaseAndCheckout() {
+        if (!Kitting.validarOp()) {
+            Toast.error('Informe a OP (7 numeros) e se o material e para completar a lista ou requisicao/retrabalho.', 6000);
+            document.getElementById('kWoInput')?.focus();
+            return;
+        }
         if (!DB.guard('Kitting - Baixa Avulsa')) return;
         const checked     = document.querySelectorAll('.search-item-chk:checked');
         const idsToRemove = Array.from(checked).map(c => String(c.value));
@@ -7348,7 +7413,9 @@ const Kitting = {
             );
             if (_fixosK > 0) Toast.info(`${_fixosK} item(ns) de armario (IA) permanecem no estoque — posicao fixa.`, 6000);
 
-            const woVal = (document.getElementById('kWoInput')?.value || '').trim().toUpperCase() || '--';
+            const woDig = (document.getElementById('kWoInput')?.value || '').trim().toUpperCase();
+            const woVal = OP.valida(woDig) || '--';
+            const destino = Kitting._destino || '';
 
             // v16.24.2: a lista sai na ordem de busca — carro e locacao crescentes
             const itemsOrdenados = Picking.ordenar(itemsToRemove);
@@ -7375,7 +7442,7 @@ const Kitting = {
                 printDate: new Date().toLocaleString('pt-BR'),
                 user: State.currentUser.nome, matricula: State.currentUser.matricula,
                 timestamp: Date.now(),
-                config: { wo: woVal },
+                config: { wo: woVal, woDigitado: woDig, destino },
             });
 
             await DB.saveNow();
@@ -7423,6 +7490,7 @@ const Kitting = {
         // Restaura botao de liberar no container de acoes
         const sac = document.getElementById('searchActionsContainer');
         if (sac)  sac.innerHTML = '<button class="btn-3d btn-red" onclick="Kitting.releaseAndCheckout()"><i class="fas fa-unlock"></i> LIBERAR POSICOES E BAIXAR</button>';
+        Kitting.validarOp();
         const sit = document.getElementById('searchInstructionText');
         if (sit)  sit.innerHTML = 'Selecione os itens e clique em <b>Liberar</b>.';
 
@@ -8723,7 +8791,8 @@ const HistoryModule = {
             } else {
                 const acao = 'retirado(s) por';
                 const woStr = h.config?.wo && h.config.wo !== '--' ? ` &mdash; <span style="font-family:'Roboto Mono',monospace; font-weight:900; color:#b45309; background:#fef3c7; padding:1px 7px; border-radius:4px;">W/O: ${Security.sanitize(h.config.wo)}</span>` : '';
-                descLine = `${count} item(ns) ${acao} <b>${Security.sanitize(h.user)}</b> (${totalQty} un.)${woStr}`;
+                const destStr = h.config?.destino ? ` &mdash; <span style="font-weight:800; color:#475569;">${Security.sanitize(OP.DESTINOS[h.config.destino] || h.config.destino)}</span>` : '';
+                descLine = `${count} item(ns) ${acao} <b>${Security.sanitize(h.user)}</b> (${totalQty} un.)${woStr}${destStr}`;
             }
 
             const showReprint = h.type !== 'RETURN' && h.type !== 'AUDIT_CLEAR' && h.type !== 'UNDO' && h.type !== 'DELETE_CAR';
@@ -14022,13 +14091,215 @@ const Consumo = {
             return r;
         }
         const b = await Consumo.saldoNoInicio(Consumo._maisDias(ate, 1), cache);
-        const r = Consumo.montar(fIni, b.s,
-            Consumo._somaSap(sap.s315, ini, ate), Consumo._somaSap(sap.s261, ini, ate),
+
+        // v17.30: OPs em linha
+        const ops = Consumo._ops || await Consumo._carregarOps();
+        const abertas = Consumo._setOps();
+        const emLinha = {}, apoFora = {}, opsUsadas = new Set();
+        let fim = b.s, apo = Consumo._somaSap(sap.s261, ini, ate);
+        if (abertas.size) {
+            // apontamento 261 dessas OPs fica fora
+            apo = {};
+            (sap.s261 || []).forEach(r => {
+                if (r[2] < ini || r[2] > ate) return;
+                if (r[3] && abertas.has(r[3])) { apoFora[r[0]] = (apoFora[r[0]] || 0) + r[1]; opsUsadas.add(r[3]); return; }
+                apo[r[0]] = (apo[r[0]] || 0) + r[1];
+            });
+            // o que saiu do estoque para essas OPs volta para o Est. Final
+            (await Consumo._retiradas(ini, ate)).forEach(h => {
+                const op = OP.norm(h.config && h.config.wo);
+                if (!op || !abertas.has(op)) return;
+                opsUsadas.add(op);
+                h.removedItems.forEach(it => {
+                    if (!it || !it.code || Consumo._isArmario(it.car)) return;
+                    const c = Consumo.norm(it.code);
+                    emLinha[c] = (emLinha[c] || 0) + (Number(it.qty) || 0);
+                });
+            });
+            fim = Object.assign({}, b.s);
+            Object.keys(emLinha).forEach(c => { fim[c] = (fim[c] || 0) + emLinha[c]; });
+        }
+        const r = Consumo.montar(fIni, fim,
+            Consumo._somaSap(sap.s315, ini, ate), apo,
             sap.precos, Consumo._desc(), Consumo._codigosArmario());
+        if (abertas.size) {
+            // a coluna Est. Final continua mostrando o estoque REAL; a diferenca fica em "Em linha"
+            r.linhas.forEach(l => {
+                l.emLinha = emLinha[l.code] || 0; l.apoFora = apoFora[l.code] || 0;
+                l.fim -= l.emLinha;
+            });
+            r.tot.fim = r.linhas.reduce((a, l) => a + l.fim, 0);
+            r.tot.emLinha = r.linhas.reduce((a, l) => a + l.emLinha, 0);
+            r.tot.apoFora = r.linhas.reduce((a, l) => a + l.apoFora, 0);
+        }
+        r.opsAbertas = [...abertas]; r.opsUsadas = opsUsadas;
         r.de = ini; r.ate = ate; r.ajustado = ini !== de;
         r.fonteIni = 'estoque salvo de ' + Consumo._br(ini);
         r.fonteFim = b.fonte; r.exato = b.exato;
         return r;
+    },
+
+    // ----------------------------------------------------- OPs em linha
+    // v17.30: OPs que ainda estao rodando (digitadas pelo admin). Enquanto a OP
+    // esta aqui: o material que saiu do estoque para ela conta como se ainda
+    // estivesse no estoque (estoque de antes da saida) e o apontamento 261 dela
+    // fica fora. Quando a OP fecha, o admin tira daqui e ela entra no calculo.
+    ARQ_OPS: 'ops_em_linha.json',
+    _ops: null,     // [{ op, em, por }]
+    async _carregarOps() {
+        const d = await Consumo._lerJson(await Consumo._pasta(), Consumo.ARQ_OPS);
+        Consumo._ops = (d && Array.isArray(d.ops)) ? d.ops : [];
+        return Consumo._ops;
+    },
+    _setOps() { return new Set((Consumo._ops || []).map(o => OP.norm(o.op)).filter(Boolean)); },
+    async addOp() {
+        const inp = document.getElementById('csOpNova');
+        const op = OP.valida((inp?.value || '').trim().toUpperCase());
+        if (!op) { Toast.error('OP nao existe. Use 7 numeros (ex.: 1234567 ou 1234567-SMT-T).'); return; }
+        const ops = await Consumo._carregarOps();          // rele antes de gravar
+        if (ops.some(o => OP.norm(o.op) === OP.norm(op))) { Toast.warn('Essa OP ja esta na lista.'); return; }
+        ops.push({ op, em: Date.now(), por: State.currentUser ? State.currentUser.nome : '' });
+        await Consumo._gravarOps(ops);
+        Logs.log('CONSUMO_OP_LINHA', `Marcou a OP ${op} como em linha (apontamento incompleto)`);
+        Consumo.render();
+    },
+    async removerOp(op) {
+        const ops = (await Consumo._carregarOps()).filter(o => OP.norm(o.op) !== OP.norm(op));
+        await Consumo._gravarOps(ops);
+        Logs.log('CONSUMO_OP_LINHA', `Tirou a OP ${op} da lista em linha (entra no calculo)`);
+        Consumo.render();
+    },
+    async _gravarOps(ops) {
+        Consumo._ops = ops; Consumo._memo = {};
+        await Store._gravarTexto(await Consumo._pasta(), Consumo.ARQ_OPS, JSON.stringify({ ops }));
+    },
+
+    _caixaOps() {
+        const S = Security.sanitize, ops = Consumo._ops || [];
+        return `
+        <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-left:5px solid #7c3aed; border-radius:6px; padding:12px 14px; margin-bottom:14px;">
+            <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+                <div><div class="oa-lbl" style="color:#5b21b6;">OPs em linha (apontamento incompleto)</div>
+                    <input id="csOpNova" class="big-input" maxlength="13" placeholder="1234567" style="padding:8px 10px; margin:0; width:160px; font-family:'Roboto Mono',monospace; font-weight:900;"
+                        onkeydown="if(event.key==='Enter') Consumo.addOp()"></div>
+                <button class="btn-3d btn-blue" style="padding:9px 14px; font-size:0.8rem;" onclick="Consumo.addOp()"><i class="fas fa-plus"></i> ADICIONAR</button>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; flex:1;">
+                    ${ops.length ? ops.map(o => `<span style="background:#7c3aed; color:#fff; font-weight:900; font-family:'Roboto Mono',monospace; padding:4px 6px 4px 10px; border-radius:14px; font-size:0.8rem;"
+                        title="Marcada por ${S(o.por || '-')} em ${new Date(o.em).toLocaleString('pt-BR')}">${S(o.op)}
+                        <button onclick="Consumo.removerOp('${S(o.op)}')" style="background:rgba(255,255,255,0.25); border:none; color:#fff; border-radius:50%; width:20px; height:20px; cursor:pointer; margin-left:4px;" title="OP fechou: tirar da lista">&times;</button></span>`).join('')
+                    : '<span style="font-size:0.8rem; color:#6d28d9;">Nenhuma OP em linha.</span>'}
+                </div>
+            </div>
+            <div style="font-size:0.75rem; color:#5b21b6; margin-top:8px; line-height:1.5;">
+                Enquanto a OP esta aqui: o material que saiu do estoque para ela conta como <b>estoque de antes da saida</b> e o <b>apontamento 261</b> dela fica fora (precisa da coluna "Ordem" no SAP).
+                Quando a OP fechar e o material voltar, clique no <b>&times;</b> e ela entra no calculo.
+            </div>
+        </div>`;
+    },
+
+    // ------------------------------------------------------- aba OPs
+    // Cruzamento por OP: o que saiu pela lista do MES, pela busca avulsa e o apontamento 261.
+    _opsDias: 30,
+    async _telaOps(box) {
+        const S = Security.sanitize, Q = Consumo._fmtQ;
+        box.innerHTML = `
+        <div class="cs-filtros" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; background:#f8fafc; border:1px solid var(--ind-border); border-radius:6px; padding:12px 14px; margin-bottom:14px;">
+            <div><div class="oa-lbl">Periodo</div>
+                <select class="big-input" style="padding:8px 10px; margin:0; width:auto;" onchange="Consumo._opsDias=Number(this.value); Consumo.render()">
+                    ${[7, 30, 60, 90].map(d => `<option value="${d}" ${Consumo._opsDias === d ? 'selected' : ''}>Ultimos ${d} dias</option>`).join('')}
+                </select></div>
+            <div style="flex:2; min-width:200px;"><div class="oa-lbl">Buscar OP</div>
+                <input id="csOpBusca" class="big-input" style="padding:8px 10px; margin:0;" placeholder="1234567" oninput="Consumo._tabelaOps()"></div>
+            <button class="btn-3d btn-green" style="padding:9px 16px; font-size:0.8rem;" onclick="Consumo.exportarOps()"><i class="fas fa-file-excel"></i> EXPORTAR EXCEL</button>
+        </div>
+        ${Consumo._caixaOps()}
+        <div id="csOpsCorpo"><div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Lendo o historico...</div></div>`;
+        const ate = Consumo._hoje(), de = Consumo._maisDias(ate, -(Consumo._opsDias - 1));
+        const hist = await Consumo._retiradas(de, ate);
+        const abertas = Consumo._setOps(), mapa = new Map();
+        const reg = (op) => { let x = mapa.get(op); if (!x) mapa.set(op, x = { op, linhas: new Set(), primeira: Infinity, ultima: 0,
+            lista: 0, listaQ: 0, avLista: 0, avListaQ: 0, avReq: 0, avReqQ: 0, avSem: 0, avSemQ: 0, apo: 0 }); return x; };
+        hist.forEach(h => {
+            const op = OP.norm(h.config && h.config.wo); if (!op) return;
+            const x = reg(op), itens = h.removedItems.filter(it => it && !Consumo._isArmario(it.car));
+            const q = itens.reduce((a, it) => a + (Number(it.qty) || 0), 0);
+            x.primeira = Math.min(x.primeira, h.timestamp); x.ultima = Math.max(x.ultima, h.timestamp);
+            if (h.config.line && h.config.line !== '--') x.linhas.add(h.config.line);
+            if (h.type === 'MANUAL_KITTING') {
+                const d = h.config.destino;
+                if (d === 'LISTA') { x.avLista += itens.length; x.avListaQ += q; }
+                else if (d === 'REQUISICAO') { x.avReq += itens.length; x.avReqQ += q; }
+                else { x.avSem += itens.length; x.avSemQ += q; }
+            } else { x.lista += itens.length; x.listaQ += q; }
+        });
+        (Consumo._sap.s261 || []).forEach(r => { if (r[3] && r[2] >= de && r[2] <= ate && mapa.has(r[3])) mapa.get(r[3]).apo += r[1]; });
+        abertas.forEach(op => reg(op));
+        Consumo._opsLinhas = [...mapa.values()].map(x => Object.assign(x, { emLinha: abertas.has(x.op) }))
+            .sort((a, b) => (b.emLinha - a.emLinha) || (b.ultima - a.ultima));
+        Consumo._opsPeriodo = { de, ate };
+        const tem261 = (Consumo._sap.s261 || []).some(r => r[3]);
+        document.getElementById('csOpsCorpo').innerHTML = `
+            <div style="font-size:0.78rem; color:#475569; margin-bottom:8px;">Retiradas de ${Consumo._br(de)} a ${Consumo._br(ate)} por OP (7 numeros; "-SMT", "-SMT-T" e "-SMT-B" contam como a mesma OP).
+            ${tem261 ? '' : ' <b style="color:#b45309;">O SAP 261 importado nao tem a coluna "Ordem": a coluna Apontamento fica vazia.</b>'}</div>
+            <div style="background:#fff; border:1px solid var(--ind-border); border-radius:6px; overflow:auto; max-height:600px;">
+            <table class="oa-table"><thead><tr><th>OP</th><th>Status</th><th>Linha</th><th>Periodo das retiradas</th>
+                <th style="text-align:right;">Lista MES<br>(itens / pecas)</th><th style="text-align:right;">Avulsa: completar lista<br>(itens / pecas)</th>
+                <th style="text-align:right;">Avulsa: requisicao<br>(itens / pecas)</th><th style="text-align:right;">Apontamento 261</th></tr></thead>
+            <tbody id="csOpsBody"></tbody></table></div>`;
+        Consumo._tabelaOps();
+    },
+    _opsFiltradas() {
+        const b = OP.norm(document.getElementById('csOpBusca')?.value || '');
+        return (Consumo._opsLinhas || []).filter(x => !b || x.op.includes(b));
+    },
+    _tabelaOps() {
+        const body = document.getElementById('csOpsBody'); if (!body) return;
+        const S = Security.sanitize, Q = Consumo._fmtQ, dt = t => isFinite(t) && t ? new Date(t).toLocaleDateString('pt-BR') : '-';
+        const iq = (i, q) => i ? `${i} / <b>${Q(q)}</b>` : '<span style="color:#cbd5e1;">-</span>';
+        const rows = Consumo._opsFiltradas();
+        body.innerHTML = rows.length ? rows.map(x => `<tr>
+            <td style="font-weight:900; font-family:'Roboto Mono',monospace; color:var(--tpv-dark-blue);">${S(x.op)}</td>
+            <td>${x.emLinha ? '<span class="oa-tag" style="background:#7c3aed;">EM LINHA</span>' : '<span class="oa-tag" style="background:#4A6B3A;">FECHADA</span>'}</td>
+            <td>${S([...x.linhas].join(', ') || '-')}</td>
+            <td>${x.ultima ? dt(x.primeira) + (dt(x.primeira) !== dt(x.ultima) ? ' a ' + dt(x.ultima) : '') : '-'}</td>
+            <td style="text-align:right;">${iq(x.lista, x.listaQ)}</td>
+            <td style="text-align:right;">${iq(x.avLista, x.avListaQ)}</td>
+            <td style="text-align:right;">${iq(x.avReq, x.avReqQ)}${x.avSem ? `<div style="font-size:0.7rem; color:#94a3b8;">sem destino: ${x.avSem} / ${Q(x.avSemQ)}</div>` : ''}</td>
+            <td style="text-align:right; font-weight:900;">${x.apo ? Q(x.apo) : '<span style="color:#cbd5e1;">-</span>'}</td></tr>`).join('')
+            : '<tr><td colspan="8" style="text-align:center; color:#94a3b8; padding:20px;">Nenhuma retirada com OP neste periodo.</td></tr>';
+    },
+    exportarOps() {
+        const rows = Consumo._opsFiltradas(); if (!rows.length) { Toast.warn('Nada para exportar.'); return; }
+        const p = Consumo._opsPeriodo, dt = t => isFinite(t) && t ? new Date(t).toLocaleDateString('pt-BR') : '';
+        const aoa = Consumo._cabecalho(p);
+        aoa.push(['OP', 'Status', 'Linha', 'Primeira retirada', 'Ultima retirada', 'Lista MES (itens)', 'Lista MES (pecas)',
+            'Avulsa completar lista (itens)', 'Avulsa completar lista (pecas)', 'Avulsa requisicao (itens)', 'Avulsa requisicao (pecas)',
+            'Avulsa sem destino (itens)', 'Avulsa sem destino (pecas)', 'Apontamento 261']);
+        rows.forEach(x => aoa.push([x.op, x.emLinha ? 'EM LINHA' : 'FECHADA', [...x.linhas].join(', '), dt(x.primeira), dt(x.ultima),
+            x.lista, x.listaQ, x.avLista, x.avListaQ, x.avReq, x.avReqQ, x.avSem, x.avSemQ, x.apo]));
+        const ws = XLSX.utils.aoa_to_sheet(aoa);
+        ws['!cols'] = aoa[4].map((c, i) => ({ wch: i === 0 ? 12 : 16 }));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'OPs');
+        XLSX.writeFile(wb, `Consumo_SpareParts_OPs_${p.de}_a_${p.ate}.xlsx`);
+    },
+
+    // Retiradas do estoque por OP no periodo (lista MES + busca avulsa), lidas da pasta.
+    _memo: {},
+    async _retiradas(de, ate) {
+        const k = de + '|' + ate;
+        if (Consumo._memo[k]) return Consumo._memo[k];
+        let hist = [];
+        const t0 = new Date(de + 'T00:00:00').getTime(), t1 = new Date(ate + 'T23:59:59').getTime();
+        try {
+            hist = (typeof Store !== 'undefined' && Store._mov) ? await Store.lerHistoricoPeriodo(t0, t1)
+                 : (State.checkoutHistory || []).filter(h => h.timestamp >= t0 && h.timestamp <= t1);
+        } catch (e) { hist = []; }
+        const estornados = new Set(hist.filter(h => h.type === 'UNDO' && h.undoRef).map(h => String(h.undoRef)));
+        const out = hist.filter(h => h && !estornados.has(String(h.id)) && h.type !== 'UNDO' && h.type !== 'RETURN'
+                                && h.type !== 'AUDIT_CLEAR' && h.type !== 'DELETE_CAR' && (h.removedItems || []).length);
+        Consumo._memo[k] = out;
+        return out;
     },
 
     // Ultima data coberta pelos arquivos do SAP
@@ -14094,6 +14365,8 @@ const Consumo = {
         s261: { code: 'material', qtd: 'quantidade', data: 'data do documento', preco: 'montante em mi' },
         s315: { code: 'material', qtd: 'quantidade', data: 'data do documento' },
     },
+    // v17.30: colunas que entram se existirem (o arquivo antigo continua valendo)
+    COLUNAS_OPCIONAIS: { s261: { ordem: 'ordem' }, s315: {} },
     _cab(v) { return String(v == null ? '' : v).normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase().replace(/\s+/g, ' '); },
 
     // Acha a linha de cabecalho (nas 30 primeiras) e o indice de cada coluna.
@@ -14103,7 +14376,11 @@ const Consumo = {
             const cab = (rows[i] || []).map(Consumo._cab);
             const idx = {};
             Object.keys(alvo).forEach(k => { idx[k] = cab.indexOf(alvo[k]); });
-            if (Object.values(idx).every(v => v >= 0)) return { linha: i, idx };
+            if (Object.values(idx).every(v => v >= 0)) {
+                const opc = Consumo.COLUNAS_OPCIONAIS[tipo] || {};
+                Object.keys(opc).forEach(k => { const j = cab.indexOf(opc[k]); if (j >= 0) idx[k] = j; });
+                return { linha: i, idx };
+            }
         }
         return null;
     },
@@ -14135,7 +14412,9 @@ const Consumo = {
                 const d = Consumo._data(r[idx.data]);
                 if (!c || isNaN(q) || !d) { ignoradas++; return; }
                 // O SAP lanca o 261 (saida) com sinal negativo: o que importa e a quantidade.
-                novos.push([c, Math.abs(q), d]);
+                // v17.30: 4o campo = OP (coluna "Ordem"), para tirar o apontamento de OPs em linha
+                const op = idx.ordem !== undefined ? OP.norm(r[idx.ordem]) : '';
+                novos.push(op ? [c, Math.abs(q), d, op] : [c, Math.abs(q), d]);
                 if (idx.preco !== undefined) {
                     const m = Math.abs(Consumo._num(r[idx.preco]));
                     if (isFinite(m) && m > 0 && q !== 0) {
@@ -14159,6 +14438,7 @@ const Consumo = {
                 `${ignoradas ? ` · ${ignoradas} linha(s) ignorada(s)` : ''}\n` +
                 `Periodo coberto: ${Consumo._br(de)} a ${Consumo._br(ate)}\n` +
                 `${fora} componente(s) nao encontrados no estoque.\n` +
+                (tipo === 's261' ? (idx.ordem !== undefined ? `Coluna "Ordem" encontrada: ${new Set(novos.map(r => r[3]).filter(Boolean)).size} OP(s).\n` : `Sem coluna "Ordem": nao da para tirar o apontamento das OPs em linha.\n`) : '') +
                 (tipo === 's261' ? `${nPreco} componente(s) com preco por peca (Montante em MI ÷ Quantidade)` +
                     (ex ? `\n   ex.: ${ex} — ${Consumo._fmtR(precoDe[ex].m)} ÷ ${Consumo._fmtQ(precoDe[ex].q)} pecas = ${Consumo._fmtPU(precoDe[ex].p)} por peca` : '') + '\n' : '') +
                 `\nOs registros de ${nome} entre essas datas serao SUBSTITUIDOS por este arquivo (sem duplicar).`, 'Importar');
@@ -14189,12 +14469,13 @@ const Consumo = {
         const el = document.getElementById('consumoContent');
         if (!el) return;
         if (!State.isConnected) { el.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:40px;">Conecte o banco de dados.</div>'; return; }
-        try { await Consumo._carregarSap(); }
+        Consumo._memo = {};
+        try { await Consumo._carregarSap(); await Consumo._carregarOps(); }
         catch (e) { el.innerHTML = `<div style="color:var(--ind-red);padding:20px;">Erro ao ler os dados do Consumo: ${Security.sanitize(e.message)}</div>`; return; }
 
         const subs = [['importar', 'fa-file-import', 'Importar SAP'], ['mensal', 'fa-calendar', 'Mensal'],
                       ['semanal', 'fa-calendar-week', 'Semanal'], ['alertas', 'fa-triangle-exclamation', 'Alertas e Compras'],
-                      ['dash', 'fa-chart-column', 'Dashboards']];
+                      ['dash', 'fa-chart-column', 'Dashboards'], ['ops', 'fa-industry', 'OPs']];
         el.innerHTML = `
         <div id="consumoFiltros"></div>
         <div style="display:flex; gap:0; border-bottom:2px solid #e2e8f0; margin-bottom:18px; flex-wrap:wrap;">
@@ -14207,6 +14488,7 @@ const Consumo = {
         const tela = Consumo._sub === 'importar' ? Consumo._telaImportar(box)
                    : Consumo._sub === 'alertas'  ? Consumo._telaAlertas(box)
                    : Consumo._sub === 'dash'     ? Consumo._telaDash(box)
+                   : Consumo._sub === 'ops'      ? Consumo._telaOps(box)
                    : Consumo._telaPeriodo(box);
         // v17.19: os filtros (mes, periodo, busca...) ficam ACIMA das sub-abas
         const slot = document.getElementById('consumoFiltros'), barra = box.querySelector('.cs-filtros');
@@ -14376,6 +14658,7 @@ const Consumo = {
                     <input type="checkbox" ${sel[k] !== false ? 'checked' : ''} onchange="Consumo.setColExcel('${k}', this.checked); Consumo._corpo()"> ${l}</label>`).join('')}
             </div>
         </div>
+        ${Consumo._caixaOps()}
         <div id="csCorpo"></div>`;
         await Consumo._recalcular();
     },
@@ -14449,9 +14732,12 @@ const Consumo = {
     },
 
     COLS: [['code', 'Componente'], ['desc', 'Descricao'], ['ini', 'Est. Inicio', 1], ['ent', 'Entradas (SAP 315)', 1], ['fim', 'Est. Final (atual)', 1],
-           ['uso', 'Uso', 1], ['apo', 'Apontamento (SAP 261)', 1], ['pct', '% Uso', 1], ['preco', 'Preco unit.', 1], ['valor', 'Valor do uso (R$)', 1], ['status', 'Status']],
+           ['emLinha', 'Em linha (OPs abertas)', 1], ['uso', 'Uso', 1], ['apo', 'Apontamento (SAP 261)', 1], ['apoFora', '261 fora (OPs abertas)', 1], ['pct', '% Uso', 1], ['preco', 'Preco unit.', 1], ['valor', 'Valor do uso (R$)', 1], ['status', 'Status']],
     COR_STATUS: { 'OK': '#4A6B3A', 'USO NEGATIVO': '#B42318', 'SEM APONTAMENTO': '#C08A1E', 'SEM PRECO': '#64748b' },
-    _colsVisiveis() { const sel = Consumo._colsExcel(); return Consumo.COLS.filter(c => sel[c[0]] !== false); },
+    _colsVisiveis() {
+        const sel = Consumo._colsExcel(), ops = !!(Consumo._res && Consumo._res.opsAbertas && Consumo._res.opsAbertas.length);
+        return Consumo.COLS.filter(c => sel[c[0]] !== false && (ops || (c[0] !== 'emLinha' && c[0] !== 'apoFora')));
+    },
 
     ordenar(k) {
         Consumo._ord = { k, dir: Consumo._ord.k === k ? -Consumo._ord.dir : (k === 'code' || k === 'desc' || k === 'status' ? 1 : -1) };
@@ -14474,7 +14760,7 @@ const Consumo = {
     _celula(k, r) {
         const S = Security.sanitize, Q = Consumo._fmtQ, dir = 'text-align:right;';
         switch (k) {
-            case 'code':   return `<td style="font-weight:900; color:var(--tpv-dark-blue); font-family:'Roboto Mono',monospace;">${S(r.code)}</td>`;
+            case 'code':   return `<td style="font-weight:900; color:var(--tpv-dark-blue); font-family:'Roboto Mono',monospace;">${S(r.code)}${(r.emLinha || r.apoFora) ? ' <span class="oa-tag" style="background:#7c3aed; font-family:inherit;" title="Material em linha: OP ainda aberta, apontamento incompleto">EM LINHA</span>' : ''}</td>`;
             case 'desc':   return `<td>${S(r.desc || '-')}</td>`;
             case 'uso':    return `<td style="${dir} font-weight:900;">${Q(r.uso)}</td>`;
             case 'pct':    return `<td style="${dir} font-weight:900;">${Consumo._fmtP(r.pct)}</td>`;
@@ -14583,14 +14869,17 @@ const Consumo = {
             ['ini',    'Est. Inicio',           r => Math.round(r.ini),  Math.round(t.ini), 'q'],
             ['ent',    'Entradas (SAP 315)',    r => Math.round(r.ent),  Math.round(t.ent), 'q'],
             ['fim',    'Est. Final (atual)',    r => Math.round(r.fim),  Math.round(t.fim), 'q'],
+            ['emLinha','Em linha (OPs abertas)', r => Math.round(r.emLinha || 0), Math.round(t.emLinha || 0), 'q'],
             ['uso',    'Uso',                   r => Math.round(r.uso),  Math.round(t.uso), 'q'],
             ['apo',    'Apontamento (SAP 261)', r => Math.round(r.apo),  Math.round(t.apo), 'q'],
+            ['apoFora','261 fora (OPs abertas)', r => Math.round(r.apoFora || 0), Math.round(t.apoFora || 0), 'q'],
             ['pct',    '% Uso',                 r => r.pct,              t.pct,   'p'],
             ['preco',  'Preco unit.',           r => r.preco,            null,    'pu'],
             ['valor',  'Valor do uso (R$)',     r => r.valor,            t.valor, 'r'],
             ['status', 'Status',                r => r.status,           '% geral = soma do Uso / soma do Apontamento (itens validos)'],
-        ].filter(c => sel[c[0]] !== false);
+        ].filter(c => sel[c[0]] !== false && ((Consumo._res.opsAbertas || []).length || (c[0] !== 'emLinha' && c[0] !== 'apoFora')));
         const aoa = Consumo._cabecalho(p);
+        if ((Consumo._res.opsAbertas || []).length) aoa[3] = ['OPs em linha (fora do calculo ate fechar): ' + Consumo._res.opsAbertas.join(', ')];
         aoa.push(cols.map(c => c[1]));
         Consumo._filtradas().forEach(r => aoa.push(cols.map(c => c[2](r))));
         aoa.push(cols.map(c => c[3]));
