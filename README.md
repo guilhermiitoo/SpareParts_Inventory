@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.20**
+**Versão atual: v17.21**
 
 ---
 
@@ -67,7 +67,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.20** | Pasta fixa `02 - SpareParts_Inventory` (recusa outra pasta). Pasta `dados` organizada em subpastas (arquivos soltos movidos sozinhos). Botão de atalho na área de trabalho. |
+| **v17.21** | Sai o cabeçalho de cima das abas; nome do usuário, status do banco e **SAIR** ficam no rodapé da barra lateral. |
+| v17.20 | Pasta fixa `02 - SpareParts_Inventory` (recusa outra pasta). Pasta `dados` organizada em subpastas (arquivos soltos movidos sozinhos). Botão de atalho na área de trabalho. |
 | v17.19 | Cabeçalho das tabelas do Consumo fica **fixo** ao rolar. Filtros (mês, período, busca, colunas) ficam **acima** das sub-abas. Este README. |
 | v17.18 | Sem estoque salvo no **dia de início** do período → aviso, sem calcular (não troca a data sozinho). |
 | v17.17 | Tela mostra de onde vem o Est. Inicial / Final e os dias com estoque salvo. |
