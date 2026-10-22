@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.25**
+**Versão atual: v17.26**
 
 ---
 
@@ -68,7 +68,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.25** | Trava pelo arquivo `SPARE_PARTS_PASTA_DO_SISTEMA.json` na pasta oficial (colocado à mão; o sistema não cria). Sem ele, a pasta é recusada. |
+| **v17.26** | Trava também no núcleo (abertura do banco): sem o arquivo de confirmação, nada é lido nem gravado, por qualquer caminho. Aviso **PASTA BLOQUEADA** na tela de login. |
+| v17.25 | Trava pelo arquivo `SPARE_PARTS_PASTA_DO_SISTEMA.json` na pasta oficial (colocado à mão; o sistema não cria). Sem ele, a pasta é recusada. |
 | v17.24 | A pasta é conferida ANTES de o navegador pedir permissão de edição; pasta lembrada com nome errado é descartada. |
 | v17.23 | Pasta do sistema renomeada para `2 - SpareParts_Inventory`. |
 | v17.22 | Cartão **BD CONECTADO** sozinho no canto superior direito. |
