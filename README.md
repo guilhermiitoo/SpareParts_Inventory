@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.34**
+**Versão atual: v17.35**
 
 ---
 
@@ -78,7 +78,7 @@ Desenvolvido por Guilherme Fernandes.
   - Preço por peça = soma do Montante em MI ÷ soma da Quantidade.
 - **Dashboards** usam o mesmo filtro do Mensal: mês ou **período (opcional)**.
 - **Sub-abas:** Importar SAP · Mensal (mês ou período livre) · Semanal (uma ou mais semanas) · Alertas e Compras (Excel por lista) · Dashboards · OPs.
-- **OPs em linha (apontamento incompleto):** o admin digita as OPs que ainda estão rodando (`dados/consumo/ops_em_linha.json`). Enquanto a OP está na lista:
+- **OPs em linha (apontamento incompleto)** (fica na sub-aba **OPs**): o admin digita as OPs que ainda estão rodando (`dados/consumo/ops_em_linha.json`). Enquanto a OP está na lista:
   - o que saiu do estoque para ela (lista MES + busca avulsa) volta para o cálculo como **estoque de antes da saída** (coluna "Em linha");
   - o **apontamento 261** dela fica fora (coluna "261 fora"; precisa da coluna `Ordem` no SAP);
   - o componente aparece com a etiqueta **EM LINHA**.
@@ -97,7 +97,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.34** | Ajustes do Consumo (aguardando apontamento, limite %, colunas) saem da tela do Consumo e vão para **Sistema › Configurações**. |
+| **v17.35** | Quadro "OPs em linha" só na sub-aba **OPs**. Cabeçalho do período mais simples (Est. Inicial: data · Est. Final: ESTOQUE ATUAL · dias salvos). |
+| v17.34 | Ajustes do Consumo (aguardando apontamento, limite %, colunas) saem da tela do Consumo e vão para **Sistema › Configurações**. |
 | v17.33 | Limite do "Aguardando apontamento" = **10%** (editável). Filtro de **período** também nos Dashboards. |
 | v17.32 | "Aguardando apontamento" passa a valer para **todo uso acima de 100%**: o % do item some, ele sai dos totais e entra no card "Aguardando apontamento". |
 | v17.31 | Etiqueta **AGUARDANDO APONTAMENTO** quando o % Uso passa de 110%, com botão para mostrar/ocultar; coluna Observação no Excel. |
