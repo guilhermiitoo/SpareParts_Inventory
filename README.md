@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.26**
+**Versão atual: v17.27**
 
 ---
 
@@ -13,7 +13,7 @@ Desenvolvido por Guilherme Fernandes.
 - **Pasta fixa do sistema:** `S:\MMT\49. JOÃO - ARQUIVOS HTML\GUILHERME FERNANDES\2 - SpareParts_Inventory`.
   O endereço aparece na tela de login (botão de copiar). Outra pasta é recusada sem criar nada.
   Como o navegador não informa o caminho completo, a conferência é pelo **nome da pasta** + existência do banco dentro dela.
-- **Atalho:** botão **CRIAR ATALHO NA ÁREA DE TRABALHO** na tela de login.
+- **Atalho:** dois cliques em `CRIAR ATALHO NA AREA DE TRABALHO.bat` (na pasta do sistema).
 
 ### Estrutura da pasta
 ```
@@ -68,7 +68,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.26** | Trava também no núcleo (abertura do banco): sem o arquivo de confirmação, nada é lido nem gravado, por qualquer caminho. Aviso **PASTA BLOQUEADA** na tela de login. |
+| **v17.27** | Removido o botão de atalho da tela de login (a janela de salvar podia sobrescrever o `SPARE_PARTS.html`). Atalho só pelo `.bat`. |
+| v17.26 | Trava também no núcleo (abertura do banco): sem o arquivo de confirmação, nada é lido nem gravado, por qualquer caminho. Aviso **PASTA BLOQUEADA** na tela de login. |
 | v17.25 | Trava pelo arquivo `SPARE_PARTS_PASTA_DO_SISTEMA.json` na pasta oficial (colocado à mão; o sistema não cria). Sem ele, a pasta é recusada. |
 | v17.24 | A pasta é conferida ANTES de o navegador pedir permissão de edição; pasta lembrada com nome errado é descartada. |
 | v17.23 | Pasta do sistema renomeada para `2 - SpareParts_Inventory`. |
