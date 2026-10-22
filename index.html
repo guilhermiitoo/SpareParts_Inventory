@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.32</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.33</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -14665,8 +14665,11 @@ const Consumo = {
             <button class="btn-3d btn-green" style="padding:9px 16px; font-size:0.8rem;" onclick="Consumo.exportar()"><i class="fas fa-file-excel"></i> EXPORTAR EXCEL</button>
             <div style="flex-basis:100%; display:flex; gap:16px; align-items:center; flex-wrap:wrap; font-size:0.78rem; font-weight:700; color:var(--tpv-dark-blue);">
                 <button type="button" class="btn-3d ${Consumo._aguardOn() ? 'btn-yellow' : 'btn-gray'}" style="padding:6px 12px; font-size:0.75rem;" onclick="Consumo.toggleAguard()"
-                    title="Uso acima do apontado: mostra 'Aguardando apontamento' no lugar do % e tira o item do % geral">
-                    <i class="fas ${Consumo._aguardOn() ? 'fa-eye' : 'fa-eye-slash'}"></i> AGUARDANDO APONTAMENTO (&gt;100%): ${Consumo._aguardOn() ? 'MOSTRANDO' : 'OCULTO'}</button>
+                    title="% Uso acima do limite: mostra 'Aguardando apontamento' no lugar do % e tira o item dos totais">
+                    <i class="fas ${Consumo._aguardOn() ? 'fa-eye' : 'fa-eye-slash'}"></i> AGUARDANDO APONTAMENTO: ${Consumo._aguardOn() ? 'MOSTRANDO' : 'OCULTO'}</button>
+                <label style="display:flex; align-items:center; gap:5px;">acima de
+                    <input type="number" step="0.1" min="0.1" value="${Consumo._limite()}" onchange="Consumo.setLimite(this.value)"
+                        style="width:70px; padding:4px 6px; border:1px solid var(--ind-border); border-radius:4px; font-weight:900; text-align:right;"> %</label>
                 <span class="oa-lbl" style="margin:0;">Colunas:</span>
                 ${Consumo.OPCIONAIS.map(([k, l]) => `<label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
                     <input type="checkbox" ${sel[k] !== false ? 'checked' : ''} onchange="Consumo.setColExcel('${k}', this.checked); Consumo._corpo()"> ${l}</label>`).join('')}
@@ -14774,13 +14777,20 @@ const Consumo = {
 
     // v17.31: % Uso acima de 110% = apontamento provavelmente incompleto
     // (as listas antigas nao tinham OP, entao ainda nao da para cruzar).
-    LIMITE_AGUARD: 1.00,
+    // v17.33: limite editavel na tela (padrao 10%), guardado por PC
+    _limite() { let v = NaN; try { v = parseFloat(localStorage.getItem('consumo_limite_aguard')); } catch (e) {} return isFinite(v) && v > 0 ? v : 10; },
+    setLimite(v) {
+        const n = parseFloat(String(v).replace(',', '.'));
+        if (!isFinite(n) || n <= 0) { Toast.warn('Limite invalido.'); return; }
+        try { localStorage.setItem('consumo_limite_aguard', String(n)); } catch (e) {}
+        Consumo.render();
+    },
     _aguardOn() { try { return localStorage.getItem('consumo_aguard') !== '0'; } catch (e) { return true; } },
     toggleAguard() {
         try { localStorage.setItem('consumo_aguard', Consumo._aguardOn() ? '0' : '1'); } catch (e) {}
         const p = Consumo._sub; Consumo.render(); Consumo._sub = p;
     },
-    _aguardando(r) { return Consumo._aguardOn() && r.pct != null && r.pct > Consumo.LIMITE_AGUARD && !(r.emLinha || r.apoFora); },
+    _aguardando(r) { return Consumo._aguardOn() && r.pct != null && r.pct * 100 > Consumo._limite() + 1e-9 && !(r.emLinha || r.apoFora); },
 
     _celula(k, r) {
         const S = Security.sanitize, Q = Consumo._fmtQ, dir = 'text-align:right;';
@@ -14789,7 +14799,7 @@ const Consumo = {
             case 'desc':   return `<td>${S(r.desc || '-')}</td>`;
             case 'uso':    return `<td style="${dir} font-weight:900;">${Q(r.uso)}</td>`;
             case 'pct':    return Consumo._aguardando(r)
-                ? `<td style="${dir}"><span class="oa-tag" style="background:#C08A1E; font-size:0.62rem;" title="Uso acima do apontado (${Consumo._fmtP(r.pct)}): o apontamento ainda nao esta completo no SAP">AGUARDANDO APONTAMENTO</span></td>`
+                ? `<td style="${dir}"><span class="oa-tag" style="background:#C08A1E; font-size:0.62rem;" title="% Uso ${Consumo._fmtP(r.pct)} (acima de ${Consumo._limite()}%): o apontamento ainda nao esta completo no SAP">AGUARDANDO APONTAMENTO</span></td>`
                 : `<td style="${dir} font-weight:900;">${Consumo._fmtP(r.pct)}</td>`;
             case 'preco':  return `<td style="${dir}">${Consumo._fmtPU(r.preco)}</td>`;
             case 'valor':  return `<td style="${dir}">${Consumo._fmtR(r.valor)}</td>`;
@@ -14933,7 +14943,7 @@ const Consumo = {
         Consumo._charts.forEach(c => { try { c.destroy(); } catch (e) {} });
         Consumo._charts = [];
         if (!Consumo._ym) Consumo._ym = Consumo._hoje().slice(0, 7);
-        const p = Consumo._periodoMes(Consumo._ym);
+        const p = Consumo._periodoMensal();   // v17.33: mesmo filtro de periodo do Mensal
         const card = (titulo, sub, id, alt) => `
             <div style="background:#fff; border:1px solid var(--ind-border); border-radius:8px; padding:16px;">
                 <div style="font-weight:900; color:var(--tpv-dark-blue); text-transform:uppercase; letter-spacing:0.5px; font-size:0.88rem;">${titulo}</div>
@@ -14942,7 +14952,13 @@ const Consumo = {
             </div>`;
         box.innerHTML = `
         <div class="cs-filtros" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; background:#f8fafc; border:1px solid var(--ind-border); border-radius:6px; padding:12px 14px; margin-bottom:14px;">
-            <div><div class="oa-lbl">Mes</div><input type="month" class="big-input" style="padding:8px 10px; margin:0; width:auto;" value="${Consumo._ym}" onchange="Consumo._ym=this.value; Consumo.render()"></div>
+            <div><div class="oa-lbl">Mes</div><input type="month" class="big-input" style="padding:8px 10px; margin:0; width:auto;" value="${Consumo._ym}" onchange="Consumo._ym=this.value; Consumo._mDe=''; Consumo._mAte=''; Consumo.render()"></div>
+            <div><div class="oa-lbl">Periodo (opcional)</div>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <input type="date" class="big-input" style="padding:7px 8px; margin:0; width:auto;" value="${Consumo._mDe}" onchange="Consumo._mDe=this.value; Consumo.render()">
+                    <span style="font-size:0.75rem; color:#475569;">a</span>
+                    <input type="date" class="big-input" style="padding:7px 8px; margin:0; width:auto;" value="${Consumo._mAte}" onchange="Consumo._mAte=this.value; Consumo.render()">
+                </div></div>
             <div style="font-size:0.78rem; color:#334155; padding-bottom:8px;">Periodo: <b>${Consumo._br(p.de)} a ${Consumo._br(p.ate)}</b></div>
         </div>
         <div id="csDash"><div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Calculando...</div></div>`;
@@ -14966,7 +14982,7 @@ const Consumo = {
         const [mes, ...porSemana] = await Promise.all([Consumo.calcular(p.de, p.ate)].concat(semanas.map(s => Consumo.calcular(s.de, s.ate))));
         if (mes.semBase) {
             document.getElementById('csDash').innerHTML = `<div style="background:#fef2f2; border:1px solid #fecaca; border-left:5px solid var(--ind-red); border-radius:6px; padding:16px 18px; color:#7f1d1d; font-weight:700;">
-                Sem estoque inicial salvo no dia ${Consumo._br(p.de)} (pasta dados/estoque_diario): nao da para calcular o consumo deste mes.</div>`;
+                Sem estoque inicial salvo no dia ${Consumo._br(p.de)} (pasta dados/estoque_diario): nao da para calcular o consumo deste periodo. Use o Periodo (opcional) comecando num dia com estoque salvo.</div>`;
             return;
         }
         const t = mes.tot, Q = Consumo._fmtQ;

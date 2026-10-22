@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.32**
+**Versão atual: v17.33**
 
 ---
 
@@ -76,13 +76,14 @@ Desenvolvido por Guilherme Fernandes.
   - 261: `Material`, `Quantidade`, `Data do documento`, `Montante em MI` (+ `Ordem`, se existir)
   - 315: `Material`, `Quantidade`, `Data do documento`
   - Preço por peça = soma do Montante em MI ÷ soma da Quantidade.
+- **Dashboards** usam o mesmo filtro do Mensal: mês ou **período (opcional)**.
 - **Sub-abas:** Importar SAP · Mensal (mês ou período livre) · Semanal (uma ou mais semanas) · Alertas e Compras (Excel por lista) · Dashboards · OPs.
 - **OPs em linha (apontamento incompleto):** o admin digita as OPs que ainda estão rodando (`dados/consumo/ops_em_linha.json`). Enquanto a OP está na lista:
   - o que saiu do estoque para ela (lista MES + busca avulsa) volta para o cálculo como **estoque de antes da saída** (coluna "Em linha");
   - o **apontamento 261** dela fica fora (coluna "261 fora"; precisa da coluna `Ordem` no SAP);
   - o componente aparece com a etiqueta **EM LINHA**.
   - Quando a OP fecha e o material volta, o admin tira a OP da lista (×) e ela entra no cálculo.
-- **Aguardando apontamento:** uso **acima do apontado** (% Uso > 100%) mostra **AGUARDANDO APONTAMENTO** no lugar do %, sai do % geral, do consumo e do valor dos cards e do Top 5 do dashboard. Card com a quantidade de itens aguardando. Botão para mostrar/ocultar (lembrado por PC); oculto = cálculo completo como antes.
+- **Aguardando apontamento:** % Uso **acima do limite** (padrão **10%**, editável na tela e lembrado por PC) mostra **AGUARDANDO APONTAMENTO** no lugar do %, sai do % geral, do consumo e do valor dos cards e do Top 5 do dashboard. Card com a quantidade de itens aguardando. Botão para mostrar/ocultar (lembrado por PC); oculto = cálculo completo como antes.
 - **OP = 7 números.** `1234567`, `1234567-SMT`, `-SMT-T` e `-SMT-B` são a mesma OP (lista do MES, busca avulsa e coluna Ordem do SAP).
 - **Sub-aba OPs:** por OP, itens/peças que saíram pela **lista MES**, pela **busca avulsa (completar lista)** e **(requisição/retrabalho)**, e o apontamento 261. Exporta Excel.
 
@@ -96,7 +97,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.32** | "Aguardando apontamento" passa a valer para **todo uso acima de 100%**: o % do item some, ele sai dos totais e entra no card "Aguardando apontamento". |
+| **v17.33** | Limite do "Aguardando apontamento" = **10%** (editável). Filtro de **período** também nos Dashboards. |
+| v17.32 | "Aguardando apontamento" passa a valer para **todo uso acima de 100%**: o % do item some, ele sai dos totais e entra no card "Aguardando apontamento". |
 | v17.31 | Etiqueta **AGUARDANDO APONTAMENTO** quando o % Uso passa de 110%, com botão para mostrar/ocultar; coluna Observação no Excel. |
 | v17.30 | Busca Avulsa com **OP obrigatória** + destino (completar lista / requisição). Consumo: **OPs em linha** (material volta como estoque de antes da saída e o 261 da OP fica fora), coluna **Ordem** do SAP 261, sub-aba **OPs**. |
 | v17.29 | Histórico e logs guardados por **90 dias** (limpeza automática). Reimpressão montada na hora para qualquer lista dos 90 dias. Filtro de Período no Histórico e botão Excel dos Logs. |
