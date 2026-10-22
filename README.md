@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.29**
+**Versão atual: v17.30**
 
 ---
 
@@ -73,10 +73,21 @@ Desenvolvido por Guilherme Fernandes.
 - **Est. Final (atual):** se o período vai até hoje, é o **estoque atual do sistema**; num período passado, é o estoque salvo do dia seguinte ao fim.
 - **Estoque diário:** o primeiro acesso de cada dia salva `dados/estoque_diario/Estoque dd.mm.aaaa - HHhMM (primeiro acesso).json`.
 - **Importar SAP:** o Excel do SAP como ele vem.
-  - 261: `Material`, `Quantidade`, `Data do documento`, `Montante em MI`
+  - 261: `Material`, `Quantidade`, `Data do documento`, `Montante em MI` (+ `Ordem`, se existir)
   - 315: `Material`, `Quantidade`, `Data do documento`
   - Preço por peça = soma do Montante em MI ÷ soma da Quantidade.
-- **Sub-abas:** Importar SAP · Mensal (mês ou período livre) · Semanal (uma ou mais semanas) · Alertas e Compras (Excel por lista) · Dashboards.
+- **Sub-abas:** Importar SAP · Mensal (mês ou período livre) · Semanal (uma ou mais semanas) · Alertas e Compras (Excel por lista) · Dashboards · OPs.
+- **OPs em linha (apontamento incompleto):** o admin digita as OPs que ainda estão rodando (`dados/consumo/ops_em_linha.json`). Enquanto a OP está na lista:
+  - o que saiu do estoque para ela (lista MES + busca avulsa) volta para o cálculo como **estoque de antes da saída** (coluna "Em linha");
+  - o **apontamento 261** dela fica fora (coluna "261 fora"; precisa da coluna `Ordem` no SAP);
+  - o componente aparece com a etiqueta **EM LINHA**.
+  - Quando a OP fecha e o material volta, o admin tira a OP da lista (×) e ela entra no cálculo.
+- **OP = 7 números.** `1234567`, `1234567-SMT`, `-SMT-T` e `-SMT-B` são a mesma OP (lista do MES, busca avulsa e coluna Ordem do SAP).
+- **Sub-aba OPs:** por OP, itens/peças que saíram pela **lista MES**, pela **busca avulsa (completar lista)** e **(requisição/retrabalho)**, e o apontamento 261. Exporta Excel.
+
+### Busca Avulsa
+- **OP obrigatória** (7 números, ou com `-SMT`, `-SMT-T`, `-SMT-B`) e **Para:** Completar lista ou Requisição / Retrabalho.
+- Sem isso o botão **LIBERAR POSIÇÕES E BAIXAR** fica travado. Formato errado mostra **"OP não existe"**.
 
 ---
 
@@ -84,7 +95,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.29** | Histórico e logs guardados por **90 dias** (limpeza automática). Reimpressão montada na hora para qualquer lista dos 90 dias. Filtro de Período no Histórico e botão Excel dos Logs. |
+| **v17.30** | Busca Avulsa com **OP obrigatória** + destino (completar lista / requisição). Consumo: **OPs em linha** (material volta como estoque de antes da saída e o 261 da OP fica fora), coluna **Ordem** do SAP 261, sub-aba **OPs**. |
+| v17.29 | Histórico e logs guardados por **90 dias** (limpeza automática). Reimpressão montada na hora para qualquer lista dos 90 dias. Filtro de Período no Histórico e botão Excel dos Logs. |
 | v17.28 | Versão aparece na tela de login. Escolher a pasta `dados` mostra "escolha a pasta de CIMA". |
 | v17.27 | Removido o botão de atalho da tela de login (a janela de salvar podia sobrescrever o `SPARE_PARTS.html`). Atalho só pelo `.bat`. |
 | v17.26 | Trava também no núcleo (abertura do banco): sem o arquivo de confirmação, nada é lido nem gravado, por qualquer caminho. Aviso **PASTA BLOQUEADA** na tela de login. |
