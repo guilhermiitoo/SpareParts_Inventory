@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.19</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.20</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -703,7 +703,7 @@ body.com-menu #btnRecolherMenu { display: grid; }
                 <i id="dbStatusIcon" class="fas fa-exclamation-circle" style="color: var(--ind-yellow);"></i>
             </div>
             <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                <input type="text" id="dbPathInput" readonly value="S:\MMT\49. JOÃO - ARQUIVOS HTML\GUILHERME FERNANDES\Banco de dados sistemas MMT\Database Estoque spare parts" style="flex:1; font-size:0.7rem; font-family:'Roboto Mono',monospace; padding:8px; border:1px solid #cbd5e1; border-radius:4px; background:#fff; color:#334155;">
+                <input type="text" id="dbPathInput" readonly value="S:\MMT\49. JOÃO - ARQUIVOS HTML\GUILHERME FERNANDES\02 - SpareParts_Inventory" title="Copie e cole este endereco na janela de selecao de pasta" style="flex:1; font-size:0.7rem; font-family:'Roboto Mono',monospace; padding:8px; border:1px solid #cbd5e1; border-radius:4px; background:#fff; color:#334155;">
                 <button class="btn-3d btn-gray" style="padding:8px 12px; font-size:0.8rem;" onclick="UI.copyDbPath()" title="Copiar"><i class="fas fa-copy"></i></button>
             </div>
             <button id="btnReconnectDb" class="btn-3d btn-green" style="width:100%; padding:12px; margin-bottom:8px; display:none;" onclick="DB.reconnectFromMemory()">
@@ -711,6 +711,9 @@ body.com-menu #btnRecolherMenu { display: grid; }
             </button>
             <button id="btnImportDb" class="btn-3d btn-blue" style="width:100%; padding:12px;" onclick="DB.loadFile()">
                 <i class="fas fa-folder-open"></i> SELECIONAR PASTA DO SISTEMA
+            </button>
+            <button type="button" class="btn-3d btn-gray" style="width:100%; padding:8px; margin-top:8px; font-size:0.78rem;" onclick="UI.criarAtalho()">
+                <i class="fas fa-desktop"></i> CRIAR ATALHO NA AREA DE TRABALHO
             </button>
             <div id="dbErrorMsg" style="color:var(--ind-red); margin-top:10px; font-weight:bold; font-size:0.8rem; text-align:center;"></div>
         </div>
@@ -2622,6 +2625,27 @@ const UI = {
         document.getElementById('userMatricula').focus();
     },
 
+    // v17.20: salva um atalho (.url) do sistema. A janela de salvar ja abre na
+    // Area de Trabalho; o navegador nao deixa criar o atalho sem o usuario confirmar.
+    async criarAtalho() {
+        const alvo = location.protocol === 'file:' ? location.href.split('#')[0].split('?')[0]
+                   : 'file:///' + DB.CAMINHO_OFICIAL.replace(/\\/g, '/') + '/SPARE_PARTS.html';
+        const conteudo = '[InternetShortcut]\r\nURL=' + encodeURI(decodeURI(alvo)) + '\r\n';
+        const nome = 'Spare Parts MMT.url';
+        try {
+            if (window.showSaveFilePicker) {
+                const fh = await window.showSaveFilePicker({ suggestedName: nome, startIn: 'desktop',
+                    types: [{ description: 'Atalho', accept: { 'application/internet-shortcut': ['.url'] } }] });
+                const w = await fh.createWritable(); await w.write(conteudo); await w.close();
+            } else {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([conteudo], { type: 'application/internet-shortcut' }));
+                a.download = nome; a.click();
+            }
+            Toast.success('Atalho criado. Clique duas vezes nele para abrir o sistema.', 6000);
+        } catch (e) { if (e.name !== 'AbortError') Toast.error('Nao foi possivel criar o atalho: ' + e.message); }
+    },
+
     copyDbPath() {
         const val = document.getElementById('dbPathInput').value;
         navigator.clipboard.writeText(val).then(() => {
@@ -2802,6 +2826,7 @@ const Store = {
     // ---- handles ----
     _raiz:  null,   // pasta escolhida pelo usuario (SPARE_PARTS)
     _dados: null,   // dados/
+    _banco: null,   // dados/banco/  (v17.20)
     _mov:   null,   // dados/movimentos/
     _logs:  null,   // dados/logs/
 
@@ -2905,7 +2930,9 @@ const Store = {
         try {
             const antigo = deveBak ? await Store._lerTexto(dir, nome) : null;
             if (antigo && antigo !== txt) {
-                const bh = await dir.getFileHandle(nome + '.bak', { create: true });
+                // v17.20: o .bak vai para a subpasta "bak" (nao fica solto ao lado do arquivo)
+                const bdir = await dir.getDirectoryHandle('bak', { create: true });
+                const bh = await bdir.getFileHandle(nome + '.bak', { create: true });
                 const bw = await bh.createWritable();
                 await bw.write(antigo);
                 await bw.close();
@@ -2977,7 +3004,7 @@ const Store = {
 
         while (Date.now() - inicio < Store.LOCK_ESPERA_MAX) {
             // alguem tem a trava e ela ainda esta viva?
-            const atual = await Store._lerTexto(Store._dados, Store.LOCK);
+            const atual = await Store._lerTexto(Store._banco, Store.LOCK);
             if (atual) {
                 let o = null;
                 try { o = JSON.parse(atual); } catch (e) { o = null; }
@@ -2988,11 +3015,11 @@ const Store = {
             }
 
             // marca como nossa e confere quem ficou
-            await Store._gravarTexto(Store._dados, Store.LOCK,
+            await Store._gravarTexto(Store._banco, Store.LOCK,
                 JSON.stringify({ id: meu, pc: Store.pcId(), ts: Date.now() }), false, true);
             await pausa(25 + Math.random() * 45);
 
-            const conf = await Store._lerTexto(Store._dados, Store.LOCK);
+            const conf = await Store._lerTexto(Store._banco, Store.LOCK);
             try { if (JSON.parse(conf).id === meu) return meu; } catch (e) {}
             await pausa(40 + Math.random() * 120);   // perdemos a disputa: tenta de novo
         }
@@ -3001,11 +3028,11 @@ const Store = {
 
     async _liberarLock(meu) {
         try {
-            const atual = await Store._lerTexto(Store._dados, Store.LOCK);
+            const atual = await Store._lerTexto(Store._banco, Store.LOCK);
             // so apaga se a trava ainda for NOSSA: se expirou e outro PC pegou,
             // apagar aqui derrubaria a trava dele
             if (atual && JSON.parse(atual).id === meu) {
-                await Store._dados.removeEntry(Store.LOCK);
+                await Store._banco.removeEntry(Store.LOCK);
             }
         } catch (e) { /* trava ja removida ou ilegivel: segue */ }
     },
@@ -3022,13 +3049,56 @@ const Store = {
         } catch (e) { return false; }
     },
 
+    // ======================================================================
+    // v17.20 — ORGANIZACAO DA PASTA "dados"
+    //   dados/banco/        catalogo, estoque, sistema, ranking, caixas, indice
+    //   dados/banco/bak/    copias .bak desses arquivos
+    //   dados/movimentos/   historico   ·  dados/logs/  logs
+    //   dados/consumo/      SAP         ·  dados/estoque_diario/  estoque do dia
+    //   dados/backups_import/  copias feitas antes de um "Importar Banco"
+    // Banco antigo (arquivos soltos em dados/) e movido sozinho na 1a abertura.
+    // ======================================================================
+    PASTA_BANCO: 'banco',
+    async _organizar() {
+        const nomes = [Store.INDICE, ...Object.values(Store.ARQ)];
+        let movidos = 0;
+        for (const nome of nomes) {
+            const txt = await Store._lerTexto(Store._dados, nome);
+            if (txt == null || txt === '') continue;
+            const jaTem = await Store._lerTexto(Store._banco, nome);
+            if (!jaTem) await Store._gravarTexto(Store._banco, nome, txt, false);
+            try { await Store._dados.removeEntry(nome); movidos++; } catch (e) {}
+        }
+        const bak = await Store._banco.getDirectoryHandle('bak', { create: true });
+        for (const nome of nomes) {
+            const txt = await Store._lerTexto(Store._dados, nome + '.bak');
+            if (txt == null) continue;
+            if (txt) await Store._gravarTexto(bak, nome + '.bak', txt, false);
+            try { await Store._dados.removeEntry(nome + '.bak'); } catch (e) {}
+        }
+        // copias antigas "_antes_do_import_*" vao para backups_import/
+        const imp = [];
+        for await (const [nome, h] of Store._dados.entries()) if (h.kind === 'directory' && nome.startsWith('_antes_do_import_')) imp.push(nome);
+        if (imp.length) {
+            const dest = await Store._dados.getDirectoryHandle('backups_import', { create: true });
+            for (const nome of imp) {
+                const de = await Store._dados.getDirectoryHandle(nome), para = await dest.getDirectoryHandle(nome, { create: true });
+                for await (const [arq, h] of de.entries()) if (h.kind === 'file') await Store._gravarTexto(para, arq, (await Store._lerTexto(de, arq)) || '', false, true);
+                try { await Store._dados.removeEntry(nome, { recursive: true }); } catch (e) {}
+            }
+        }
+        if (movidos) console.log('[Store] pasta dados organizada:', movidos, 'arquivo(s) movidos para dados/banco');
+    },
+
     async conectar(dirHandle) {
         Store._raiz  = dirHandle;
         Store._dados = await dirHandle.getDirectoryHandle(Store.PASTA_DADOS, { create: true });
         Store._mov   = await Store._dados.getDirectoryHandle(Store.PASTA_MOV,  { create: true });
         Store._logs  = await Store._dados.getDirectoryHandle(Store.PASTA_LOGS, { create: true });
+        Store._banco = await Store._dados.getDirectoryHandle(Store.PASTA_BANCO, { create: true });
+        await Store._organizar();
 
-        const txtIdx = await Store._lerTexto(Store._dados, Store.INDICE);
+        const txtIdx = await Store._lerTexto(Store._banco, Store.INDICE);
 
         if (txtIdx) {
             Store._indice = JSON.parse(txtIdx);
@@ -3196,15 +3266,15 @@ const Store = {
     async _copiaDeSeguranca() {
         const carimbo = Store._hoje() + '_' + new Date().toTimeString().slice(0, 5).replace(':', 'h');
         const nome = '_antes_do_import_' + carimbo;
-        const destino = await Store._dados.getDirectoryHandle(nome, { create: true });
+        const destino = await (await Store._dados.getDirectoryHandle('backups_import', { create: true })).getDirectoryHandle(nome, { create: true });
         let n = 0;
         for (const dom of Store.DOMINIOS) {
-            const txt = await Store._lerTexto(Store._dados, Store.ARQ[dom]);
+            const txt = await Store._lerTexto(Store._banco, Store.ARQ[dom]);
             if (txt === null) continue;
             await Store._gravarTexto(destino, Store.ARQ[dom], txt, false);
             n++;
         }
-        const idx = await Store._lerTexto(Store._dados, Store.INDICE);
+        const idx = await Store._lerTexto(Store._banco, Store.INDICE);
         if (idx !== null) { await Store._gravarTexto(destino, Store.INDICE, idx, false); n++; }
         return { pasta: nome, arquivos: n };
     },
@@ -3275,7 +3345,7 @@ const Store = {
     // LEITURA
     // ======================================================================
     async _lerDominio(dom) {
-        const txt = await Store._lerTexto(Store._dados, Store.ARQ[dom]);
+        const txt = await Store._lerTexto(Store._banco, Store.ARQ[dom]);
         if (txt === null) return {};
         try {
             Store._brutoAnterior[dom] = Store._bruto[dom];   // base para o merge de 3 vias
@@ -3284,7 +3354,7 @@ const Store = {
         } catch (e) {
             // arquivo corrompido: tenta a copia de seguranca
             console.warn(`[Store] ${Store.ARQ[dom]} ilegivel, tentando .bak`, e.message);
-            const bak = await Store._lerTexto(Store._dados, Store.ARQ[dom] + '.bak');
+            const bak = await Store._lerTexto(await Store._banco.getDirectoryHandle('bak', { create: true }), Store.ARQ[dom] + '.bak');
             if (bak) {
                 try {
                     const d = JSON.parse(bak);
@@ -3425,7 +3495,7 @@ const Store = {
     // ======================================================================
     async indiceMudou() {
         try {
-            const fh = await Store._dados.getFileHandle(Store.INDICE);
+            const fh = await Store._banco.getFileHandle(Store.INDICE);
             const f  = await fh.getFile();
             if (f.lastModified === Store._idxMtime) return false;
             Store._idxMtime = f.lastModified;
@@ -3436,7 +3506,7 @@ const Store = {
     // Devolve um payload PARCIAL — so os dominios cuja versao mudou.
     // Vai para DB._mergeFromDisk(), que ja trata objetos parciais.
     async lerMudancas() {
-        const txt = await Store._lerTexto(Store._dados, Store.INDICE);
+        const txt = await Store._lerTexto(Store._banco, Store.INDICE);
         if (!txt) return null;
 
         let novo;
@@ -3625,7 +3695,7 @@ const Store = {
             // JA COM A TRAVA: agora a conferencia vale de verdade. Se outro PC
             // gravou antes de nos travarmos, abortamos SEM ESCREVER e o
             // chamador refaz o merge com o dado dele.
-            const txtAgora = await Store._lerTexto(Store._dados, Store.INDICE);
+            const txtAgora = await Store._lerTexto(Store._banco, Store.INDICE);
             if (txtAgora) {
                 let discoIdx = null;
                 try { discoIdx = JSON.parse(txtAgora); } catch (e) { discoIdx = null; }
@@ -3647,7 +3717,7 @@ const Store = {
         try {
 
         for (const { dom, txt } of paraGravar) {
-            await Store._gravarTexto(Store._dados, Store.ARQ[dom], txt);
+            await Store._gravarTexto(Store._banco, Store.ARQ[dom], txt);
             Store._brutoAnterior[dom] = Store._bruto[dom];
             Store._bruto[dom] = txt;
             idx.arquivos[dom] = { tk: Store._novoToken(), t: Date.now() };
@@ -3715,16 +3785,16 @@ const Store = {
 
     async _gravarDominio(dom, obj) {
         const txt = JSON.stringify(obj);
-        await Store._gravarTexto(Store._dados, Store.ARQ[dom], txt);
+        await Store._gravarTexto(Store._banco, Store.ARQ[dom], txt);
         Store._brutoAnterior[dom] = Store._bruto[dom];
         Store._bruto[dom] = txt;
     },
 
     async _gravarIndice() {
         const txt = JSON.stringify(Store._indice, null, 1);
-        await Store._gravarTexto(Store._dados, Store.INDICE, txt, false);
+        await Store._gravarTexto(Store._banco, Store.INDICE, txt, false);
         try {
-            const fh = await Store._dados.getFileHandle(Store.INDICE);
+            const fh = await Store._banco.getFileHandle(Store.INDICE);
             Store._idxMtime = (await fh.getFile()).lastModified;
         } catch (e) {}
     },
@@ -3800,8 +3870,8 @@ const Store = {
                 out.totalBytes += f.size;
             } catch (e) {}
         };
-        await add(Store._dados, Store.INDICE);
-        for (const d of Store.DOMINIOS) await add(Store._dados, Store.ARQ[d]);
+        await add(Store._banco, Store.INDICE);
+        for (const d of Store.DOMINIOS) await add(Store._banco, Store.ARQ[d]);
         let nMov = 0, bMov = 0;
         for await (const [nome, h] of Store._mov.entries()) {
             if (h.kind !== 'file') continue;
@@ -4674,7 +4744,8 @@ const DB = {
 
             clearTimeout(State._syncTimer);   // para o sync antes de trocar o handle
 
-            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
+            const dh = await DB._escolherPasta();
+            if (!dh) { if (reconnBtn) reconnBtn.style.display = 'none'; return; }
             State.dbDirHandle = dh;
             await DB._abrirPasta(dh);
 
@@ -4740,13 +4811,18 @@ const DB = {
         // Mante-lo em State.dbFileHandle preserva todos os guards do sistema
         // (`if (!State.dbFileHandle)`) sem alterar uma linha dos outros modulos.
         State.dbDirHandle      = dh;
-        State.dbFileHandle     = await Store._dados.getFileHandle(Store.INDICE, { create: true });
+        State.dbFileHandle     = await Store._banco.getFileHandle(Store.INDICE, { create: true });
         State.lastModifiedTime = (await State.dbFileHandle.getFile()).lastModified;
         Store._idxMtime        = State.lastModifiedTime;
     },
 
     // Logica comum a 1a conexao e a reconexao, com a pasta ja escolhida.
     async _finishInitialConnect(opts) {
+        if (!(opts && opts.demo) && !(await DB._pastaOk(State.dbDirHandle))) {
+            await Store.esquecerPasta();
+            DB._reconnBtnLoginUI(false);
+            throw new Error(`Pasta errada. Selecione: ${DB.CAMINHO_OFICIAL}`);
+        }
         await DB._abrirPasta(State.dbDirHandle);
 
         State.isConnected = true;
@@ -4792,7 +4868,10 @@ const DB = {
                 await DB._finishInitialConnect();   // ZERO cliques
                 return;
             }
-        } catch (e) { /* deixa o botao tentar */ }
+        } catch (e) {
+            const msg = document.getElementById('dbErrorMsg');
+            if (msg && /Pasta errada/.test(e.message)) { msg.textContent = e.message; return; }
+        }
         DB._reconnBtnLoginUI(true);             // 1 clique
     },
 
@@ -4801,6 +4880,42 @@ const DB = {
     // Uma unica autorizacao cobre TODOS os arquivos do banco: nao existe
     // "autorizar cada JSON". Depois disso este PC nunca mais pergunta.
     // ============================================================
+    // ============================================================
+    // v17.20 — PASTA FIXA DO SISTEMA
+    // O navegador NAO informa o caminho completo da pasta (so o nome), entao
+    // a pasta e conferida por: NOME = "02 - SpareParts_Inventory" e ter o
+    // banco dentro (dados/banco/indice.json, ou dados/indice.json antigo).
+    // Qualquer outra pasta e recusada SEM criar nada, e o sistema pede de novo.
+    // ============================================================
+    PASTA_OFICIAL: '02 - SpareParts_Inventory',
+    CAMINHO_OFICIAL: 'S:\\MMT\\49. JOÃO - ARQUIVOS HTML\\GUILHERME FERNANDES\\02 - SpareParts_Inventory',
+    async _pastaOk(dh) {
+        if (!dh || String(dh.name).trim().toLowerCase() !== DB.PASTA_OFICIAL.toLowerCase()) return false;
+        try {
+            const dados = await dh.getDirectoryHandle('dados');                    // SEM create
+            try { await (await dados.getDirectoryHandle('banco')).getFileHandle('indice.json'); return true; } catch (e) {}
+            await dados.getFileHandle('indice.json');                              // formato anterior a v17.20
+            return true;
+        } catch (e) { return false; }
+    },
+    async _escolherPasta() {
+        while (true) {
+            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
+            if (await DB._pastaOk(dh)) {
+                const perm = await dh.requestPermission({ mode: 'readwrite' });
+                if (perm !== 'granted') { Toast.error('Permissao de gravacao negada para a pasta.'); return null; }
+                return dh;
+            }
+            const msg = document.getElementById('dbErrorMsg');
+            if (msg) msg.textContent = `Pasta errada: "${dh.name}".`;
+            const again = await Modal.confirm('Pasta errada',
+                `A pasta "${dh.name}" NAO e a pasta do sistema.\n\n` +
+                `Selecione SEMPRE esta pasta:\n${DB.CAMINHO_OFICIAL}\n\n` +
+                'Nada foi criado nem alterado na pasta escolhida.', 'Tentar novamente', true);
+            if (!again) return null;
+        }
+    },
+
     async loadFile() {
         try {
             if (!window.showDirectoryPicker) {
@@ -4808,7 +4923,8 @@ const DB = {
                 return;
             }
 
-            const dh = await window.showDirectoryPicker({ id: 'spare-parts-db', mode: 'readwrite' });
+            const dh = await DB._escolherPasta();
+            if (!dh) return;
 
             const perm = await dh.requestPermission({ mode: 'readwrite' });
             if (perm !== 'granted') {
