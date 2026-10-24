@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.35</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.36</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1232,7 +1232,7 @@ body.menu-recolhido #menuRodape .rodape-sair { display: block; text-align: cente
                     <!-- v17.30: OP obrigatoria na busca avulsa -->
                     <div style="display:flex; flex-direction:column;">
                         <label style="font-weight:bold; color:#475569; display:block; margin-bottom:5px; font-size:0.85rem;">OP (Ordem):</label>
-                        <input type="text" id="kWoInput" class="big-input" maxlength="13" placeholder="1234567" autocomplete="off"
+                        <input type="text" id="kWoInput" class="big-input" maxlength="13" placeholder="Digite a OP" autocomplete="off"
                                style="width:170px; font-family:'Roboto Mono',monospace; font-weight:900; letter-spacing:1px;" oninput="Kitting.validarOp()">
                     </div>
                     <div style="display:flex; flex-direction:column;">
@@ -1289,6 +1289,7 @@ body.menu-recolhido #menuRodape .rodape-sair { display: block; text-align: cente
                     <div id="searchActionsContainer">
                         <button class="btn-3d btn-red" onclick="Kitting.releaseAndCheckout()"><i class="fas fa-unlock"></i> LIBERAR POSICOES E BAIXAR</button>
                     </div>
+                    <div id="kWoAviso" style="display:none; margin-top:8px; padding:8px 12px; border-radius:6px; background:#fef2f2; border:2px solid var(--ind-red); color:var(--ind-red); font-weight:900; font-size:0.85rem;"></div>
                 </div>
                 <p id="searchInstructionText" style="color:#64748b; font-size:0.9rem;">Selecione os itens e clique em <b>Liberar</b>.</p>
                 <div style="max-height:420px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:6px;">
@@ -7246,12 +7247,37 @@ const Kitting = {
         if (msg) msg.style.color = (txt && !op) ? 'var(--ind-red)' : '#b45309';
         if (inp) inp.style.borderColor = !txt ? '' : op ? 'var(--ind-green)' : 'var(--ind-red)';
         const ok = !!op && !!Kitting._destino;
-        document.querySelectorAll('#searchActionsContainer button').forEach(b => {
-            if (!b.getAttribute('onclick')?.includes('releaseAndCheckout')) return;
-            b.disabled = !ok; b.style.opacity = ok ? '' : '0.45'; b.style.cursor = ok ? '' : 'not-allowed';
-            b.title = ok ? '' : 'Informe a OP (7 numeros) e para onde vai o material';
-        });
+        // v17.36: botao sempre ativo; o aviso mostra o que falta antes do clique
+        const av = document.getElementById('kWoAviso');
+        if (av) {
+            const falta = Kitting._faltando(txt, op);
+            av.style.display = falta.length ? 'block' : 'none';
+            av.innerHTML = falta.length ? '<i class="fas fa-exclamation-triangle"></i> Antes de baixar: ' + falta.join(' e ') : '';
+        }
         return ok ? op : null;
+    },
+    _faltando(txt, op) {
+        const f = [];
+        if (!txt) f.push('digite a OP');
+        else if (!op) f.push('a OP nao existe (use 7 numeros)');
+        if (!Kitting._destino) f.push('escolha COMPLETAR LISTA ou REQUISICAO / RETRABALHO');
+        return f;
+    },
+    _destacarFalta() {
+        const txt = (document.getElementById('kWoInput')?.value || '').trim().toUpperCase();
+        const op = OP.valida(txt);
+        const alvos = [];
+        if (!op) alvos.push(document.getElementById('kWoInput'));
+        if (!Kitting._destino) alvos.push(document.getElementById('kDestLISTA'), document.getElementById('kDestREQUISICAO'));
+        alvos.forEach(el => {
+            if (!el) return;
+            el.style.outline = '3px solid var(--ind-red)'; el.style.outlineOffset = '2px';
+            el.style.animation = 'none'; void el.offsetWidth; el.style.animation = 'shakeInput 0.4s';
+            setTimeout(() => { el.style.outline = ''; el.style.outlineOffset = ''; }, 2500);
+        });
+        alvos[0]?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        if (!op) document.getElementById('kWoInput')?.focus();
+        return Kitting._faltando(txt, op);
     },
 
     // -------------------------------------------------------
@@ -7366,8 +7392,8 @@ const Kitting = {
 
     async releaseAndCheckout() {
         if (!Kitting.validarOp()) {
-            Toast.error('Informe a OP (7 numeros) e se o material e para completar a lista ou requisicao/retrabalho.', 6000);
-            document.getElementById('kWoInput')?.focus();
+            const falta = Kitting._destacarFalta();
+            Toast.error('Nao foi possivel baixar: ' + falta.join(' e ') + '.', 6000);
             return;
         }
         if (!DB.guard('Kitting - Baixa Avulsa')) return;
@@ -15108,216 +15134,6 @@ const Consumo = {
     },
 };
 window.Consumo = Consumo;
-
-</script>
-<script>
-// ===== js/26-demo.js =====
-// ==========================================================================
-// SPARE PARTS - 26-demo.js   (v17.07)
-// ==========================================================================
-
-// ============================================================================
-// MODULO: MODO DEMONSTRACAO
-// ----------------------------------------------------------------------------
-// Para testar o sistema sem a pasta da rede (ex.: no GitHub Pages).
-// Usa a pasta PRIVADA do navegador (OPFS — navigator.storage.getDirectory),
-// que tem a mesma API de uma pasta real. Assim a demonstracao passa pelo
-// MESMO codigo de gravacao/leitura do sistema verdadeiro, sem simulacao.
-//
-// - Sem faixa nem campos preenchidos: a tela fica igual a do sistema real,
-//   so pula a escolha da pasta. Login: ADMIN / admin123 (ou OP01 / 1234).
-// - Cada navegador tem a sua propria copia: nada vai para a rede da empresa.
-// - Dados 100% ficticios, criados na primeira abertura.
-// - A pasta demo nunca e "lembrada" como pasta oficial deste PC.
-// - Liga sozinho em *.github.io ou com ?demo=1 no endereco; em qualquer
-//   outro lugar so pelo botao da tela de login.
-// ============================================================================
-const Demo = {
-    PASTA: 'spare_parts_demo',
-    ativo: false,
-
-    disponivel() { return !!(navigator.storage && navigator.storage.getDirectory); },
-    automatico() {
-        return /\.github\.io$/i.test(location.hostname) || /[?&]demo=1\b/.test(location.search);
-    },
-
-    async iniciar() {
-        if (!Demo.disponivel()) { Toast.error('Este navegador nao suporta o modo demonstracao. Use Chrome ou Edge atualizados.'); return; }
-        try {
-            const root = await navigator.storage.getDirectory();
-            const dh = await root.getDirectoryHandle(Demo.PASTA, { create: true });
-            const nova = !(await Store._temIndiceAntigo(dh));
-            State.dbDirHandle = dh;
-            Demo.ativo = true;
-            await DB._finishInitialConnect({ demo: true });
-            if (nova) await Demo._semear();
-            else {
-                // demo criada por uma versao anterior: refaz so os dados do Consumo
-                let v = null; try { v = localStorage.getItem('sp_demo_semente'); } catch (e) {}
-                if (v !== Demo.SEMENTE_CONSUMO) await Demo._semearConsumo();
-            }
-            const m = document.getElementById('userMatricula');
-            if (m) m.focus();
-        } catch (e) {
-            console.error('[Demo]', e);
-            Toast.error('Nao foi possivel abrir a demonstracao: ' + e.message, 8000);
-        }
-    },
-
-    // Apaga a copia de teste e recomeca do zero
-    async recomecar() {
-        const ok = await Modal.confirm('Recomecar demonstracao', 'Apaga TODOS os dados de teste deste navegador e cria dados ficticios novos.', 'Recomecar', true);
-        if (!ok) return;
-        const root = await navigator.storage.getDirectory();
-        try { await root.removeEntry(Demo.PASTA, { recursive: true }); } catch (e) {}
-        location.reload();
-    },
-
-    // ------------------------------------------------------------------
-    // Dados ficticios
-    // ------------------------------------------------------------------
-    async _semear() {
-        const agora = Date.now(), DIA = 86400000;
-        const hash = await Security.hashPassword('1234');
-        State.users = (State.users || []).concat([
-            { nome: 'Operador Teste', matricula: 'OP01', passwordHash: hash, isAdmin: false },
-            { nome: 'Lider Teste',    matricula: 'LID01', passwordHash: hash, isAdmin: true },
-        ]);
-
-        const comps = [
-            ['RC0603FR-0710KL', 'Resistor 10K 0603'], ['RC0402JR-07100RL', 'Resistor 100R 0402'],
-            ['CL10A106KP8NNNC', 'Capacitor 10uF 0603'], ['GRM155R71C104KA88', 'Capacitor 100nF 0402'],
-            ['BAT54C-7-F', 'Diodo Schottky BAT54C'], ['MMBT3904LT1G', 'Transistor NPN 3904'],
-            ['LM358DR2G', 'Amp. operacional LM358'], ['STM32F030C8T6', 'Microcontrolador STM32'],
-            ['LTST-C191KRKT', 'LED vermelho 0603'], ['BLM18PG221SN1D', 'Ferrite 220R 0603'],
-            ['TPS62130RGTR', 'Regulador buck TPS62130'], ['AO3401A', 'MOSFET P AO3401'],
-            ['ECS-160-20-3X', 'Cristal 16MHz'], ['SN74LVC1G08DBVR', 'Porta AND 1G08'],
-            ['B2B-PH-K-S', 'Conector JST PH 2 vias'],
-        ];
-        State.componentCatalog = comps.map(([code, description]) => ({ code, description }));
-
-        const cars = ['01', '02', '03'];
-        State.carMaterialType = { '01': 'NXT', '02': 'NXT', '03': 'XP' };
-        State.validLocations = []; State.inventory = [];
-        let n = 0;
-        cars.forEach(car => {
-            for (let i = 1; i <= 24; i++) {
-                const loc = String.fromCharCode(65 + Math.floor((i - 1) / 8)) + String(((i - 1) % 8) + 1).padStart(2, '0');
-                State.validLocations.push({ car, loc, id: `demo_${car}_${loc}` });
-                if (i % 5 === 0) continue;                        // algumas posicoes vazias
-                const c = comps[n++ % comps.length][0];
-                State.inventory.push({ id: `demo_i_${car}_${loc}`, code: c, car, loc,
-                    qty: [500, 1000, 2000, 3000, 5000, 10000][n % 6], timestamp: agora - (n % 7) * 15 * DIA });
-            }
-        });
-
-        // historico: listas, buscas avulsas e devolucoes dos ultimos dias
-        const ops = [['Operador Teste', 'OP01'], ['Lider Teste', 'LID01']];
-        State.checkoutHistory = [];
-        for (let d = 6; d >= 0; d--) {
-            const [nome, mat] = ops[d % 2];
-            const it = State.inventory[(d * 3) % State.inventory.length];
-            State.checkoutHistory.unshift(
-                { id: `demo_h_${d}_c`, type: 'CHECKOUT', removedItems: [{ car: it.car, loc: it.loc, code: it.code, qty: it.qty }],
-                  config: { line: 'L0' + (d % 3 + 1), wo: 'OP' + (500100 + d) + '-SMT', machine: '' }, user: nome, matricula: mat,
-                  printUser: nome, timestamp: agora - d * DIA - 3600000 },
-                { id: `demo_h_${d}_r`, type: 'RETURN', returnedItems: [{ car: it.car, loc: it.loc, code: it.code, qty: Math.round(it.qty * 0.6) }],
-                  user: nome, matricula: mat, timestamp: agora - d * DIA - 1800000 });
-        }
-        await DB.saveNow();
-
-        await Demo._semearConsumo();
-    },
-
-    // Consumo do mes: uma foto de saldo POR DIA (como o sistema real faz) e
-    // apontamentos espalhados nos dias, com ritmo diferente em cada semana —
-    // assim os graficos de tendencia mostram algo parecido com a realidade.
-    SEMENTE_CONSUMO: '3',
-    async _semearConsumo() {
-        try {
-            const hj = Consumo._hoje(), ym = hj.slice(0, 7), d1 = ym + '-01', agora = Date.now();
-            const dias = [];
-            for (let d = d1; d <= hj; d = Consumo._maisDias(d, 1)) dias.push(d);
-            const peso = dias.map((d, k) => { const dw = new Date(d + 'T12:00:00').getDay(); return dw === 0 ? 0.1 : dw === 6 ? 0.4 : 1 + 0.6 * Math.sin(k / 2); });
-            const acum = []; peso.reduce((a, p, k) => (acum[k] = a + p, a + p), 0);
-            const totPeso = acum[acum.length - 1] || 1;
-
-            const saldo = Consumo.saldoAtual(), ini = {}, ent = {}, s261 = [], s315Base = [];
-            Object.keys(saldo).forEach((c, i) => {
-                ini[c] = saldo[c] + (i % 4 + 1) * 1500;               // havia mais no inicio do mes
-                if (i % 3 === 0) { ent[c] = 2000; s315Base.push([c, 2000, d1]); }
-            });
-            // uso negativo: alguns itens terminam com mais do que comecaram (sem entrada registrada)
-            ['AO3401A', 'BAT54C-7-F', 'B2B-PH-K-S', 'LTST-C191KRKT'].forEach((c, i) => {
-                if (c in saldo) { ini[c] = Math.round(saldo[c] * (0.3 + i * 0.15)); ent[c] = 0; }
-            });
-            const s315 = s315Base;
-            const pasta = await Consumo._pastaDiaria();
-            for await (const [nome] of pasta.entries()) await pasta.removeEntry(nome);
-            const fotos = { dias: {} };
-            dias.forEach((d, k) => {
-                const frac = k === 0 ? 0 : acum[k - 1] / totPeso;     // consumo ate o INICIO do dia
-                const sd = {};
-                Object.keys(ini).forEach(c => {
-                    const uso = ini[c] + (ent[c] || 0) - saldo[c];
-                    sd[c] = Math.round(ini[c] + (k > 0 ? (ent[c] || 0) : 0) - (uso > 0 ? uso * frac : 0));
-                });
-                fotos.dias[d] = { t: agora, pc: 'DEMO', s: sd };
-            });
-            Object.keys(saldo).forEach((c, i) => {
-                if (i % 5 === 4) return;                              // um sem apontamento a cada 5
-                if (s315.some(x => x[0] === c) === false && ini[c] < saldo[c]) return;   // uso negativo fica sem 261
-                const total = (i + 2) * 40000;
-                dias.forEach((d, k) => { const q = Math.round(total * peso[k] / totPeso); if (q > 0) s261.push([c, q, d]); });
-            });
-            // usado e sem estoque: componentes apontados no SAP que o Spare Parts nao tem
-            const semEstoque = [
-                ['XC7A35T-1CSG324C', 'FPGA Artix-7'], ['ESP32-WROOM-32E', 'Modulo Wi-Fi ESP32'], ['ADS1115IDGSR', 'ADC 16 bits I2C'],
-                ['MAX3232CDR', 'Transceiver RS-232'], ['SI2302CDS-T1-GE3', 'MOSFET N SI2302'], ['1N4148WS', 'Diodo sinal 1N4148'],
-                ['LM1117IMP-3.3', 'Regulador LDO 3V3'], ['TLV70033DDCR', 'Regulador LDO 3V3 200mA'], ['CC0603KRX7R9BB104', 'Capacitor 100nF 0603'],
-                ['RC0805FR-074K7L', 'Resistor 4K7 0805'], ['74HC595D', 'Shift register 8 bits'], ['PCF8574T', 'Expansor I/O I2C'],
-                ['USBLC6-2SC6', 'Protecao ESD USB'], ['NCP1117ST50T3G', 'Regulador 5V 1A'], ['W25Q32JVSSIQ', 'Flash SPI 32Mbit'],
-                ['CH340G', 'Conversor USB-Serial'], ['SMBJ5.0A', 'Diodo TVS 5V'], ['FDV301N', 'MOSFET N digital'],
-            ];
-            semEstoque.forEach(([c, desc], i) => {
-                if (!State.componentCatalog.some(x => x.code === c)) State.componentCatalog.push({ code: c, description: desc });
-                const dd = dias[Math.min(dias.length - 1, (i * 3) % dias.length)];
-                s261.push([c, (i + 1) * 2500, dd]);
-                if (i % 2 === 0) s315.push([c, 5000, Consumo._maisDias(d1, -20 - i)]);   // entrou no mes passado e acabou
-            });
-            try { await DB.saveNow(); } catch (e) {}
-
-            for (const d of dias) {
-                const hh = `07h${String(10 + (d.charCodeAt(9) % 40)).padStart(2, '0')}`;
-                await Store._gravarTexto(pasta, `${Consumo._nomeDia(d)} - ${hh} (primeiro acesso).json`,
-                    JSON.stringify({ data: d, hora: hh.replace('h', ':'), pc: 'DEMO', usuario: 'Demonstracao', s: fotos.dias[d].s }, null, 1), false);
-            }
-            const precos = {};
-            Object.keys(saldo).forEach((c, i) => { if (i % 6) precos[c] = +(0.002 + i * 0.013).toFixed(4); });
-            const imp = { em: agora, por: 'Demonstracao', arquivo: 'dados_ficticios.xlsx', de: d1, ate: hj };
-            await Store._gravarTexto(await Consumo._pasta(), Consumo.ARQ_SAP, JSON.stringify({ s261, s315, precos,
-                imp: { s261: { ...imp, n: s261.length }, s315: { ...imp, n: s315.length }, precos: { em: agora, por: 'Demonstracao', n: Object.keys(precos).length } } }));
-            Consumo._fotoFeitaEm = hj;   // a foto de hoje ja esta no arquivo
-            try { localStorage.setItem('sp_demo_semente', Demo.SEMENTE_CONSUMO); } catch (e) {}
-        } catch (e) { console.warn('[Demo] consumo:', e.message); }
-    },
-};
-window.Demo = Demo;
-
-// Botao na tela de login + inicio automatico no GitHub Pages
-document.addEventListener('DOMContentLoaded', function () {
-    if (!Demo.disponivel()) return;
-    const ref = document.getElementById('btnImportDb');
-    if (ref && !document.getElementById('btnDemo')) {
-        const b = document.createElement('button');
-        b.id = 'btnDemo'; b.type = 'button'; b.className = 'btn-3d btn-yellow';
-        b.style.cssText = 'width:100%; padding:10px; margin-top:8px;';
-        b.innerHTML = '<i class="fas fa-flask"></i> MODO DEMONSTRACAO (dados ficticios)';
-        b.onclick = () => Demo.iniciar();
-        ref.insertAdjacentElement('afterend', b);
-    }
-    if (Demo.automatico()) setTimeout(() => { if (!State.isConnected) Demo.iniciar(); }, 400);
-});
 
 </script>
 <script>
