@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.36**
+**Versão atual: v17.37**
 
 ---
 
@@ -95,7 +95,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.36** | Busca Avulsa: o botão **LIBERAR POSICOES E BAIXAR** fica sempre ativo. Um aviso vermelho mostra antes o que falta (OP e/ou Para), e o clique sem isso dá erro e destaca o campo. Campo da OP agora diz "Digite a OP". Main e branch ficam iguais (sem modo de testes). |
+| **v17.37** | Busca Avulsa: o aviso só aparece ao clicar em baixar. Sem OP e motivo: "Informe a OP que esse material será usado e o Motivo"; só sem motivo: "Selecione o motivo da baixa"; só sem OP: "Selecione a OP que esse material será usado". |
+| v17.36 | Busca Avulsa: o botão **LIBERAR POSICOES E BAIXAR** fica sempre ativo. Um aviso vermelho mostra antes o que falta (OP e/ou Para), e o clique sem isso dá erro e destaca o campo. Campo da OP agora diz "Digite a OP". Main e branch ficam iguais (sem modo de testes). |
 | v17.35 | Quadro "OPs em linha" só na sub-aba **OPs**. Cabeçalho do período mais simples (Est. Inicial: data · Est. Final: ESTOQUE ATUAL · dias salvos). |
 | v17.34 | Ajustes do Consumo (aguardando apontamento, limite %, colunas) saem da tela do Consumo e vão para **Sistema › Configurações**. |
 | v17.33 | Limite do "Aguardando apontamento" = **10%** (editável). Filtro de **período** também nos Dashboards. |
