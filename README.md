@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.35**
+**Versão atual: v17.36**
 
 ---
 
@@ -46,9 +46,7 @@ Desenvolvido por Guilherme Fernandes.
 - **Logs:** botão **EXCEL DOS LOGS** no Histórico (usa o mesmo período). O backup diário também leva 90 dias de logs.
 - **Limpeza automática:** 1x por dia, 20 s depois de abrir, cada PC apaga o que passou de 90 dias.
 
-- **Duas versões no GitHub:**
-  - `main` → **fábrica** (sistema real, pede a pasta do banco).
-  - `claude/brave-allen-9k8wup` → **testes** (site do GitHub Pages, abre com dados fictícios; login `ADMIN` / `admin123`).
+- **Uma versão só no GitHub:** `main` e `claude/brave-allen-9k8wup` têm o mesmo arquivo da **fábrica** (sistema real, pede a pasta do banco). O modo de testes com dados fictícios foi retirado na v17.36.
 
 ### Abas
 | Aba | Para que serve |
@@ -97,7 +95,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.35** | Quadro "OPs em linha" só na sub-aba **OPs**. Cabeçalho do período mais simples (Est. Inicial: data · Est. Final: ESTOQUE ATUAL · dias salvos). |
+| **v17.36** | Busca Avulsa: o botão **LIBERAR POSICOES E BAIXAR** fica sempre ativo. Um aviso vermelho mostra antes o que falta (OP e/ou Para), e o clique sem isso dá erro e destaca o campo. Campo da OP agora diz "Digite a OP". Main e branch ficam iguais (sem modo de testes). |
+| v17.35 | Quadro "OPs em linha" só na sub-aba **OPs**. Cabeçalho do período mais simples (Est. Inicial: data · Est. Final: ESTOQUE ATUAL · dias salvos). |
 | v17.34 | Ajustes do Consumo (aguardando apontamento, limite %, colunas) saem da tela do Consumo e vão para **Sistema › Configurações**. |
 | v17.33 | Limite do "Aguardando apontamento" = **10%** (editável). Filtro de **período** também nos Dashboards. |
 | v17.32 | "Aguardando apontamento" passa a valer para **todo uso acima de 100%**: o % do item some, ele sai dos totais e entra no card "Aguardando apontamento". |
