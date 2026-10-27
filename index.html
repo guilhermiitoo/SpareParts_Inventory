@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.44</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.45</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -15147,6 +15147,40 @@ ${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consum
         Consumo._charts.push(new Chart(cv, cfg));
     },
 
+    // v17.45: componentes que nao entram no Top 5 mais usados
+    FORA_TOP5: ['X05G000100300000DG', 'Q09G60121'],
+    DIAS_TENDENCIA: 120,
+
+    // v17.45: tendencia fixa (sem filtro), do primeiro estoque salvo ate hoje.
+    // Calcula entre cada par de dias com estoque salvo (o ultimo vai ate o ESTOQUE ATUAL)
+    // e reparte o uso desse trecho pelos dias dele; depois soma por semana (seg a dom).
+    async _tendenciaSemanal() {
+        const hoje = Consumo._hoje();
+        const dias = await Consumo.diasComEstoque(Consumo._maisDias(hoje, -Consumo.DIAS_TENDENCIA), hoje);
+        if (!dias.length) return { semanas: [] };
+        const porDia = {}, aprox = {};
+        const trechos = dias.map((d, i) => ({ de: d, ate: i + 1 < dias.length ? Consumo._maisDias(dias[i + 1], -1) : hoje }));
+        const res = await Promise.all(trechos.map(t => Consumo.calcular(t.de, t.ate)));
+        trechos.forEach((t, i) => {
+            const r = res[i]; if (!r || r.semBase) return;
+            const uso = r.linhas.reduce((a, l) => a + (l.uso > 0 ? l.uso : 0), 0);
+            let n = 0; for (let d = t.de; d <= t.ate; d = Consumo._maisDias(d, 1)) n++;
+            for (let d = t.de; d <= t.ate; d = Consumo._maisDias(d, 1)) { porDia[d] = uso / n; if (n > 1) aprox[d] = true; }
+        });
+        const semanas = [];
+        let a = dias[0];
+        while (a <= hoje) {
+            const seg = Consumo._iso(Consumo._segunda(new Date(a + 'T12:00:00')));
+            let b = Consumo._maisDias(seg, 6); if (b > hoje) b = hoje;
+            const w = Consumo._numSemana(new Date(a + 'T12:00:00'));
+            let uso = 0, tem = false, ap = false;
+            for (let d = a; d <= b; d = Consumo._maisDias(d, 1)) if (d in porDia) { uso += porDia[d]; tem = true; if (aprox[d]) ap = true; }
+            semanas.push({ de: a, ate: b, uso: tem ? uso : null, aprox: ap, rot: `S${String(w.n).padStart(2, '0')} (${a.slice(8)}–${b.slice(8)}/${b.slice(5, 7)})` });
+            a = Consumo._maisDias(b, 1);
+        }
+        return { semanas };
+    },
+
     async _telaDash(box) {
         Consumo._charts.forEach(c => { try { c.destroy(); } catch (e) {} });
         Consumo._charts = [];
@@ -15176,18 +15210,8 @@ ${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consum
             return;
         }
 
-        // Semanas do mes (segunda a domingo, cortadas nas bordas do periodo)
-        const semanas = [];
-        let a = p.de;
-        while (a <= p.ate) {
-            const seg = Consumo._iso(Consumo._segunda(new Date(a + 'T12:00:00')));
-            let b = Consumo._maisDias(seg, 6);
-            if (b > p.ate) b = p.ate;
-            const w = Consumo._numSemana(new Date(a + 'T12:00:00'));
-            semanas.push({ de: a, ate: b, rot: `S${String(w.n).padStart(2, '0')} (${a.slice(8)}–${b.slice(8)}/${b.slice(5, 7)})` });
-            a = Consumo._maisDias(b, 1);
-        }
-        const [mes, ...porSemana] = await Promise.all([Consumo.calcular(p.de, p.ate)].concat(semanas.map(s => Consumo.calcular(s.de, s.ate))));
+        const [mes, tendSem] = await Promise.all([Consumo.calcular(p.de, p.ate), Consumo._tendenciaSemanal()]);
+        const semanas = tendSem.semanas;
         if (mes.semBase) {
             document.getElementById('csDash').innerHTML = `<div style="background:#fef2f2; border:1px solid #fecaca; border-left:5px solid var(--ind-red); border-radius:6px; padding:16px 18px; color:#7f1d1d; font-weight:700;">
                 Sem estoque inicial salvo no dia ${Consumo._br(p.de)} (pasta dados/estoque_diario): nao da para calcular o consumo deste periodo. Use o Periodo (opcional) comecando num dia com estoque salvo.</div>`;
@@ -15195,13 +15219,13 @@ ${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consum
         }
         const t = mes.tot, Q = Consumo._fmtQ;
         const validas = mes.linhas.filter(r => r.status !== 'USO NEGATIVO' && r.uso > 0);
-        const top5 = validas.slice().sort((x, y) => y.uso - x.uso).slice(0, 5);
+        const top5 = validas.filter(r => !Consumo.FORA_TOP5.includes(r.code)).slice().sort((x, y) => y.uso - x.uso).slice(0, 5);
         const top5pct = validas.filter(r => r.pct != null && !Consumo._aguardando(r)).sort((x, y) => y.pct - x.pct).slice(0, 5);
 
         document.getElementById('csDash').innerHTML = Consumo._titulo(p.de, p.ate) + Consumo._cards(t) + `
         <div class="cs-dash-grade" style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px;">
-            ${card('Tendencia de uso por semana', 'Consumo (pecas) em cada semana do mes · linha tracejada = tendencia', 'csChSemana', 380)}
-            ${card('Estoque inicial x estoque final', 'Total de pecas no inicio e no fim do periodo', 'csChEst', 380)}
+            ${card('Tendencia de uso por semana', 'Consumo (pecas) por semana, do primeiro estoque salvo ate hoje (nao usa o filtro) · linha tracejada = tendencia', 'csChSemana', 380)}
+            ${card('Estoque inicial x estoque final', 'Total de pecas no inicio e no fim do periodo (% de cada um)', 'csChEst', 380)}
             ${card('Top 5 itens mais usados no mes', 'Consumo em pecas (itens com uso negativo ficam fora)', 'csChTop', 380)}
             ${card('Top 5 maior % de uso', 'Consumo ÷ Apontamento (SAP 261) de cada componente', 'csChPct', 380)}
         </div>
@@ -15212,26 +15236,26 @@ ${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consum
         const eixoN = { beginAtZero: true, ticks: { callback: v => fmtN(v) } };
 
         // Tendencia: linha do consumo semanal + reta de tendencia (minimos quadrados)
-        const ys = porSemana.map(r => r.semBase ? null : Math.round(r.tot.uso));   // semana sem estoque salvo = sem ponto
+        const ys = semanas.map(s2 => s2.uso == null ? null : Math.round(s2.uso));
         // reta de tendencia so com as semanas que tem dado
         const pts = ys.map((v, i) => [i, v]).filter(x => x[1] != null);
         const n = pts.length, xm = pts.reduce((a2, x) => a2 + x[0], 0) / (n || 1), ym = pts.reduce((a2, x) => a2 + x[1], 0) / (n || 1);
         let num = 0, den = 0;
         pts.forEach(([i, v]) => { num += (i - xm) * (v - ym); den += (i - xm) * (i - xm); });
         const incl = den ? num / den : 0;
-        const tend = ys.map((v, i) => v == null ? null : Math.round(ym + incl * (i - xm)));
+        const tend = ys.map((v, i) => Math.max(0, Math.round(ym + incl * (i - xm))));   // reta continua em todas as semanas
         Consumo._novoGrafico('csChSemana', {
             type: 'line',
             data: { labels: semanas.map(s2 => s2.rot), datasets: [
                 { label: 'Consumo (pecas)', data: ys, borderColor: azul, backgroundColor: azul + '22', fill: true,
-                  borderWidth: 3, tension: 0.3, pointRadius: 5, pointHoverRadius: 7 },
+                  borderWidth: 3, tension: 0.3, pointRadius: 5, pointHoverRadius: 7, spanGaps: true },
                 { label: n > 1 ? `Tendencia (${incl >= 0 ? 'subindo' : 'caindo'})` : 'Tendencia', data: n > 1 ? tend : [],
                   borderColor: amarelo, borderDash: [6, 5], borderWidth: 2, pointRadius: 0, fill: false },
             ] },
             options: { maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { position: 'top', labels: { usePointStyle: true } },
                     tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmtN(c.parsed.y)}`,
-                        afterBody: it => { const r = porSemana[it[0].dataIndex]; return r ? '% de uso: ' + Consumo._fmtP(r.tot.pct) : ''; } } } },
+                        afterBody: it => { const s2 = semanas[it[0].dataIndex]; return s2 && s2.aprox ? '(semana sem estoque salvo todo dia: valor estimado)' : ''; } } } },
                 scales: { x: { grid: { display: false } }, y: eixoN } },
         });
 
@@ -15244,8 +15268,22 @@ ${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consum
                 scales: { x: eixoN, y: { grid: { display: false } } } },
         });
 
+        // v17.45: % escrito dentro de cada fatia
+        const pctNaPizza = { id: 'pctNaPizza', afterDatasetsDraw(ch) {
+            const ds = ch.data.datasets[0], tot = ds.data.reduce((a2, b2) => a2 + b2, 0) || 1, ctx = ch.ctx;
+            ch.getDatasetMeta(0).data.forEach((arc, i) => {
+                const v = ds.data[i]; if (!v || v / tot < 0.06) return;   // fatia fina demais: % fica so no tooltip
+                const pos = arc.tooltipPosition();
+                ctx.save(); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.font = '900 22px Roboto, sans-serif';
+                ctx.fillText((v / tot * 100).toFixed(1).replace('.', ',') + '%', pos.x, pos.y - 10);
+                ctx.font = '700 12px Roboto, sans-serif';
+                ctx.fillText(fmtN(v) + ' pecas', pos.x, pos.y + 12);
+                ctx.restore();
+            });
+        } };
         Consumo._novoGrafico('csChEst', {
-            type: 'pie',
+            type: 'pie', plugins: [pctNaPizza],
             data: { labels: ['Estoque inicial', 'Estoque final'],
                     datasets: [{ data: [Math.round(t.ini), Math.round(t.fim)], backgroundColor: [cinza, azul], borderColor: '#fff', borderWidth: 2 }] },
             options: { maintainAspectRatio: false,
