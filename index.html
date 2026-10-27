@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.41</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.42</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -14882,8 +14882,6 @@ ${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consum
     _cards(t) {
         const Q = Consumo._fmtQ, R = Consumo._fmtR, K = Consumo._kpi;
         const temV = t.nPreco > 0, vIni = temV ? R(t.vIni) : '—', vFim = temV ? R(t.vFim) : '—';
-        const nota = t.nPreco != null && t.nPreco < t.nItens
-            ? `<div style="font-size:0.72rem; color:#64748b; margin:-6px 0 12px;">Valor do estoque: soma de ${Q(t.nPreco)} de ${Q(t.nItens)} componentes que tem preco (tabela de precos em Sistema › Configuracoes, ou o SAP 261).</div>` : '';
         return `
         <div style="display:grid; grid-template-columns:minmax(260px,1fr) minmax(260px,1fr) minmax(320px,2fr); gap:12px; margin-bottom:14px;">
             ${Consumo._bloco('<i class="fas fa-history"></i> O que tinha', '#475569',
@@ -14894,7 +14892,7 @@ ${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consum
                 K('Consumo (pecas)', Q(t.usoSP != null ? t.usoSP : t.uso), 'var(--tpv-blue)') + K('Valor do uso', R(t.valorSP != null ? t.valorSP : t.valor), 'var(--ind-green)') +
                 K('% Uso geral', Consumo._fmtP(t.pct), '#C08A1E') +
                 (t.aguard ? K('Aguardando apontamento', Q(t.aguard) + ' itens', '#C08A1E') : ''), 140)}
-        </div>${nota}`;
+        </div>`;
     },
 
     _corpo() {
@@ -14922,9 +14920,14 @@ ${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consum
             · <span style="color:#64748b;">${dias.length ? dias.join(', ') : 'nenhum dia salvo'}</span>
         </div>
         ${Consumo._cards(r.tot)}
-        <div id="csCount" class="oa-lbl" style="margin-bottom:6px;"></div>
-        <div style="background:#fff; border:1px solid var(--ind-border); border-radius:6px; overflow:auto; max-height:min(900px, calc(100vh - 30px));">
-            <table class="oa-table"><thead><tr>${cols.map(c => `<th onclick="Consumo.ordenar('${c[0]}')" style="${c[2] ? 'text-align:right;' : ''}">${c[1]}${Consumo._ord.k === c[0] ? (Consumo._ord.dir > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('')}</tr></thead>
+        <style>
+            /* v17.42: numeracao "por fora" da tabela, acompanha a rolagem */
+            #csTabela .cs-n{position:sticky;left:0;z-index:1;width:1%;min-width:38px;padding:0 6px 0 0 !important;text-align:right;
+                background:#fff !important;color:#94a3b8;font-size:0.68rem;font-weight:700;font-family:'Roboto Mono',monospace;border:none !important;cursor:default;}
+            #csTabela thead .cs-n{z-index:3;color:#94a3b8;}
+        </style>
+        <div id="csTabela" style="background:#fff; overflow:auto; max-height:min(900px, calc(100vh - 30px));">
+            <table class="oa-table"><thead><tr><th class="cs-n">#</th>${cols.map(c => `<th onclick="Consumo.ordenar('${c[0]}')" style="${c[2] ? 'text-align:right;' : ''}">${c[1]}${Consumo._ord.k === c[0] ? (Consumo._ord.dir > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('')}</tr></thead>
             <tbody id="csBody"></tbody></table>
         </div>`;
         Consumo._tabela();
@@ -15018,11 +15021,9 @@ ${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consum
     _tabela() {
         const body = document.getElementById('csBody'); if (!body) return;
         const rows = Consumo._filtradas(), cols = Consumo._colsVisiveis();
-        const cnt = document.getElementById('csCount');
-        if (cnt) cnt.textContent = `${rows.length} componente(s)`;
         body.innerHTML = rows.length
-            ? rows.slice(0, 1500).map(r => '<tr>' + cols.map(c => Consumo._celula(c[0], r)).join('') + '</tr>').join('')
-            : `<tr><td colspan="${cols.length}" style="text-align:center; color:#94a3b8; padding:24px;">Nenhum componente com movimento no periodo.</td></tr>`;
+            ? rows.slice(0, 1500).map((r, i) => '<tr><td class="cs-n">' + (i + 1) + '</td>' + cols.map(c => Consumo._celula(c[0], r)).join('') + '</tr>').join('')
+            : `<tr><td class="cs-n"></td><td colspan="${cols.length}" style="text-align:center; color:#94a3b8; padding:24px;">Nenhum componente com movimento no periodo.</td></tr>`;
     },
 
     // --------------------------------------------------- alertas e compras
