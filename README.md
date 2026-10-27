@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.42**
+**Versão atual: v17.43**
 
 ---
 
@@ -95,7 +95,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.42** | Consumo: tabela com numeração dos componentes por fora (coluna fina à esquerda que acompanha a rolagem). Saíram a frase "Valor do estoque: soma de…" e o "N componente(s)". |
+| **v17.43** | Consumo: a barra azul do cabeçalho agora cobre também a coluna da numeração (#). |
+| v17.42 | Consumo: tabela com numeração dos componentes por fora (coluna fina à esquerda que acompanha a rolagem). Saíram a frase "Valor do estoque: soma de…" e o "N componente(s)". |
 | v17.41 | **Tabela de preços** em Sistema › Configurações (`dados/consumo/precos.json`): importa o Excel do SAP (Material + Quantidade + Montante em MI → preço de 1 peça = Montante ÷ Quantidade) ou Material + Preço. Tem prioridade sobre o preço do 261. Consumo (peças) e Valor do uso: tudo que saiu do estoque, **menos os itens Aguardando apontamento**. Tabela de componentes do Consumo 50% maior (até 900 px, sem passar da altura da tela). |
 | v17.40 | Consumo: os cards **Consumo (peças)** e **Valor do uso** somam tudo que saiu do spare parts (uso > 0), sem depender do apontamento do 261. O **% Uso geral** continua comparando com o 261. |
 | v17.39 | Consumo: cards em 3 blocos — **O que tinha** (Est. Inicial + valor do estoque), **O que tem agora** (Est. Final + valor do estoque) e **O que consumiu** (peças, valor do uso, % e aguardando). Valor do estoque = qtd × preço do 261 (só componentes com preço). |
