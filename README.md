@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.47**
+**Versão atual: v17.48**
 
 ---
 
@@ -95,6 +95,7 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
+| **v17.48** | Nova aba **Log de OPs** (Administração). Pesquisa a OP e mostra: linha, máquina, quem tirou e quando; KPIs (movimentações, componentes, peças, valor estimado, apontado no SAP 261, não encontrados, estornos); a linha do tempo de cada lista/busca avulsa com os materiais e o local; e a tabela consolidada dos materiais usados na OP. Também pesquisa por **código** (em quais OPs o material foi usado). Lê até 90 dias da pasta, exporta para Excel e não grava nada. Permissão: **tab:logops**. |
 | **v17.47** | **Lista da IA:** código repetido aparece em **todas** as linhas (cada Trk/Spec), cada uma com a sua posição no estoque, mesmo repetindo o mesmo local. Na baixa/histórico a posição entra uma vez só. A reimpressão também mostra o local em todas as linhas repetidas. |
 | **v17.46** | **Confirmação de Listas:** corrigido o "Finalizar carro" que não salvava. Ao gravar, o sistema relia o banco e a versão de outro PC apagava a finalização feita aqui. Agora vence a alteração mais recente. Finalizar, pausar, deixar para o próximo turno e as ações de ADM gravam a lista e o log de uma vez só (antes eram 2 gravações na rede), e a tela atualiza na hora. Se a gravação falhar, a alteração é desfeita e aparece o aviso. |
 | **v17.45** | Dashboards do Consumo: **Tendência** não usa mais o filtro — vai do primeiro estoque salvo (até 120 dias) até hoje, sem buracos (o uso entre dois estoques salvos é repartido pelos dias) e com a linha de tendência contínua. **Pizza** mostra o % e as peças dentro de cada fatia. **Top 5 mais usados** ignora X05G000100300000DG e Q09G60121. |
