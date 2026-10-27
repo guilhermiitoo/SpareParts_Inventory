@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.44**
+**Versão atual: v17.45**
 
 ---
 
@@ -95,7 +95,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.44** | Consumo: filtros no topo da aba; título **CONSUMO X SAP** com o período (dd/mm a dd/mm) fica logo acima dos cards (bom para captura de tela). Saiu o texto longo do período. Cards padronizados: peças em azul, valores (R$) em verde. |
+| **v17.45** | Dashboards do Consumo: **Tendência** não usa mais o filtro — vai do primeiro estoque salvo (até 120 dias) até hoje, sem buracos (o uso entre dois estoques salvos é repartido pelos dias) e com a linha de tendência contínua. **Pizza** mostra o % e as peças dentro de cada fatia. **Top 5 mais usados** ignora X05G000100300000DG e Q09G60121. |
+| v17.44 | Consumo: filtros no topo da aba; título **CONSUMO X SAP** com o período (dd/mm a dd/mm) fica logo acima dos cards (bom para captura de tela). Saiu o texto longo do período. Cards padronizados: peças em azul, valores (R$) em verde. |
 | v17.43 | Consumo: a barra azul do cabeçalho agora cobre também a coluna da numeração (#). |
 | v17.42 | Consumo: tabela com numeração dos componentes por fora (coluna fina à esquerda que acompanha a rolagem). Saíram a frase "Valor do estoque: soma de…" e o "N componente(s)". |
 | v17.41 | **Tabela de preços** em Sistema › Configurações (`dados/consumo/precos.json`): importa o Excel do SAP (Material + Quantidade + Montante em MI → preço de 1 peça = Montante ÷ Quantidade) ou Material + Preço. Tem prioridade sobre o preço do 261. Consumo (peças) e Valor do uso: tudo que saiu do estoque, **menos os itens Aguardando apontamento**. Tabela de componentes do Consumo 50% maior (até 900 px, sem passar da altura da tela). |
