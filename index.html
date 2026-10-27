@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.47</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.48</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1395,6 +1395,12 @@ body.menu-recolhido #menuRodape .rodape-sair { display: block; text-align: cente
             <div id="consumoContent"><div style="color:#94a3b8; text-align:center; padding:30px;">Carregando...</div></div>
         </div>
 
+        <!-- ==================== LOG DE OPs (v17.48) ==================== -->
+        <div id="tab-logops" class="section">
+            <h2>Log de OPs</h2>
+            <div id="logopsContent"><div style="color:#94a3b8; text-align:center; padding:30px;">Carregando...</div></div>
+        </div>
+
         <!-- MEU RENDIMENTO (operador) -->
         <!-- ==================== RANKING ==================== -->
         <div id="tab-ranking" class="section">
@@ -2593,6 +2599,9 @@ const UI = {
         if (tab === 'consumo') {   // v17.07: so calcula quando a aba e aberta
             setTimeout(function() { if (typeof Consumo !== 'undefined') Consumo.render(); }, 80);
         }
+        if (tab === 'logops') {    // v17.48
+            setTimeout(function() { if (typeof LogOPs !== 'undefined') LogOPs.render(); }, 80);
+        }
         if (tab === 'etiquetas') {
             setTimeout(function() { if (typeof Etiquetas !== 'undefined') Etiquetas.render(); }, 80);
         }
@@ -2648,6 +2657,7 @@ const UI = {
             { tab: 'adm-stockdash', icon: 'fa-chart-bar',       label: 'Dashboard',      admin: true  },
             { tab: 'dashboard_adm', icon: 'fa-exclamation-triangle', label: 'ALERTA', admin: true  },
             { tab: 'consumo',       icon: 'fa-scale-balanced',  label: 'Consumo',        admin: true  },
+            { tab: 'logops',        icon: 'fa-magnifying-glass-chart', label: 'Log de OPs', admin: true  },
         ];
         nav.innerHTML = '';
         const visible = tabs.filter(function(t) { return Perms.can('tab:' + t.tab); });
@@ -5481,6 +5491,7 @@ const Perms = {
             { key: 'tab:users',         label: 'Sistema',               desc: 'Usuarios, backups e manutencao' },
             { key: 'tab:adm-stockdash', label: 'Dashboard',             desc: 'Graficos de estoque' },
             { key: 'tab:consumo',      label: 'Consumo',               desc: 'Relatorio de consumo x SAP (Controladoria)' },
+            { key: 'tab:logops',       label: 'Log de OPs',            desc: 'Pesquisa por OP: materiais usados, quem tirou e apontamento 261' },
             { key: 'tab:dashboard_adm', label: 'ALERTA',   desc: 'Codigos sem movimentacao (obsoletos)' },
         ]},
         { group: 'Aba Estoque — coluna "Acoes"', icon: 'fa-pen-to-square', items: [
@@ -13952,6 +13963,424 @@ window.ObsAlerts = ObsAlerts;
 // NADA aqui roda em segundo plano alem da foto diaria. O calculo so acontece
 // quando a aba e aberta ou quando o usuario troca o periodo.
 // ============================================================================
+// ============================================================
+// MODULO: LOG DE OPs  (v17.48)
+// ------------------------------------------------------------
+// Rastreabilidade por OP: pesquisa uma OP e mostra tudo o que saiu do
+// estoque para ela (listas do Comparador e Busca Avulsa), quem tirou,
+// de onde, se foi estornado e quanto o SAP apontou (261).
+// Tambem pesquisa o caminho inverso: em quais OPs um codigo foi usado.
+// So LE o historico — nao grava nada no banco.
+// ============================================================
+const LogOPs = {
+    _dias: 90,
+    _modo: 'op',          // 'op' | 'codigo'
+    _hist: null,          // movimentos do periodo (ja com estornos marcados)
+    _histDias: null,
+    _ultimo: null,        // ultimo resultado (para o Excel)
+
+    _S(v) { return Security.sanitize(String(v == null ? '' : v)); },
+    _Q(n) { return Math.round(n || 0).toLocaleString('pt-BR'); },
+    _R(n) { return n == null ? '-' : n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); },
+    _dt(t) { return t ? new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'; },
+    _d(t) { return t ? new Date(t).toLocaleDateString('pt-BR') : '-'; },
+    _norm(c) { return (typeof Consumo !== 'undefined') ? Consumo.norm(c) : String(c || '').toUpperCase().replace(/\s+/g, ''); },
+    _armario(car) { try { return PTHCabinets.isCabinet(car); } catch (e) { return false; } },
+
+    _css() {
+        if (document.getElementById('loCSS')) return;
+        const st = document.createElement('style');
+        st.id = 'loCSS';
+        st.textContent = `
+        #logopsContent .lo-busca{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;background:#f8fafc;border:1px solid var(--ind-border);border-radius:8px;padding:14px 16px;margin-bottom:14px;}
+        #logopsContent .lo-chips{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 16px;align-items:center;}
+        #logopsContent .lo-chip{border:1px solid #cbd5e1;background:#fff;color:var(--tpv-dark-blue);border-radius:20px;padding:4px 11px;font-size:0.74rem;font-weight:800;font-family:'Roboto Mono',monospace;cursor:pointer;}
+        #logopsContent .lo-chip:hover{background:var(--tpv-blue);color:#fff;border-color:var(--tpv-blue);}
+        #logopsContent .lo-head{background:var(--tpv-dark-blue);color:#fff;border-radius:10px;padding:16px 20px;display:flex;flex-wrap:wrap;gap:8px 28px;align-items:center;margin-bottom:14px;}
+        #logopsContent .lo-head .op{font-family:'Roboto Mono',monospace;font-size:1.6rem;font-weight:900;letter-spacing:1px;}
+        #logopsContent .lo-head .it{font-size:0.78rem;opacity:.85;}
+        #logopsContent .lo-head .it b{opacity:1;font-size:0.9rem;}
+        #logopsContent .lo-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px;}
+        #logopsContent .lo-kpi{background:#fff;border:1px solid #e2e8f0;border-top:4px solid var(--tpv-blue);border-radius:8px;padding:10px 14px;}
+        #logopsContent .lo-kpi .n{font-family:'Roboto Mono',monospace;font-size:1.35rem;font-weight:900;color:var(--tpv-dark-blue);line-height:1.1;}
+        #logopsContent .lo-kpi .l{font-size:0.64rem;font-weight:800;letter-spacing:.8px;color:#94a3b8;text-transform:uppercase;margin-top:4px;}
+        #logopsContent .lo-kpi.v{border-top-color:var(--ind-green);} #logopsContent .lo-kpi.v .n{color:var(--ind-green);}
+        #logopsContent .lo-kpi.a{border-top-color:#f59e0b;} #logopsContent .lo-kpi.r{border-top-color:#dc2626;}
+        #logopsContent .lo-sec{font-size:0.8rem;font-weight:900;letter-spacing:1.2px;text-transform:uppercase;color:var(--tpv-dark-blue);margin:18px 0 8px;display:flex;align-items:center;gap:10px;}
+        #logopsContent .lo-sec:after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#cbd5e1,transparent);}
+        #logopsContent .lo-mov{background:#fff;border:1px solid #e2e8f0;border-left:5px solid var(--tpv-blue);border-radius:8px;margin-bottom:8px;}
+        #logopsContent .lo-mov.av{border-left-color:#f59e0b;} #logopsContent .lo-mov.est{border-left-color:#dc2626;opacity:.7;}
+        #logopsContent .lo-mov-top{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;padding:10px 14px;cursor:pointer;font-size:0.8rem;color:#475569;}
+        #logopsContent .lo-mov-top b{color:#1e293b;}
+        #logopsContent .lo-mov-det{display:none;padding:0 14px 12px;}
+        #logopsContent .lo-mov.aberto .lo-mov-det{display:block;}
+        #logopsContent .lo-tag{font-size:0.66rem;font-weight:900;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:20px;color:#fff;white-space:nowrap;}
+        #logopsContent .lo-box{background:#fff;border:1px solid var(--ind-border);border-radius:8px;overflow:auto;max-height:520px;}
+        #logopsContent .lo-vazio{text-align:center;color:#94a3b8;padding:34px;font-size:0.9rem;}
+        #logopsContent .lo-mono{font-family:'Roboto Mono',monospace;font-weight:700;}
+        `;
+        document.head.appendChild(st);
+    },
+
+    // ------------------------------------------------------------ dados
+    async _carregar(forcar) {
+        if (!forcar && LogOPs._hist && LogOPs._histDias === LogOPs._dias) return LogOPs._hist;
+        const ate = Date.now(), de = ate - LogOPs._dias * 86400000;
+        let hist = [];
+        try {
+            hist = (typeof Store !== 'undefined' && Store._mov) ? await Store.lerHistoricoPeriodo(de, ate) : [];
+        } catch (e) { console.warn('[LogOPs]', e); hist = []; }
+        // a memoria tem a versao mais nova (ex.: confirmacao da lista); o arquivo completa os itens
+        const porId = new Map(hist.map(h => [String(h.id), h]));
+        (State.checkoutHistory || []).forEach(m => {
+            if (!m || !m.id || m.timestamp < de) return;
+            const f = porId.get(String(m.id));
+            porId.set(String(m.id), f ? Store._enriquecer(m, f) : m);
+        });
+        const todos = [...porId.values()];
+        const estornos = new Map();
+        todos.forEach(h => { if (h.type === 'UNDO' && h.undoRef) estornos.set(String(h.undoRef), h); });
+        LogOPs._hist = todos
+            .filter(h => (h.type === 'CHECKOUT' || h.type === 'MANUAL_KITTING') && (h.removedItems || []).length)
+            .map(h => Object.assign({}, h, { _estorno: estornos.get(String(h.id)) || null }))
+            .sort((a, b) => b.timestamp - a.timestamp);
+        LogOPs._histDias = LogOPs._dias;
+        return LogOPs._hist;
+    },
+
+    async _sap() {
+        try {
+            if (typeof Consumo === 'undefined') return { s261: [], precos: {} };
+            const sap = Consumo._sap || await Consumo._carregarSap();
+            const tab = Consumo._precos || await Consumo._carregarPrecos();
+            return { s261: sap.s261 || [], precos: Object.assign({}, sap.precos || {}, (tab && tab.precos) || {}) };
+        } catch (e) { return { s261: [], precos: {} }; }
+    },
+
+    _tipo(h) {
+        if (h._estorno) return { txt: 'ESTORNADO', cor: '#dc2626', cls: 'est' };
+        if (h.type === 'MANUAL_KITTING') {
+            const d = h.config && h.config.destino;
+            return { txt: d === 'REQUISICAO' ? 'Avulsa: requisicao' : d === 'LISTA' ? 'Avulsa: completar lista' : 'Busca avulsa', cor: '#d97706', cls: 'av' };
+        }
+        return { txt: 'Lista ' + ((h.config && h.config.mode) === 'IA' ? 'IA' : 'SMT'), cor: 'var(--tpv-blue)', cls: '' };
+    },
+
+    _status(h) {
+        if (h.type !== 'CHECKOUT') return '';
+        const st = (h.confirm && h.confirm.status) || 'ABERTA';
+        const m = { CONCLUIDA: ['Concluida', '#16a34a'], PENDENTE: ['Pendente', '#f59e0b'], PAUSADA: ['Pausada', '#8b5cf6'], ABERTA: ['Aguardando confirmacao', '#64748b'] }[st] || [st, '#64748b'];
+        return `<span class="lo-tag" style="background:${m[1]};">${m[0]}</span>`;
+    },
+
+    // codigos da lista que nao foram achados no estoque (so listas do Comparador)
+    _naoAchados(h) {
+        const rows = h.config && h.config.listRows;
+        if (h.type !== 'CHECKOUT' || !rows || !rows.length) return [];
+        const achou = new Set((h.config.listLocs || []).map(l => String(l[0] || '').toUpperCase()));
+        const out = [], vistos = new Set();
+        rows.forEach(r => {
+            const c = String(r[1] || '').toUpperCase();
+            if (!c || achou.has(c) || vistos.has(c)) return;
+            vistos.add(c); out.push({ code: c, mach: r[0], pos: r[2] });
+        });
+        return out;
+    },
+
+    // ------------------------------------------------------------ tela
+    async render() {
+        LogOPs._css();
+        const box = document.getElementById('logopsContent');
+        if (!box) return;
+        const S = LogOPs._S;
+        box.innerHTML = `
+        <div class="lo-busca">
+            <div><div class="oa-lbl">Pesquisar por</div>
+                <select id="loModo" class="big-input" style="padding:8px 10px; margin:0; width:auto;" onchange="LogOPs._modo=this.value; LogOPs._placeholder()">
+                    <option value="op" ${LogOPs._modo === 'op' ? 'selected' : ''}>OP</option>
+                    <option value="codigo" ${LogOPs._modo === 'codigo' ? 'selected' : ''}>Codigo do material</option>
+                </select></div>
+            <div style="flex:2; min-width:220px;"><div class="oa-lbl" id="loLbl">OP</div>
+                <input id="loBusca" class="big-input" style="padding:8px 10px; margin:0;" autocomplete="off"
+                       onkeydown="if(event.key==='Enter') LogOPs.pesquisar()"></div>
+            <div><div class="oa-lbl">Periodo</div>
+                <select class="big-input" style="padding:8px 10px; margin:0; width:auto;" onchange="LogOPs._dias=Number(this.value); LogOPs.pesquisar(true)">
+                    ${[7, 30, 60, 90].map(d => `<option value="${d}" ${LogOPs._dias === d ? 'selected' : ''}>Ultimos ${d} dias</option>`).join('')}
+                </select></div>
+            <button class="btn-3d btn-blue" style="padding:9px 18px; font-size:0.8rem;" onclick="LogOPs.pesquisar()"><i class="fas fa-search"></i> PESQUISAR</button>
+            <button class="btn-3d btn-gray" style="padding:9px 14px; font-size:0.8rem;" title="Rele o historico da pasta" onclick="LogOPs.pesquisar(true)"><i class="fas fa-rotate"></i></button>
+            <button class="btn-3d btn-green" style="padding:9px 16px; font-size:0.8rem;" onclick="LogOPs.exportar()"><i class="fas fa-file-excel"></i> EXCEL</button>
+        </div>
+        <div class="lo-chips" id="loChips"></div>
+        <div id="loCorpo"><div class="lo-vazio"><i class="fas fa-spinner fa-spin"></i> Lendo o historico...</div></div>`;
+        LogOPs._placeholder();
+        await LogOPs._carregar(true);
+        LogOPs._chips();
+        const inp = document.getElementById('loBusca');
+        if (inp && inp.value.trim()) LogOPs.pesquisar();
+        else document.getElementById('loCorpo').innerHTML = `<div class="lo-vazio"><i class="fas fa-magnifying-glass" style="font-size:1.6rem; display:block; margin-bottom:8px;"></i>
+            Digite a OP para ver todos os materiais que sairam do estoque para ela.<br>
+            <span style="font-size:0.78rem;">${LogOPs._hist.length} movimentacao(oes) com OP nos ultimos ${LogOPs._dias} dias.</span></div>`;
+        if (inp) inp.focus();
+    },
+
+    _placeholder() {
+        const inp = document.getElementById('loBusca'), lbl = document.getElementById('loLbl');
+        if (!inp) return;
+        inp.placeholder = LogOPs._modo === 'op' ? 'Digite a OP' : 'Digite o codigo do material';
+        if (lbl) lbl.textContent = LogOPs._modo === 'op' ? 'OP' : 'Codigo do material';
+    },
+
+    _chips() {
+        const el = document.getElementById('loChips'); if (!el) return;
+        const vistas = [];
+        (LogOPs._hist || []).forEach(h => {
+            const op = OP.norm(h.config && h.config.wo);
+            if (op && !vistas.includes(op) && vistas.length < 14) vistas.push(op);
+        });
+        el.innerHTML = vistas.length
+            ? `<span class="oa-lbl" style="margin:0 4px 0 0;">OPs recentes:</span>` +
+              vistas.map(op => `<span class="lo-chip" onclick="LogOPs.abrirOP('${LogOPs._S(op)}')">${LogOPs._S(op)}</span>`).join('')
+            : '';
+    },
+
+    abrirOP(op) {
+        LogOPs._modo = 'op';
+        const sel = document.getElementById('loModo'); if (sel) sel.value = 'op';
+        LogOPs._placeholder();
+        const inp = document.getElementById('loBusca'); if (inp) inp.value = op;
+        LogOPs.pesquisar();
+    },
+
+    async pesquisar(reler) {
+        const corpo = document.getElementById('loCorpo'); if (!corpo) return;
+        const txt = (document.getElementById('loBusca')?.value || '').trim();
+        if (reler) {
+            corpo.innerHTML = `<div class="lo-vazio"><i class="fas fa-spinner fa-spin"></i> Lendo o historico...</div>`;
+            await LogOPs._carregar(true);
+            LogOPs._chips();
+        } else await LogOPs._carregar(false);
+        if (!txt) {
+            corpo.innerHTML = `<div class="lo-vazio">Digite ${LogOPs._modo === 'op' ? 'a OP' : 'o codigo do material'} para pesquisar.</div>`;
+            return;
+        }
+        if (LogOPs._modo === 'op') {
+            const op = OP.norm(txt);
+            if (!op) { Toast.warn('Digite o numero da OP.'); return; }
+            await LogOPs._telaOP(op);
+        } else {
+            await LogOPs._telaCodigo(txt);
+        }
+    },
+
+    // ------------------------------------------------------------ por OP
+    async _telaOP(op) {
+        const S = LogOPs._S, Q = LogOPs._Q, corpo = document.getElementById('loCorpo');
+        const movs = (LogOPs._hist || []).filter(h => OP.norm(h.config && h.config.wo) === op);
+        const sap = await LogOPs._sap();
+        const apo = {};
+        sap.s261.forEach(r => { if (r[3] && String(r[3]) === op) apo[LogOPs._norm(r[0])] = (apo[LogOPs._norm(r[0])] || 0) + (Number(r[1]) || 0); });
+        const tem261 = Object.keys(apo).length > 0;
+
+        if (!movs.length && !tem261) {
+            LogOPs._ultimo = null;
+            corpo.innerHTML = `<div class="lo-vazio"><i class="fas fa-circle-exclamation" style="font-size:1.6rem; display:block; margin-bottom:8px; color:#f59e0b;"></i>
+                Nenhuma movimentacao encontrada para a OP <b>${S(op)}</b> nos ultimos ${LogOPs._dias} dias.</div>`;
+            return;
+        }
+
+        // consolida os materiais (estornados ficam fora da soma)
+        const mat = new Map();
+        const linhas = new Set(), maqs = new Set(), users = new Set();
+        let pecas = 0, valor = 0, temPreco = false, armario = 0, estornos = 0;
+        const naoAchados = new Map();
+        movs.forEach(h => {
+            const c = h.config || {};
+            if (c.line && c.line !== '--') linhas.add(c.line);
+            if (c.machine) maqs.add(c.machine);
+            if (h.user) users.add(h.user);
+            if (h._estorno) { estornos++; return; }
+            const orig = h.type === 'MANUAL_KITTING' ? 'Avulsa' : 'Lista';
+            (h.removedItems || []).forEach(it => {
+                if (!it || !it.code) return;
+                const k = LogOPs._norm(it.code), arm = LogOPs._armario(it.car);
+                let x = mat.get(k);
+                if (!x) mat.set(k, x = { code: String(it.code).toUpperCase(), pecas: 0, vezes: 0, locais: new Set(), origens: new Set(), arm: false });
+                x.vezes++; x.locais.add((it.car || '') + ' - ' + (it.loc || '')); x.origens.add(orig);
+                if (arm) { x.arm = true; armario++; return; }
+                const q = Number(it.qty) || 0;
+                x.pecas += q; pecas += q;
+                const p = sap.precos[k];
+                if (p != null) { temPreco = true; valor += q * p; }
+            });
+            LogOPs._naoAchados(h).forEach(n => { if (!naoAchados.has(n.code)) naoAchados.set(n.code, n); });
+        });
+        // codigo nao achado na lista mas que veio depois pela busca avulsa: nao e mais falta
+        mat.forEach((x, k) => { naoAchados.delete(x.code); });
+        Object.keys(apo).forEach(k => { if (!mat.has(k)) mat.set(k, { code: k, pecas: 0, vezes: 0, locais: new Set(), origens: new Set(), arm: false }); });
+
+        const lista = [...mat.entries()].map(([k, x]) => Object.assign(x, {
+            apo: apo[k] || 0, preco: sap.precos[k], valor: (sap.precos[k] != null && !x.arm) ? x.pecas * sap.precos[k] : null,
+        })).sort((a, b) => (b.pecas - a.pecas) || a.code.localeCompare(b.code));
+        const apoTot = Object.values(apo).reduce((a, b) => a + b, 0);
+        const prim = movs.length ? Math.min(...movs.map(h => h.timestamp)) : 0;
+        const ult  = movs.length ? Math.max(...movs.map(h => h.timestamp)) : 0;
+        LogOPs._ultimo = { tipo: 'op', op, movs, lista };
+
+        const kpi = (n, l, c = '') => `<div class="lo-kpi ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+        const movHTML = movs.map((h, i) => {
+            const t = LogOPs._tipo(h), c = h.config || {};
+            const itens = (h.removedItems || []).filter(it => it && it.code);
+            const pc = itens.filter(it => !LogOPs._armario(it.car)).reduce((a, it) => a + (Number(it.qty) || 0), 0);
+            const na = LogOPs._naoAchados(h);
+            return `<div class="lo-mov ${t.cls}" id="loMov${i}">
+                <div class="lo-mov-top" onclick="document.getElementById('loMov${i}').classList.toggle('aberto')">
+                    <i class="fas fa-chevron-down" style="color:#94a3b8;"></i>
+                    <span><b>${LogOPs._dt(h.timestamp)}</b></span>
+                    <span class="lo-tag" style="background:${t.cor};">${S(t.txt)}</span>
+                    ${LogOPs._status(h)}
+                    <span>Linha: <b>${S(c.line || '-')}</b></span>
+                    ${c.machine ? `<span>Maq: <b>${S(c.machine)}</b></span>` : ''}
+                    <span>Por: <b>${S(h.user || h.printUser || '-')}</b></span>
+                    <span>Itens: <b>${itens.length}</b> | Pecas: <b>${Q(pc)}</b></span>
+                    ${na.length ? `<span style="color:#dc2626;">Nao encontrados: <b style="color:#dc2626;">${na.length}</b></span>` : ''}
+                    ${h.confirm && h.confirm.finishedBy ? `<span>Finalizada por: <b>${S(h.confirm.finishedBy)}</b> ${S(h.confirm.finishedAt || '')}</span>` : ''}
+                    ${h._estorno ? `<span style="color:#dc2626;">Estornado por <b style="color:#dc2626;">${S(h._estorno.user || '-')}</b> em ${LogOPs._dt(h._estorno.timestamp)}</span>` : ''}
+                </div>
+                <div class="lo-mov-det">
+                    <table class="oa-table"><thead><tr><th>#</th><th>Codigo</th><th>Carro - Local</th><th style="text-align:right;">Qtd</th></tr></thead><tbody>
+                    ${itens.map((it, j) => `<tr><td style="color:#94a3b8;">${j + 1}</td><td class="lo-mono">${S(it.code)}</td>
+                        <td>${S(it.car || '-')} - <b>${S(it.loc || '-')}</b>${LogOPs._armario(it.car) ? ' <span class="lo-tag" style="background:#64748b;">armario fixo</span>' : ''}</td>
+                        <td style="text-align:right;">${Q(it.qty)}</td></tr>`).join('')}
+                    ${na.map(n => `<tr style="background:#fef2f2;"><td style="color:#dc2626;">!</td><td class="lo-mono" style="color:#dc2626;">${S(n.code)}</td>
+                        <td colspan="2" style="color:#dc2626;">Nao encontrado no estoque (${S(n.mach || '')} ${S(n.pos || '')})</td></tr>`).join('')}
+                    </tbody></table>
+                </div></div>`;
+        }).join('');
+
+        corpo.innerHTML = `
+        <div class="lo-head">
+            <div class="op">OP ${S(op)}</div>
+            <div class="it">Linha(s)<br><b>${S([...linhas].join(', ') || '-')}</b></div>
+            ${maqs.size ? `<div class="it">Maquina(s)<br><b>${S([...maqs].join(', '))}</b></div>` : ''}
+            <div class="it">Retiradas<br><b>${movs.length ? (LogOPs._d(prim) === LogOPs._d(ult) ? LogOPs._dt(prim) : LogOPs._d(prim) + ' a ' + LogOPs._d(ult)) : '-'}</b></div>
+            <div class="it">Quem tirou<br><b>${S([...users].join(', ') || '-')}</b></div>
+        </div>
+        <div class="lo-kpis">
+            ${kpi(movs.length, 'Movimentacoes')}
+            ${kpi(lista.filter(x => x.vezes).length, 'Componentes usados')}
+            ${kpi(Q(pecas), 'Pecas retiradas')}
+            ${kpi(temPreco ? LogOPs._R(valor) : '-', 'Valor estimado', 'v')}
+            ${kpi(tem261 ? Q(apoTot) : '-', 'Apontado no SAP (261)')}
+            ${kpi(naoAchados.size, 'Nao encontrados', naoAchados.size ? 'r' : '')}
+            ${estornos ? kpi(estornos, 'Estornos', 'r') : ''}
+            ${armario ? kpi(armario, 'Itens de armario (fixos)', 'a') : ''}
+        </div>
+
+        <div class="lo-sec"><i class="fas fa-clock-rotate-left"></i> Linha do tempo (clique para ver os materiais)</div>
+        ${movHTML || '<div class="lo-vazio">Sem retiradas no periodo — so apontamento no SAP.</div>'}
+
+        <div class="lo-sec"><i class="fas fa-microchip"></i> Materiais usados na OP</div>
+        <div class="lo-box"><table class="oa-table"><thead><tr>
+            <th>#</th><th>Codigo</th><th>Origem</th><th>Carro - Local</th><th style="text-align:right;">Vezes</th>
+            <th style="text-align:right;">Pecas</th><th style="text-align:right;">Valor</th>
+            <th style="text-align:right;">Apontado 261</th></tr></thead><tbody>
+            ${lista.map((x, i) => `<tr>
+                <td style="color:#94a3b8;">${i + 1}</td>
+                <td class="lo-mono">${S(x.code)}</td>
+                <td>${x.arm ? '<span class="lo-tag" style="background:#64748b;">armario fixo</span>' : (S([...x.origens].join(' + ')) || '<span style="color:#94a3b8;">so SAP</span>')}</td>
+                <td style="font-size:0.76rem;">${S([...x.locais].join(' | ') || '-')}</td>
+                <td style="text-align:right;">${x.vezes || '-'}</td>
+                <td style="text-align:right; font-weight:900; color:var(--tpv-blue);">${x.arm ? '-' : Q(x.pecas)}</td>
+                <td style="text-align:right; color:var(--ind-green); font-weight:700;">${x.valor != null ? LogOPs._R(x.valor) : '-'}</td>
+                <td style="text-align:right;">${x.apo ? Q(x.apo) : '<span style="color:#cbd5e1;">-</span>'}</td>
+            </tr>`).join('')}
+        </tbody></table></div>
+        ${naoAchados.size ? `
+        <div class="lo-sec" style="color:#dc2626;"><i class="fas fa-triangle-exclamation"></i> Nao encontrados no estoque</div>
+        <div class="lo-box"><table class="oa-table"><thead><tr><th>Codigo</th><th>Maquina / Trk</th><th>Posicao / Spec</th></tr></thead><tbody>
+            ${[...naoAchados.values()].map(n => `<tr><td class="lo-mono" style="color:#dc2626;">${S(n.code)}</td><td>${S(n.mach || '-')}</td><td>${S(n.pos || '-')}</td></tr>`).join('')}
+        </tbody></table></div>` : ''}
+        <div style="font-size:0.72rem; color:#94a3b8; margin-top:10px;">
+            Itens de armario (IA) sao fixos: aparecem na lista mas nao contam nas pecas. Movimentacoes estornadas nao entram na soma.
+            ${tem261 ? '' : 'Sem apontamento 261 dessa OP (importe o SAP com a coluna "Ordem" no Consumo).'}
+        </div>`;
+    },
+
+    // ------------------------------------------------------------ por codigo
+    async _telaCodigo(txt) {
+        const S = LogOPs._S, Q = LogOPs._Q, corpo = document.getElementById('loCorpo');
+        const alvo = LogOPs._norm(txt);
+        const regs = [];
+        (LogOPs._hist || []).forEach(h => {
+            (h.removedItems || []).forEach(it => {
+                if (!it || !it.code) return;
+                if (!LogOPs._norm(it.code).includes(alvo)) return;
+                regs.push({ h, it });
+            });
+        });
+        LogOPs._ultimo = { tipo: 'codigo', codigo: txt, regs };
+        if (!regs.length) {
+            corpo.innerHTML = `<div class="lo-vazio">O codigo <b>${S(txt)}</b> nao saiu do estoque nos ultimos ${LogOPs._dias} dias.</div>`;
+            return;
+        }
+        const ops = new Set(regs.map(r => OP.norm(r.h.config && r.h.config.wo)).filter(Boolean));
+        const pecas = regs.filter(r => !r.h._estorno && !LogOPs._armario(r.it.car)).reduce((a, r) => a + (Number(r.it.qty) || 0), 0);
+        const kpi = (n, l) => `<div class="lo-kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+        corpo.innerHTML = `
+        <div class="lo-kpis">${kpi(regs.length, 'Retiradas')}${kpi(ops.size, 'OPs diferentes')}${kpi(Q(pecas), 'Pecas retiradas')}</div>
+        <div class="lo-sec"><i class="fas fa-list"></i> Em quais OPs o material foi usado (clique na OP para abrir)</div>
+        <div class="lo-box"><table class="oa-table"><thead><tr><th>Data</th><th>OP</th><th>Tipo</th><th>Linha</th><th>Codigo</th><th>Carro - Local</th><th style="text-align:right;">Qtd</th><th>Por</th></tr></thead><tbody>
+        ${regs.map(({ h, it }) => {
+            const op = OP.norm(h.config && h.config.wo), t = LogOPs._tipo(h);
+            return `<tr ${h._estorno ? 'style="opacity:.55;"' : ''}>
+                <td>${LogOPs._dt(h.timestamp)}</td>
+                <td>${op ? `<span class="lo-chip" onclick="LogOPs.abrirOP('${S(op)}')">${S(op)}</span>` : '-'}</td>
+                <td><span class="lo-tag" style="background:${t.cor};">${S(t.txt)}</span></td>
+                <td>${S((h.config && h.config.line) || '-')}</td>
+                <td class="lo-mono">${S(it.code)}</td>
+                <td>${S(it.car || '-')} - <b>${S(it.loc || '-')}</b></td>
+                <td style="text-align:right; font-weight:900;">${Q(it.qty)}</td>
+                <td>${S(h.user || '-')}</td></tr>`;
+        }).join('')}
+        </tbody></table></div>`;
+    },
+
+    // ------------------------------------------------------------ excel
+    exportar() {
+        const u = LogOPs._ultimo;
+        if (!u) { Toast.warn('Pesquise uma OP ou um codigo primeiro.'); return; }
+        if (!window.XLSX) { Toast.warn('Biblioteca XLSX nao carregada.'); return; }
+        const wb = XLSX.utils.book_new();
+        if (u.tipo === 'op') {
+            const mats = u.lista.map(x => ({
+                'OP': u.op, 'Codigo': x.code, 'Origem': x.arm ? 'Armario fixo' : [...x.origens].join(' + '),
+                'Carro - Local': [...x.locais].join(' | '), 'Vezes': x.vezes, 'Pecas': x.arm ? 0 : x.pecas,
+                'Valor (R$)': x.valor != null ? Number(x.valor.toFixed(2)) : '', 'Apontado 261': x.apo || 0,
+            }));
+            const movs = [];
+            u.movs.forEach(h => (h.removedItems || []).forEach(it => movs.push({
+                'Data': LogOPs._dt(h.timestamp), 'OP': u.op, 'Tipo': LogOPs._tipo(h).txt,
+                'Linha': (h.config && h.config.line) || '', 'Por': h.user || '', 'Codigo': it.code,
+                'Carro': it.car || '', 'Local': it.loc || '', 'Qtd': Number(it.qty) || 0,
+            })));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(mats), 'Materiais');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(movs), 'Movimentacoes');
+            XLSX.writeFile(wb, `LogOP_${u.op}.xlsx`);
+        } else {
+            const rows = u.regs.map(({ h, it }) => ({
+                'Data': LogOPs._dt(h.timestamp), 'OP': OP.norm(h.config && h.config.wo), 'Tipo': LogOPs._tipo(h).txt,
+                'Linha': (h.config && h.config.line) || '', 'Codigo': it.code, 'Carro': it.car || '', 'Local': it.loc || '',
+                'Qtd': Number(it.qty) || 0, 'Por': h.user || '',
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Codigo');
+            XLSX.writeFile(wb, `LogCodigo_${String(u.codigo).replace(/[^\w-]/g, '')}.xlsx`);
+        }
+        Toast.success('Excel gerado!');
+    },
+};
+window.LogOPs = LogOPs;
+
 const Consumo = {
     PASTA: 'consumo',
     ARQ_SAP: 'sap.json',
