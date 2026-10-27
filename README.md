@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.45**
+**Versão atual: v17.46**
 
 ---
 
@@ -95,6 +95,7 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
+| **v17.46** | **Confirmação de Listas:** corrigido o "Finalizar carro" que não salvava. Ao gravar, o sistema relia o banco e a versão de outro PC apagava a finalização feita aqui. Agora vence a alteração mais recente. Finalizar, pausar, deixar para o próximo turno e as ações de ADM gravam a lista e o log de uma vez só (antes eram 2 gravações na rede), e a tela atualiza na hora. Se a gravação falhar, a alteração é desfeita e aparece o aviso. |
 | **v17.45** | Dashboards do Consumo: **Tendência** não usa mais o filtro — vai do primeiro estoque salvo (até 120 dias) até hoje, sem buracos (o uso entre dois estoques salvos é repartido pelos dias) e com a linha de tendência contínua. **Pizza** mostra o % e as peças dentro de cada fatia. **Top 5 mais usados** ignora X05G000100300000DG e Q09G60121. |
 | v17.44 | Consumo: filtros no topo da aba; título **CONSUMO X SAP** com o período (dd/mm a dd/mm) fica logo acima dos cards (bom para captura de tela). Saiu o texto longo do período. Cards padronizados: peças em azul, valores (R$) em verde. |
 | v17.43 | Consumo: a barra azul do cabeçalho agora cobre também a coluna da numeração (#). |
