@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.38**
+**Versão atual: v17.39**
 
 ---
 
@@ -95,7 +95,8 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
-| **v17.38** | **Card de erro:** todo erro do sistema abre um card no meio da tela ("A operação falhou!"), com o fundo escurecido, e só fecha clicando em **SIM** (ou Enter). Antes era um aviso pequeno no canto que sumia sozinho. |
+| **v17.39** | Consumo: cards em 3 blocos — **O que tinha** (Est. Inicial + valor do estoque), **O que tem agora** (Est. Final + valor do estoque) e **O que consumiu** (peças, valor do uso, % e aguardando). Valor do estoque = qtd × preço do 261 (só componentes com preço). |
+| v17.38 | **Card de erro:** todo erro do sistema abre um card no meio da tela ("A operação falhou!"), com o fundo escurecido, e só fecha clicando em **SIM** (ou Enter). Antes era um aviso pequeno no canto que sumia sozinho. |
 | v17.37 | Busca Avulsa: o aviso só aparece ao clicar em baixar. Sem OP e motivo: "Informe a OP que esse material será usado e o Motivo"; só sem motivo: "Selecione o motivo da baixa"; só sem OP: "Selecione a OP que esse material será usado". |
 | v17.36 | Busca Avulsa: o botão **LIBERAR POSICOES E BAIXAR** fica sempre ativo. Um aviso vermelho mostra antes o que falta (OP e/ou Para), e o clique sem isso dá erro e destaca o campo. Campo da OP agora diz "Digite a OP". Main e branch ficam iguais (sem modo de testes). |
 | v17.35 | Quadro "OPs em linha" só na sub-aba **OPs**. Cabeçalho do período mais simples (Est. Inicial: data · Est. Final: ESTOQUE ATUAL · dias salvos). |
