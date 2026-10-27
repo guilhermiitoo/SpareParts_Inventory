@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.40</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.41</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -14006,6 +14006,114 @@ const Consumo = {
         return Consumo._sap;
     },
 
+    // ------------------------------------------------------- tabela de precos
+    // v17.41: dados/consumo/precos.json = { precos: {codigo: preco de UMA peca}, imp: {...} }.
+    // Importada em Sistema > Configuracoes. Aceita o relatorio do SAP com
+    // "Material" + "Quantidade" + "Montante em MI" (preco = soma do montante ÷ soma da qtd)
+    // ou uma planilha simples com "Material" + "Preco".
+    ARQ_PRECOS: 'precos.json',
+    _precos: null,
+    async _carregarPrecos() {
+        const d = await Consumo._lerJson(await Consumo._pasta(), Consumo.ARQ_PRECOS);
+        Consumo._precos = Object.assign({ precos: {}, imp: null }, d || {});
+        return Consumo._precos;
+    },
+    COLS_PRECO_UNIT: ['preco', 'preco unitario', 'preco unit.', 'preco por peca', 'valor unitario', 'preco unit'],
+    async importarPrecos(input) {
+        const file = input && input.files && input.files[0];
+        if (input) input.value = '';
+        if (!file) return;
+        if (!DB.guard('Importar tabela de precos')) return;
+        try {
+            const rows = await Consumo._lerPlanilha(file);
+            let lin = -1, iC = -1, iQ = -1, iM = -1, iP = -1;
+            for (let i = 0; i < Math.min(rows.length, 30) && lin < 0; i++) {
+                const cab = (rows[i] || []).map(Consumo._cab);
+                iC = cab.indexOf('material');
+                if (iC < 0) continue;
+                iQ = cab.indexOf('quantidade'); iM = cab.indexOf('montante em mi');
+                iP = cab.findIndex(h => Consumo.COLS_PRECO_UNIT.includes(h));
+                if ((iQ >= 0 && iM >= 0) || iP >= 0) lin = i;
+            }
+            if (lin < 0) { Toast.error('Nao achei as colunas de preco. O Excel precisa ter "Material" + "Quantidade" + "Montante em MI" (relatorio do SAP) ou "Material" + "Preco".'); return; }
+            const porMontante = iQ >= 0 && iM >= 0;
+            const soma = {}, novos = {};
+            let ignoradas = 0;
+            rows.slice(lin + 1).forEach(r => {
+                if (!r || r.every(v => v === '' || v == null)) return;
+                const c = Consumo.norm(r[iC]);
+                if (!c) { ignoradas++; return; }
+                if (porMontante) {
+                    const q = Math.abs(Consumo._num(r[iQ])), m = Math.abs(Consumo._num(r[iM]));
+                    if (!isFinite(q) || !isFinite(m) || q <= 0 || m <= 0) { ignoradas++; return; }
+                    const a = soma[c] || (soma[c] = { m: 0, q: 0 }); a.m += m; a.q += q;
+                } else {
+                    const pr = Math.abs(Consumo._num(r[iP]));
+                    if (!isFinite(pr) || pr <= 0) { ignoradas++; return; }
+                    novos[c] = pr;
+                }
+            });
+            Object.keys(soma).forEach(c => { novos[c] = soma[c].m / soma[c].q; });
+            const cods = Object.keys(novos);
+            if (!cods.length) { Toast.error('Nenhum preco valido no arquivo.'); return; }
+            const atual = await Consumo._carregarPrecos();
+            const jaTinha = cods.filter(c => c in atual.precos).length;
+            const ex = cods[0];
+            const ok = await Modal.confirm('Importar tabela de precos',
+                `Arquivo: ${file.name}
+${cods.length} componente(s) com preco${ignoradas ? ` · ${ignoradas} linha(s) ignorada(s)` : ''}
+` +
+                (porMontante ? `Preco de uma peca = soma do "Montante em MI" ÷ soma da "Quantidade" de cada material.
+` +
+                    `   ex.: ${ex} — ${Consumo._fmtR(soma[ex].m)} ÷ ${Consumo._fmtQ(soma[ex].q)} pecas = ${Consumo._fmtPU(novos[ex])} por peca
+`
+                    : `   ex.: ${ex} = ${Consumo._fmtPU(novos[ex])} por peca
+`) +
+                `
+${jaTinha} componente(s) ja tinham preco e serao ATUALIZADOS. Os outros ${Consumo._fmtQ(Object.keys(atual.precos).length - jaTinha)} da tabela continuam como estao.`, 'Importar');
+            if (!ok) return;
+            const tab = await Consumo._carregarPrecos();   // rele antes de gravar
+            Object.assign(tab.precos, novos);
+            tab.imp = { em: Date.now(), por: State.currentUser ? State.currentUser.nome : '', arquivo: file.name, n: cods.length };
+            await Store._gravarTexto(await Consumo._pasta(), Consumo.ARQ_PRECOS, JSON.stringify(tab));
+            Consumo._precos = tab;
+            Logs.log('CONSUMO_PRECOS', `Importou tabela de precos (${cods.length} componentes) — ${Security.sanitize(file.name)}`);
+            Toast.success(`Tabela de precos salva: ${Consumo._fmtQ(Object.keys(tab.precos).length)} componente(s) com preco.`);
+            Consumo.renderConfig();
+        } catch (e) {
+            console.error('[Consumo precos]', e);
+            Toast.error('Erro ao importar a tabela de precos: ' + e.message);
+        }
+    },
+    async limparPrecos() {
+        if (!DB.guard('Limpar tabela de precos')) return;
+        if (!(await Modal.confirm('Limpar tabela de precos', 'Apagar todos os precos importados? O Consumo volta a usar so o preco tirado do SAP 261.', 'Apagar', true))) return;
+        Consumo._precos = { precos: {}, imp: null };
+        await Store._gravarTexto(await Consumo._pasta(), Consumo.ARQ_PRECOS, JSON.stringify(Consumo._precos));
+        Logs.log('CONSUMO_PRECOS', 'Limpou a tabela de precos');
+        Consumo.renderConfig();
+    },
+    _blocoPrecos() {
+        const t = Consumo._precos;
+        if (!t) { Consumo._carregarPrecos().then(() => Consumo.renderConfig()).catch(() => {}); return '<div style="font-size:0.8rem; color:#64748b;">Carregando tabela de precos...</div>'; }
+        const n = Object.keys(t.precos).length, i = t.imp;
+        return `
+            <div style="border-top:1px solid var(--ind-border); margin-top:18px; padding-top:14px;">
+                <div style="font-weight:900; color:var(--tpv-dark-blue); font-size:0.9rem; margin-bottom:4px;"><i class="fas fa-tags"></i> TABELA DE PRECOS</div>
+                <p style="font-size:0.8rem; color:#64748b; margin:0 0 10px;">
+                    Excel do SAP com <b>Material</b>, <b>Quantidade</b> e <b>Montante em MI</b> (ex.: o relatorio do 261), ou uma planilha com <b>Material</b> e <b>Preco</b>.
+                    O sistema calcula o preco de UMA peca (Montante ÷ Quantidade) e usa no valor do estoque e do uso. Tem prioridade sobre o preco do 261 importado no Consumo.
+                    Fica salvo em <b>dados/consumo/precos.json</b>.</p>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <label class="btn-3d btn-blue" style="padding:8px 14px; font-size:0.8rem; cursor:pointer;"><i class="fas fa-file-import"></i> IMPORTAR PRECOS
+                        <input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="Consumo.importarPrecos(this)"></label>
+                    ${n ? `<button type="button" class="btn-3d btn-gray" style="padding:8px 14px; font-size:0.8rem;" onclick="Consumo.limparPrecos()"><i class="fas fa-trash"></i> LIMPAR</button>` : ''}
+                    <span style="font-size:0.85rem; font-weight:800; color:${n ? 'var(--ind-green)' : '#64748b'};">${n ? Consumo._fmtQ(n) + ' componente(s) com preco' : 'Nenhum preco importado'}</span>
+                </div>
+                ${i ? `<div style="font-size:0.75rem; color:#64748b; margin-top:6px;">Ultima importacao: ${Security.sanitize(i.arquivo || '')} · ${new Date(i.em).toLocaleString('pt-BR')}${i.por ? ' · ' + Security.sanitize(i.por) : ''} · ${Consumo._fmtQ(i.n)} componente(s)</div>` : ''}
+            </div>`;
+    },
+
     // ------------------------------------------------------- foto diaria
     // v17.15: UM ARQUIVO POR DIA em dados/estoque_diario/, gravado no PRIMEIRO
     // acesso do dia (de qualquer PC). Ex.: "Estoque 21.10.2026 - 09h12 (primeiro acesso).json".
@@ -14141,7 +14249,10 @@ const Consumo = {
     // Est. Final: se o periodo vai ate hoje, e o ESTOQUE ATUAL do sistema;
     // se e um periodo passado, e o estoque salvo do dia seguinte ao fim.
     async calcular(de, ate) {
-        const sap = Consumo._sap || await Consumo._carregarSap();
+        const sap0 = Consumo._sap || await Consumo._carregarSap();
+        // v17.41: a tabela de precos (Configuracoes) tem prioridade sobre o preco tirado do 261
+        const tab = Consumo._precos || await Consumo._carregarPrecos();
+        const sap = Object.assign({}, sap0, { precos: Object.assign({}, sap0.precos, tab.precos) });
         const cache = {};
         const hoje = Consumo._hoje();
         const ini = de;
@@ -14210,8 +14321,9 @@ const Consumo = {
         r.tot.vIni = comPreco.reduce((a, l) => a + l.ini * l.preco, 0);
         r.tot.vFim = comPreco.reduce((a, l) => a + l.fim * l.preco, 0);
         r.tot.nPreco = comPreco.length; r.tot.nItens = r.linhas.length;
-        // v17.40: consumo do spare parts = tudo que saiu (uso > 0), sem depender do 261
-        const saiu = r.linhas.filter(l => l.uso > 0);
+        // v17.41: consumo do spare parts = tudo que saiu (uso > 0), sem depender do 261,
+        // menos os itens "Aguardando apontamento" (uso alto demais distorce o total)
+        const saiu = r.linhas.filter(l => l.uso > 0 && !Consumo._aguardando(l));
         r.tot.usoSP = saiu.reduce((a, l) => a + l.uso, 0);
         r.tot.valorSP = saiu.reduce((a, l) => a + (l.preco != null ? l.uso * l.preco : 0), 0);
         r.tot.entSP = r.linhas.reduce((a, l) => a + l.ent, 0);
@@ -14771,7 +14883,7 @@ const Consumo = {
         const Q = Consumo._fmtQ, R = Consumo._fmtR, K = Consumo._kpi;
         const temV = t.nPreco > 0, vIni = temV ? R(t.vIni) : '—', vFim = temV ? R(t.vFim) : '—';
         const nota = t.nPreco != null && t.nPreco < t.nItens
-            ? `<div style="font-size:0.72rem; color:#64748b; margin:-6px 0 12px;">Valor do estoque: soma de ${Q(t.nPreco)} de ${Q(t.nItens)} componentes que tem preco (vem do SAP 261).</div>` : '';
+            ? `<div style="font-size:0.72rem; color:#64748b; margin:-6px 0 12px;">Valor do estoque: soma de ${Q(t.nPreco)} de ${Q(t.nItens)} componentes que tem preco (tabela de precos em Sistema › Configuracoes, ou o SAP 261).</div>` : '';
         return `
         <div style="display:grid; grid-template-columns:minmax(260px,1fr) minmax(260px,1fr) minmax(320px,2fr); gap:12px; margin-bottom:14px;">
             ${Consumo._bloco('<i class="fas fa-history"></i> O que tinha', '#475569',
@@ -14811,7 +14923,7 @@ const Consumo = {
         </div>
         ${Consumo._cards(r.tot)}
         <div id="csCount" class="oa-lbl" style="margin-bottom:6px;"></div>
-        <div style="background:#fff; border:1px solid var(--ind-border); border-radius:6px; overflow:auto; max-height:600px;">
+        <div style="background:#fff; border:1px solid var(--ind-border); border-radius:6px; overflow:auto; max-height:min(900px, calc(100vh - 30px));">
             <table class="oa-table"><thead><tr>${cols.map(c => `<th onclick="Consumo.ordenar('${c[0]}')" style="${c[2] ? 'text-align:right;' : ''}">${c[1]}${Consumo._ord.k === c[0] ? (Consumo._ord.dir > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('')}</tr></thead>
             <tbody id="csBody"></tbody></table>
         </div>`;
@@ -14878,7 +14990,7 @@ const Consumo = {
                 <span class="oa-lbl" style="margin:0;">Colunas da tabela e do Excel:</span>
                 ${Consumo.OPCIONAIS.map(([k, l]) => `<label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
                     <input type="checkbox" ${sel[k] !== false ? 'checked' : ''} onchange="Consumo.setColExcel('${k}', this.checked)"> ${l}</label>`).join('')}
-            </div>`;
+            </div>${Consumo._blocoPrecos()}`;
     },
     _aguardOn() { try { return localStorage.getItem('consumo_aguard') !== '0'; } catch (e) { return true; } },
     toggleAguard() {
