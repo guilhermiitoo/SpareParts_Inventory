@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.49**
+**Versão atual: v17.50**
 
 ---
 
@@ -58,9 +58,9 @@ Desenvolvido por Guilherme Fernandes.
 | Confirmação | Andamento das listas; "Voltar para leitura" sem baixar estoque de novo |
 | Etiquetas | Etiqueta 50x25 mm com o código da lista do MES (código de barras) |
 | Ranking | Ranking dos operadores |
-| Estoque | Mapa dos carros e posições |
+| Estoque | Mapa dos carros e posições; botão **OCUPAÇÃO POR CARRO** |
 | Sistema *(admin)* | Usuários, banco de dados, catálogo, configurações, famílias |
-| Dashboard *(admin)* | Gráficos do estoque |
+| Dashboard *(admin)* | Gráficos do estoque (a Ocupação por Carro foi para a aba Estoque) |
 | ALERTA *(admin)* | Códigos sem movimentação |
 | **Consumo** *(admin)* | Consumo real x apontamento do SAP (relatório para a Controladoria) |
 
@@ -95,6 +95,7 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
+| **v17.50** | **Confirmação de Listas:** "SÓ IMPRIMIR A LISTA" não imprime mais a aba Confirmação junto (as abas são escondidas de verdade antes de imprimir). Novo botão **VER LISTA NA ABA COMPARADOR**: abre a lista já baixada no Comparador só para ver, com a baixa travada em "JÁ BAIXADA" (sai com "Subir Nova Lista"). **Lista IA no Comparador:** cruzamento **exato** do código (sem ignorar / ler até / hífen); código repetido traz o local em todas as linhas; LOCAL ESTOQUE em ordem crescente de armário (tela e reimpressão). **Ocupação por Carro** saiu do Dashboard e virou janela na aba Estoque (botão ao lado do título), com filtros de ordem, tipo (NXT/XP/PTH/sem tipo/armários/só carros), faixa de cor e busca; clicar no card abre o carro no estoque. **Estoque:** "Mostrar ___ por página" foi para baixo da tabela, no lugar do "Total de Posições" (o total aparece no próprio filtro, ex.: 1–200 de 474). |
 | **v17.49** | **Log de OPs** em duas sub-abas (igual à Gestão do Sistema): **Lista de OPs** (todas as OPs do período, 50 por página, com filtro, status da lista, listas/avulsas, itens, peças, última retirada e quem tirou; clicando, abre o detalhe) e **Detalhes da OP**. O detalhe agora vem em blocos que abrem com um clique: **Retirado em lista**, **Retirado na busca avulsa**, **Resumo por componente** (com 261) e **Não encontrados**. Período padrão: 30 dias. |
 | **v17.48** | Nova aba **Log de OPs** (Administração). Pesquisa a OP e mostra: linha, máquina, quem tirou e quando; KPIs (movimentações, componentes, peças, valor estimado, apontado no SAP 261, não encontrados, estornos); a linha do tempo de cada lista/busca avulsa com os materiais e o local; e a tabela consolidada dos materiais usados na OP. Também pesquisa por **código** (em quais OPs o material foi usado). Lê até 90 dias da pasta, exporta para Excel e não grava nada. Permissão: **tab:logops**. |
 | **v17.47** | **Lista da IA:** código repetido aparece em **todas** as linhas (cada Trk/Spec), cada uma com a sua posição no estoque, mesmo repetindo o mesmo local. Na baixa/histórico a posição entra uma vez só. A reimpressão também mostra o local em todas as linhas repetidas. |
