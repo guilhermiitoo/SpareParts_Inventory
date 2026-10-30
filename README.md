@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.50**
+**Versão atual: v17.51**
 
 ---
 
@@ -58,7 +58,7 @@ Desenvolvido por Guilherme Fernandes.
 | Confirmação | Andamento das listas; "Voltar para leitura" sem baixar estoque de novo |
 | Etiquetas | Etiqueta 50x25 mm com o código da lista do MES (código de barras) |
 | Ranking | Ranking dos operadores |
-| Estoque | Mapa dos carros e posições; botão **OCUPAÇÃO POR CARRO** |
+| Estoque | Mapa dos carros e posições; botões **OCUPAÇÃO POR CARRO** e **CARRO EM 3D** |
 | Sistema *(admin)* | Usuários, banco de dados, catálogo, configurações, famílias |
 | Dashboard *(admin)* | Gráficos do estoque (a Ocupação por Carro foi para a aba Estoque) |
 | ALERTA *(admin)* | Códigos sem movimentação |
@@ -95,6 +95,7 @@ Desenvolvido por Guilherme Fernandes.
 
 | Versão | O que mudou |
 |---|---|
+| **v17.51** | **Carro em 3D** (aba Estoque): o carro gira na tela com a **% de ocupação** em cima e as posições **vazias em vermelho** (piscando). Desenho padrão: **4 andares × 2 lados (A = frente, B = trás) × 63 posições = 504**, rolos em pé entre as divisórias em V. Carro com outra quantidade no banco: as posições são divididas por igual nos 8 andares/lados. Ordem: lado A, andar 1 (o de cima), da esquerda para a direita de quem está de frente; depois andares 2–4; depois o lado B. Passar o mouse mostra posição e código; clicar para de girar e mostra os detalhes. Painel com vazias por andar e lado, botões Frente/Trás/Lateral/Diagonal, **Só vazias** e troca de carro (setas). Abre pelo botão **CARRO EM 3D** ou por **VER EM 3D** em cada card da Ocupação por Carro (armários IA ficam de fora). O Three.js é baixado da internet só quando a janela abre. |
 | **v17.50** | **Confirmação de Listas:** "SÓ IMPRIMIR A LISTA" não imprime mais a aba Confirmação junto (as abas são escondidas de verdade antes de imprimir). Novo botão **VER LISTA NA ABA COMPARADOR**: abre a lista já baixada no Comparador só para ver, com a baixa travada em "JÁ BAIXADA" (sai com "Subir Nova Lista"). **Lista IA no Comparador:** cruzamento **exato** do código (sem ignorar / ler até / hífen); código repetido traz o local em todas as linhas; LOCAL ESTOQUE em ordem crescente de armário (tela e reimpressão). **Ocupação por Carro** saiu do Dashboard e virou janela na aba Estoque (botão ao lado do título), com filtros de ordem, tipo (NXT/XP/PTH/sem tipo/armários/só carros), faixa de cor e busca; clicar no card abre o carro no estoque. **Estoque:** "Mostrar ___ por página" foi para baixo da tabela, no lugar do "Total de Posições" (o total aparece no próprio filtro, ex.: 1–200 de 474). |
 | **v17.49** | **Log de OPs** em duas sub-abas (igual à Gestão do Sistema): **Lista de OPs** (todas as OPs do período, 50 por página, com filtro, status da lista, listas/avulsas, itens, peças, última retirada e quem tirou; clicando, abre o detalhe) e **Detalhes da OP**. O detalhe agora vem em blocos que abrem com um clique: **Retirado em lista**, **Retirado na busca avulsa**, **Resumo por componente** (com 261) e **Não encontrados**. Período padrão: 30 dias. |
 | **v17.48** | Nova aba **Log de OPs** (Administração). Pesquisa a OP e mostra: linha, máquina, quem tirou e quando; KPIs (movimentações, componentes, peças, valor estimado, apontado no SAP 261, não encontrados, estornos); a linha do tempo de cada lista/busca avulsa com os materiais e o local; e a tabela consolidada dos materiais usados na OP. Também pesquisa por **código** (em quais OPs o material foi usado). Lê até 90 dias da pasta, exporta para Excel e não grava nada. Permissão: **tab:logops**. |

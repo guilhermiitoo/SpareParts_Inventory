@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.50</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.51</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1421,7 +1421,7 @@ body.menu-recolhido #menuRodape .rodape-sair { display: block; text-align: cente
         <!-- ==================== TABS ADMIN ==================== -->
         <!-- GESTAO ESTOQUE -->
         <div id="adm-stock_manage" class="section active">
-            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:10px;"><h2 style="color:var(--ind-red); border-color:var(--ind-red); margin-bottom:0;" id="stockManageTitle">Gestao de Estoque Completa</h2><button class="btn-3d btn-blue" style="padding:9px 16px; font-size:0.82rem;" onclick="OcupCarros.abrir()"><i class="fas fa-chart-bar"></i> OCUPACAO POR CARRO</button></div>
+            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:10px;"><h2 style="color:var(--ind-red); border-color:var(--ind-red); margin-bottom:0;" id="stockManageTitle">Gestao de Estoque Completa</h2><button class="btn-3d btn-blue" style="padding:9px 16px; font-size:0.82rem;" onclick="OcupCarros.abrir()"><i class="fas fa-chart-bar"></i> OCUPACAO POR CARRO</button><button class="btn-3d btn-blue" style="padding:9px 16px; font-size:0.82rem;" onclick="Carro3D.abrir(State.selectedMapCar)"><i class="fas fa-cube"></i> CARRO EM 3D</button></div>
             <details class="viewer-hidden op-hidden" style="margin-bottom:20px; background:#fff5f5; border:1px solid #fecaca; padding:15px; border-radius:6px;">
                 <summary style="font-weight:bold; color:var(--ind-red); cursor:pointer;">Opcoes Avancadas: Carga Mestra (Reset Total)</summary>
                 <div style="padding-top:15px;">
@@ -13703,11 +13703,496 @@ const OcupCarros = {
                     <div style="font-weight:900; color:var(--tpv-dark-blue); font-family:'Roboto Mono',monospace;">${S(x.car)}${x.tipo ? ` <span style="font-size:0.62rem; background:#eff6ff; color:var(--tpv-blue); border:1px solid #bfdbfe; border-radius:4px; padding:1px 5px;">${S(x.tipo)}</span>` : ''}</div>
                     <div style="font-size:1.15rem; font-weight:900; color:${cor}; font-family:'Roboto Mono',monospace;">${x.pct}%</div></div>
                 <div style="background:#f1f5f9; border-radius:4px; height:8px; overflow:hidden; margin-bottom:6px;"><div style="width:${x.pct}%; height:100%; background:${cor};"></div></div>
-                <div style="font-size:0.7rem; color:#64748b; display:flex; justify-content:space-between;"><span>${x.vaz} vazias</span><span>${x.f} / ${x.t} pos.</span></div></div>`;
+                <div style="font-size:0.7rem; color:#64748b; display:flex; justify-content:space-between;"><span>${x.vaz} vazias</span><span>${x.f} / ${x.t} pos.</span></div>
+                ${x.arm ? '' : `<button class="btn-3d btn-blue" style="width:100%; margin-top:8px; padding:5px; font-size:0.7rem; color:#fff;" onclick="event.stopPropagation(); Carro3D.abrir('${S(x.car)}')"><i class="fas fa-cube"></i> VER EM 3D</button>`}</div>`;
         }).join('') : '<div style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:30px;">Nenhum carro neste filtro.</div>';
     },
 };
 window.OcupCarros = OcupCarros;
+
+// v17.51: CARRO 3D (aba Estoque) — o carro girando, com a % de ocupacao e as
+// posicoes vazias em vermelho.
+// Carro padrao: 4 andares x 2 lados (frente = lado A, tras = lado B) x 63
+// posicoes = 504. Os rolos ficam em pe entre as divisorias em V.
+// Carro com outra quantidade no banco: as posicoes (ordem crescente) sao
+// divididas por igual nos 8 andares/lados.
+// Ordem: lado A, andar 1 (o de cima), da esquerda para a direita de quem esta
+// de frente para o lado; depois andar 2, 3 e 4; depois o lado B do mesmo jeito.
+// O Three.js (r128) so e baixado quando a janela abre pela primeira vez.
+const Carro3D = {
+    ANDARES: 4, LADOS: 2,
+    LIBS: ['https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js',
+           'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js'],
+    // medidas em metros (carro de arame 1,22 x 0,61 m, rolo de 7")
+    M: { comp: 1.22, prof: 0.61, alt: 1.62, roda: 0.12, andarY: [1.38, 1.04, 0.70, 0.36], rolo: 0.178 },
+    COR: { cheia: 0xf8fafc, vazia: 0xef4444, marca: 0xfacc15 },
+    VISTAS: { padrao: [2.5, 1.6, 2.9], frente: [0, 1.0, 3.7], tras: [0, 1.0, -3.7], lateral: [3.7, 1.0, 0] },
+    car: null, girando: true, soVazias: false, sel: null,
+    _lib: null, _g: null, _d: null, _res: null,
+
+    _carregarLibs() {
+        if (Carro3D._lib) return Carro3D._lib;
+        const um = (src, pronto) => pronto() ? Promise.resolve() : new Promise((ok, erro) => {
+            const s = document.createElement('script');
+            s.src = src; s.onload = ok; s.onerror = () => { s.remove(); erro(new Error(src)); };
+            document.head.appendChild(s);
+        });
+        Carro3D._lib = um(Carro3D.LIBS[0], () => window.THREE)
+            .then(() => um(Carro3D.LIBS[1], () => window.THREE && THREE.OrbitControls))
+            .catch(e => { Carro3D._lib = null; throw e; });
+        return Carro3D._lib;
+    },
+
+    // posicoes e ocupadas de todos os carros (sem armarios), numa passada so
+    _resumo() {
+        const locs = {}, che = {};
+        (State.validLocations || []).forEach(l => {
+            if (!PTHCabinets.isCabinet(l.car)) (locs[l.car] = locs[l.car] || new Set()).add(String(l.loc));
+        });
+        (State.inventory || []).forEach(i => {
+            if (i.code && locs[i.car] && locs[i.car].has(String(i.loc))) (che[i.car] = che[i.car] || new Set()).add(String(i.loc));
+        });
+        const carros = Object.keys(locs).sort(Picking._natural);
+        const pct = {};
+        carros.forEach(c => { pct[c] = Math.round((che[c] ? che[c].size : 0) / locs[c].size * 100); });
+        Carro3D._res = { carros, pct };
+        return Carro3D._res;
+    },
+
+    dados(car) {
+        const locs = [...new Set((State.validLocations || []).filter(l => l.car === car).map(l => String(l.loc)))].sort(Picking._natural);
+        const inv = {};
+        (State.inventory || []).forEach(i => { if (i.car === car && i.code) (inv[String(i.loc)] = inv[String(i.loc)] || []).push(i); });
+        const porLinha = Math.max(1, Math.ceil(locs.length / (Carro3D.ANDARES * Carro3D.LADOS)));
+        const pos = locs.map((loc, n) => {
+            const linha = Math.floor(n / porLinha);
+            return { loc, lado: Math.floor(linha / Carro3D.ANDARES), andar: linha % Carro3D.ANDARES, slot: n % porLinha, itens: inv[loc] || [] };
+        });
+        const cheias = pos.filter(p => p.itens.length).length;
+        return { car, pos, porLinha, total: pos.length, cheias, vazias: pos.length - cheias,
+                 pct: pos.length ? Math.round(cheias / pos.length * 100) : 0 };
+    },
+
+    _corPct(p) { return p >= 80 ? '#10b981' : p >= 40 ? '#f59e0b' : '#ef4444'; },
+
+    abrir(car) {
+        const res = Carro3D._resumo();
+        if (!res.carros.length) { Toast.error('Nenhum carro cadastrado no Mapa de Carros.'); return; }
+        Carro3D.car = res.carros.includes(car) ? car : res.carros[0];
+        const m = document.getElementById('c3dModal') || Carro3D._criarJanela();
+        m.style.display = 'flex';
+        Carro3D._lista();
+        Carro3D._painel(Carro3D.dados(Carro3D.car));
+        Carro3D._msg('Carregando o 3D...');
+        Carro3D._carregarLibs().then(() => {
+            if (m.style.display === 'none') return;
+            if (!Carro3D._g && !Carro3D._iniciar()) return;
+            Carro3D._msg('');
+            Carro3D._tamanho();
+            Carro3D._montar();
+            Carro3D._loop();
+        }).catch(() => Carro3D._msg('Nao foi possivel carregar o 3D.<br>Confira a internet deste PC e abra de novo.'));
+    },
+
+    fechar() {
+        const m = document.getElementById('c3dModal'); if (m) m.style.display = 'none';
+        Carro3D._semDica();
+        if (Carro3D._g) cancelAnimationFrame(Carro3D._g.raf);
+    },
+
+    trocar(passo) {
+        const l = Carro3D._res.carros, i = l.indexOf(Carro3D.car);
+        Carro3D.ir(l[(i + passo + l.length) % l.length]);
+    },
+
+    ir(car) {
+        Carro3D.car = car;
+        const sel = document.getElementById('c3dCarro'); if (sel) sel.value = car;
+        if (Carro3D._g) Carro3D._montar(); else Carro3D._painel(Carro3D.dados(car));
+    },
+
+    _criarJanela() {
+        const css = document.createElement('style');
+        css.textContent = `
+            #c3dModal .c3d-box { background:#fff; border-radius:10px; width:96%; max-width:1280px; height:90vh; display:flex; flex-direction:column; border-top:6px solid var(--tpv-blue); box-shadow:0 25px 50px rgba(0,0,0,.25); overflow:hidden; }
+            #c3dModal .c3d-topo { padding:12px 18px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #e2e8f0; flex-wrap:wrap; }
+            #c3dModal .c3d-seta { background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; width:34px; height:34px; cursor:pointer; font-weight:900; color:var(--tpv-dark-blue); }
+            #c3dModal .c3d-corpo { flex:1; display:flex; min-height:0; }
+            #c3dModal .c3d-palco { flex:1; position:relative; min-height:300px; background:radial-gradient(ellipse at 50% 40%, #ffffff 0%, #e8eef5 60%, #d5dee8 100%); overflow:hidden; }
+            #c3dModal .c3d-palco canvas { position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+            #c3dModal .c3d-msg { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:800; color:#475569; pointer-events:none; }
+            #c3dModal .c3d-tip { position:absolute; display:none; pointer-events:none; background:rgba(15,23,42,.92); color:#fff; font-size:.78rem; padding:7px 10px; border-radius:6px; max-width:280px; line-height:1.35; z-index:2; }
+            #c3dModal .c3d-leg { position:absolute; left:12px; bottom:10px; font-size:.7rem; color:#475569; font-weight:700; background:rgba(255,255,255,.85); padding:6px 10px; border-radius:6px; pointer-events:none; }
+            #c3dModal .c3d-bola { display:inline-block; width:10px; height:10px; border-radius:50%; margin:0 4px -1px 0; border:1px solid #94a3b8; }
+            #c3dModal .c3d-lado { width:300px; border-left:1px solid #e2e8f0; padding:16px; overflow-y:auto; background:#f8fafc; }
+            #c3dModal .c3d-sub { font-size:.66rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.6px; margin:14px 0 6px; }
+            #c3dModal .c3d-tab { width:100%; border-collapse:collapse; font-size:.8rem; }
+            #c3dModal .c3d-tab th { font-size:.68rem; color:#64748b; padding:4px; text-align:center; }
+            #c3dModal .c3d-tab td { padding:6px 4px; text-align:center; border-top:1px solid #e2e8f0; font-weight:800; }
+            #c3dModal .c3d-tab td.c3d-cel { cursor:pointer; border-radius:4px; }
+            #c3dModal .c3d-tab td.c3d-cel:hover { background:#e0f2fe; }
+            #c3dModal .c3d-bts { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+            #c3dModal .btn-3d { color:#fff; }
+            #c3dModal .c3d-bts button { padding:7px 6px; font-size:.72rem; }
+            #c3dModal .c3d-info { margin-top:14px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; font-size:.8rem; color:#334155; line-height:1.45; }
+            @media (max-width: 820px) { #c3dModal .c3d-corpo { flex-direction:column; } #c3dModal .c3d-lado { width:auto; border-left:none; border-top:1px solid #e2e8f0; max-height:42%; } }`;
+        document.head.appendChild(css);
+        const m = document.createElement('div');
+        m.id = 'c3dModal'; m.className = 'modal-backdrop'; m.style.zIndex = '100060';
+        m.onclick = e => { if (e.target === m) Carro3D.fechar(); };
+        m.innerHTML = `<div class="c3d-box">
+            <div class="c3d-topo">
+                <div style="font-weight:900; font-size:1.1rem; color:var(--tpv-dark-blue); margin-right:8px;"><i class="fas fa-cube" style="color:var(--tpv-blue);"></i> Carro em 3D</div>
+                <button class="c3d-seta" title="Carro anterior" onclick="Carro3D.trocar(-1)">&#8249;</button>
+                <select id="c3dCarro" class="big-input" style="padding:6px 10px; width:auto; min-width:170px;" onchange="Carro3D.ir(this.value)"></select>
+                <button class="c3d-seta" title="Proximo carro" onclick="Carro3D.trocar(1)">&#8250;</button>
+                <div style="flex:1;"></div>
+                <button onclick="Carro3D.fechar()" title="Fechar" style="background:none; border:none; font-size:1.6rem; cursor:pointer; color:#64748b;">&times;</button>
+            </div>
+            <div class="c3d-corpo">
+                <div class="c3d-palco" id="c3dPalco">
+                    <div class="c3d-msg" id="c3dMsg"></div>
+                    <div class="c3d-tip" id="c3dTip"></div>
+                    <div class="c3d-leg"><span class="c3d-bola" style="background:#f8fafc;"></span>Rolo = ocupada &nbsp; <span class="c3d-bola" style="background:#ef4444; border-color:#ef4444;"></span>Vermelho = vazia &nbsp; <span class="c3d-bola" style="background:#facc15; border-color:#eab308;"></span>Selecionada<br>Arraste para girar · roda do mouse = zoom · setas do teclado = trocar de carro</div>
+                </div>
+                <div class="c3d-lado" id="c3dLado"></div>
+            </div></div>`;
+        document.body.appendChild(m);
+        document.addEventListener('keydown', e => {
+            if (m.style.display === 'none') return;
+            if (e.key === 'Escape') { e.stopPropagation(); Carro3D.fechar(); }
+            else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && e.target.tagName !== 'SELECT' && e.target.tagName !== 'INPUT') {
+                e.preventDefault(); Carro3D.trocar(e.key === 'ArrowLeft' ? -1 : 1);
+            }
+        });
+        return m;
+    },
+
+    _semDica() { const tip = document.getElementById('c3dTip'); if (tip) tip.style.display = 'none'; },
+
+    _msg(html) { const e = document.getElementById('c3dMsg'); if (e) e.innerHTML = html; },
+
+    _lista() {
+        const S = Security.sanitize, { carros, pct } = Carro3D._res;
+        const sel = document.getElementById('c3dCarro');
+        sel.innerHTML = carros.map(c => `<option value="${S(c)}">${S(c)} — ${pct[c]}%</option>`).join('');
+        sel.value = Carro3D.car;
+    },
+
+    _painel(d) {
+        const lado = document.getElementById('c3dLado'); if (!lado) return;
+        if (!d.total) { lado.innerHTML = '<div style="color:#94a3b8; font-weight:700;">Este carro nao tem posicoes cadastradas.</div>'; return; }
+        const cor = Carro3D._corPct(d.pct);
+        const vaz = [0, 1].map(l => [0, 1, 2, 3].map(a => d.pos.filter(p => p.lado === l && p.andar === a)));
+        const cel = (ps, l) => {
+            if (!ps.length) return '<td style="color:#cbd5e1;">—</td>';
+            const v = ps.filter(p => !p.itens.length).length;
+            return `<td class="c3d-cel" title="Ver o lado ${l ? 'B' : 'A'}" onclick="Carro3D.vista('${l ? 'tras' : 'frente'}')" style="color:${v ? '#dc2626' : '#059669'};">${v ? v + ' vazia' + (v > 1 ? 's' : '') : 'cheio'}</td>`;
+        };
+        lado.innerHTML = `
+            <div class="c3d-sub" style="margin-top:0;">Ocupacao do carro</div>
+            <div style="font-size:2.8rem; font-weight:900; color:${cor}; font-family:'Roboto Mono',monospace; line-height:1;">${d.pct}%</div>
+            <div style="background:#e2e8f0; border-radius:4px; height:10px; overflow:hidden; margin:8px 0;"><div style="width:${d.pct}%; height:100%; background:${cor};"></div></div>
+            <div style="font-size:.8rem; color:#475569;"><b>${d.cheias}</b> ocupadas · <b style="color:#dc2626;">${d.vazias}</b> vazias · ${d.total} posicoes<br><span style="color:#94a3b8;">${d.porLinha} posicoes por andar em cada lado</span></div>
+            <div class="c3d-sub">Vazias por andar</div>
+            <table class="c3d-tab"><tr><th>Andar</th><th>Lado A<br>frente</th><th>Lado B<br>tras</th></tr>
+                ${[0, 1, 2, 3].map(a => `<tr><td>${a + 1}</td>${cel(vaz[0][a], 0)}${cel(vaz[1][a], 1)}</tr>`).join('')}</table>
+            <div class="c3d-sub">Ver</div>
+            <div class="c3d-bts">
+                <button class="btn-3d btn-blue" id="c3dGirar" onclick="Carro3D.girar()">${Carro3D.girando ? 'PARAR' : 'GIRAR'}</button>
+                <button class="btn-3d ${Carro3D.soVazias ? 'btn-red' : 'btn-gray'}" id="c3dSoVazias" onclick="Carro3D.alternarVazias()">SO VAZIAS</button>
+                <button class="btn-3d btn-gray" onclick="Carro3D.vista('frente')">FRENTE (A)</button>
+                <button class="btn-3d btn-gray" onclick="Carro3D.vista('tras')">TRAS (B)</button>
+                <button class="btn-3d btn-gray" onclick="Carro3D.vista('lateral')">LATERAL</button>
+                <button class="btn-3d btn-gray" onclick="Carro3D.vista('padrao')">DIAGONAL</button>
+            </div>
+            <div class="c3d-info" id="c3dInfo">Clique num rolo ou numa posicao vermelha para ver os detalhes.</div>
+            <button class="btn-3d btn-blue" style="width:100%; margin-top:12px; font-size:.78rem;" onclick="Carro3D.fechar(); OcupCarros.fechar(); StockAdmin.selectCar(Carro3D.car)"><i class="fas fa-warehouse"></i> ABRIR NO ESTOQUE</button>`;
+    },
+
+    girar() {
+        Carro3D.girando = !Carro3D.girando;
+        if (Carro3D._g) Carro3D._g.ctl.autoRotate = Carro3D.girando;
+        const b = document.getElementById('c3dGirar'); if (b) b.textContent = Carro3D.girando ? 'PARAR' : 'GIRAR';
+    },
+
+    vista(nome) {
+        if (Carro3D.girando) Carro3D.girar();
+        const g = Carro3D._g; if (!g) return;
+        Carro3D._semDica();
+        g.cam.position.set(...Carro3D.VISTAS[nome]);
+        g.ctl.update();
+    },
+
+    alternarVazias() {
+        Carro3D.soVazias = !Carro3D.soVazias;
+        const b = document.getElementById('c3dSoVazias'); if (b) b.className = 'btn-3d ' + (Carro3D.soVazias ? 'btn-red' : 'btn-gray');
+        const g = Carro3D._g; if (!g || !g.matCheia) return;
+        g.matCheia.forEach(m => { m.opacity = Carro3D.soVazias ? 0.12 : 1; m.depthWrite = !Carro3D.soVazias; });
+    },
+
+    _iniciar() {
+        const palco = document.getElementById('c3dPalco');
+        let r;
+        try { r = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
+        catch (e) { Carro3D._msg('Este PC nao consegue mostrar 3D<br>(WebGL desligado no navegador).'); return false; }
+        r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        palco.insertBefore(r.domElement, palco.firstChild);
+        const cena = new THREE.Scene();
+        const cam = new THREE.PerspectiveCamera(38, 1, 0.05, 50);
+        cam.position.set(...Carro3D.VISTAS.padrao);
+        const ctl = new THREE.OrbitControls(cam, r.domElement);
+        ctl.target.set(0, 0.92, 0);
+        ctl.enableDamping = true; ctl.enablePan = false;
+        ctl.minDistance = 0.8; ctl.maxDistance = 5.5; ctl.maxPolarAngle = Math.PI * 0.53;
+        ctl.autoRotate = Carro3D.girando; ctl.autoRotateSpeed = 1.6;
+        ctl.update();
+        cena.add(new THREE.HemisphereLight(0xffffff, 0x8a99ab, 0.75));
+        const sol = new THREE.DirectionalLight(0xffffff, 0.7); sol.position.set(3, 5, 4); cena.add(sol);
+        const contra = new THREE.DirectionalLight(0xffffff, 0.35); contra.position.set(-4, 3, -3); cena.add(contra);
+        // chao com sombra suave embaixo do carro
+        const chao = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 4.4), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false,
+            map: Carro3D._textura(512, 512, (c, w, h) => {
+                const gr = c.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+                gr.addColorStop(0, 'rgba(71,85,105,.45)'); gr.addColorStop(0.16, 'rgba(100,116,139,.28)');
+                gr.addColorStop(0.45, 'rgba(203,213,225,.45)'); gr.addColorStop(1, 'rgba(226,232,240,0)');
+                c.fillStyle = gr; c.fillRect(0, 0, w, h);
+            }) }));
+        chao.rotation.x = -Math.PI / 2;
+        cena.add(chao);
+        Carro3D._g = { r, cena, cam, ctl, palco, chao, ray: new THREE.Raycaster(), mouse: new THREE.Vector2(), cor: new THREE.Color(),
+                       grupo: null, raf: 0, hover: null };
+        const el = r.domElement;
+        let ini = null;
+        el.addEventListener('pointerdown', e => { ini = [e.clientX, e.clientY]; });
+        el.addEventListener('pointerup', e => {
+            if (ini && Math.abs(e.clientX - ini[0]) + Math.abs(e.clientY - ini[1]) < 6) Carro3D._clique(e);
+            ini = null;
+        });
+        el.addEventListener('pointermove', e => Carro3D._passar(e));
+        el.addEventListener('pointerleave', () => Carro3D._passar(null));
+        if (window.ResizeObserver) new ResizeObserver(() => Carro3D._tamanho()).observe(palco);
+        else window.addEventListener('resize', () => Carro3D._tamanho());
+        return true;
+    },
+
+    _tamanho() {
+        const g = Carro3D._g; if (!g) return;
+        const w = g.palco.clientWidth, h = g.palco.clientHeight; if (!w || !h) return;
+        g.r.setSize(w, h, false);
+        g.cam.aspect = w / h; g.cam.updateProjectionMatrix();
+    },
+
+    _textura(w, h, desenhar) {
+        const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+        desenhar(cv.getContext('2d'), w, h);
+        const t = new THREE.CanvasTexture(cv); t.anisotropy = 4;
+        return t;
+    },
+
+    _montar() {
+        const g = Carro3D._g, M = Carro3D.M, d = Carro3D.dados(Carro3D.car);
+        Carro3D._d = d; Carro3D.sel = null; g.hover = null; Carro3D._semDica();
+        Carro3D._painel(d);
+        if (g.grupo) { g.cena.remove(g.grupo); Carro3D._liberar(g.grupo); }
+        const grupo = new THREE.Group(); g.grupo = grupo; g.cena.add(grupo);
+        const L = M.comp, D = M.prof, cromo = new THREE.MeshPhongMaterial({ color: 0xc9d1da, specular: 0xffffff, shininess: 90 });
+        const tubo = (comp, raio, eixo, x, y, z, mat) => {
+            const t = new THREE.Mesh(new THREE.CylinderGeometry(raio, raio, comp, 12), mat || cromo);
+            if (eixo === 'x') t.rotation.z = Math.PI / 2; else if (eixo === 'z') t.rotation.x = Math.PI / 2;
+            t.position.set(x, y, z); grupo.add(t);
+        };
+        const fios = [];   // pares de pontos -> um LineSegments so
+        const fio = (x1, y1, z1, x2, y2, z2) => fios.push(x1, y1, z1, x2, y2, z2);
+        const zigue = (eixo, a, b, y1, y2, fixo, passo) => {   // treliça da borda da prateleira
+            const n = Math.max(2, Math.round((b - a) / passo));
+            for (let k = 0; k < n; k++) {
+                const p1 = a + (b - a) * k / n, p2 = a + (b - a) * (k + 1) / n, y = k % 2 ? y2 : y1, yy = k % 2 ? y1 : y2;
+                if (eixo === 'x') fio(p1, y, fixo, p2, yy, fixo); else fio(fixo, y, p1, fixo, yy, p2);
+            }
+        };
+        // colunas, aneis em cada andar e rodizios
+        const preto = new THREE.MeshPhongMaterial({ color: 0x1f2937, shininess: 30 });
+        [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([sx, sz]) => {
+            const x = sx * L / 2, z = sz * D / 2;
+            tubo(M.alt - M.roda + 0.02, 0.0125, 'y', x, M.roda + (M.alt - M.roda) / 2, z);
+            M.andarY.forEach(y => tubo(0.04, 0.02, 'y', x, y - 0.012, z));
+            tubo(0.032, 0.045, 'x', x, 0.047, z, preto);
+            const garfo = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.035, 0.06), cromo);
+            garfo.position.set(x, 0.1, z); grupo.add(garfo);
+        });
+        // prateleiras de arame + divisorias em V
+        const x0 = -L / 2 + 0.03, passo = (L - 0.06) / d.porLinha;
+        M.andarY.forEach(y => {
+            tubo(L, 0.005, 'x', 0, y, D / 2); tubo(L, 0.005, 'x', 0, y, -D / 2);
+            tubo(D, 0.005, 'z', L / 2, y, 0); tubo(D, 0.005, 'z', -L / 2, y, 0);
+            [D / 2, -D / 2].forEach(z => { fio(-L / 2, y - 0.04, z, L / 2, y - 0.04, z); zigue('x', -L / 2, L / 2, y, y - 0.04, z, 0.06); });
+            [L / 2, -L / 2].forEach(x => { fio(x, y - 0.04, -D / 2, x, y - 0.04, D / 2); zigue('z', -D / 2, D / 2, y, y - 0.04, x, 0.06); });
+            for (let z = -D / 2 + 0.04; z < D / 2 - 0.02; z += 0.04) fio(-L / 2, y - 0.004, z, L / 2, y - 0.004, z);
+            for (let x = -L / 2 + 0.2; x < L / 2 - 0.05; x += 0.2) fio(x, y - 0.006, -D / 2, x, y - 0.006, D / 2);
+            [D / 4, -D / 4].forEach(zc => {
+                for (let k = 0; k <= d.porLinha; k++) {
+                    const x = x0 + passo * k;
+                    fio(x, y, zc - 0.12, x, y + 0.13, zc); fio(x, y + 0.13, zc, x, y, zc + 0.12);
+                }
+            });
+        });
+        const geoFios = new THREE.BufferGeometry();
+        geoFios.setAttribute('position', new THREE.Float32BufferAttribute(fios, 3));
+        grupo.add(new THREE.LineSegments(geoFios, new THREE.LineBasicMaterial({ color: 0x8d99a6 })));
+
+        // rolos: em pe, de lado, entre as divisorias (um InstancedMesh para as cheias e outro para as vazias)
+        const R = M.rolo / 2, esp = Math.min(passo * 0.62, 0.045);
+        const geo = new THREE.CylinderGeometry(R, R, esp, 32); geo.rotateZ(Math.PI / 2);
+        const face = Carro3D._textura(256, 256, (c, w) => {
+            const m = w / 2, r = w / 2 - 2;
+            c.fillStyle = '#ffffff'; c.beginPath(); c.arc(m, m, r, 0, Math.PI * 2); c.fill();
+            c.strokeStyle = '#cbd5e1'; c.lineWidth = 6; c.beginPath(); c.arc(m, m, r - 6, 0, Math.PI * 2); c.stroke();
+            c.fillStyle = '#e2e8f0';
+            for (let k = 0; k < 3; k++) {
+                const a = k * Math.PI * 2 / 3 - Math.PI / 2;
+                c.beginPath(); c.arc(m, m, r * 0.78, a + 0.35, a + 1.75); c.arc(m, m, r * 0.36, a + 1.75, a + 0.35, true); c.closePath(); c.fill();
+            }
+            c.fillStyle = '#cbd5e1'; c.beginPath(); c.arc(m, m, r * 0.24, 0, Math.PI * 2); c.fill();
+            c.fillStyle = '#475569'; c.beginPath(); c.arc(m, m, r * 0.09, 0, Math.PI * 2); c.fill();
+        });
+        const lateral = new THREE.MeshPhongMaterial({ color: 0xe5e7eb, shininess: 20, transparent: true });
+        const tampa = new THREE.MeshPhongMaterial({ color: 0xffffff, map: face, shininess: 25, transparent: true });
+        g.matCheia = [lateral, tampa, tampa];   // lateral, tampa de cima, tampa de baixo
+        if (Carro3D.soVazias) g.matCheia.forEach(m => { m.opacity = 0.12; m.depthWrite = false; });
+        g.matVazia = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0xef4444, emissiveIntensity: 0.4, transparent: true, opacity: 0.55, depthWrite: false });
+        const xDe = p => x0 + passo * ((p.lado === 0 ? p.slot : d.porLinha - 1 - p.slot) + 0.5);
+        const boneco = new THREE.Object3D();
+        const instancias = (lista, mat, escala, cor) => {
+            if (!lista.length) return null;
+            const im = new THREE.InstancedMesh(geo, mat, lista.length);
+            im.frustumCulled = false;
+            lista.forEach((p, i) => {
+                boneco.position.set(xDe(p), M.andarY[p.andar] + R + 0.012, p.lado === 0 ? D / 4 : -D / 4);
+                boneco.scale.setScalar(escala); boneco.updateMatrix();
+                im.setMatrixAt(i, boneco.matrix);
+                im.setColorAt(i, g.cor.set(cor(p)));
+            });
+            im.userData.pos = lista;
+            grupo.add(im);
+            return im;
+        };
+        g.mCheia = instancias(d.pos.filter(p => p.itens.length), g.matCheia, 1, Carro3D._tom);
+        g.mVazia = instancias(d.pos.filter(p => !p.itens.length), g.matVazia, 0.92, Carro3D._tom);
+
+        // textos: % em cima, andares nas pontas, frente/tras no chao
+        const rotulo = (txt, cor, w, h, sx, sy, x, y, z) => {
+            const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: Carro3D._textura(w, h, (c) => {
+                c.fillStyle = cor; c.font = `900 ${Math.round(h * 0.7)}px Roboto, Arial, sans-serif`;
+                c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(txt, w / 2, h / 2 + 2);
+            }) }));
+            sp.scale.set(sx, sy, 1); sp.position.set(x, y, z); grupo.add(sp);
+        };
+        const corPct = Carro3D._corPct(d.pct);
+        const topo = new THREE.Sprite(new THREE.SpriteMaterial({ map: Carro3D._textura(512, 256, (c, w, h) => {
+            c.fillStyle = 'rgba(255,255,255,.94)'; c.strokeStyle = corPct; c.lineWidth = 10;
+            c.beginPath(); if (c.roundRect) c.roundRect(8, 8, w - 16, h - 16, 28); else c.rect(8, 8, w - 16, h - 16); c.fill(); c.stroke();
+            c.textAlign = 'center'; c.textBaseline = 'middle';
+            c.fillStyle = '#004065'; c.font = '900 62px Roboto, Arial, sans-serif'; c.fillText(String(d.car), w / 2, 72);
+            c.fillStyle = corPct; c.font = '900 112px Roboto, Arial, sans-serif'; c.fillText(d.pct + '%', w / 2, 170);
+        }) }));
+        topo.scale.set(0.56, 0.28, 1); topo.position.set(0, M.alt + 0.24, 0); grupo.add(topo);
+        M.andarY.forEach((y, a) => [L / 2 + 0.17, -L / 2 - 0.17].forEach(x => rotulo('ANDAR ' + (a + 1), '#004065', 256, 64, 0.24, 0.06, x, y + 0.08, 0)));
+        [['FRENTE  ·  LADO A', D / 2 + 0.26, 0], ['TRAS  ·  LADO B', -D / 2 - 0.26, Math.PI]].forEach(([txt, z, giro]) => {
+            const placa = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.14), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false,
+                map: Carro3D._textura(1024, 128, (c, w, h) => {
+                    c.fillStyle = '#0066A1'; c.font = '900 84px Roboto, Arial, sans-serif';
+                    c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(txt, w / 2, h / 2 + 4);
+                }) }));
+            placa.rotation.set(-Math.PI / 2, 0, giro); placa.position.set(0, 0.004, z); grupo.add(placa);
+        });
+    },
+
+    _liberar(obj) {
+        obj.traverse(o => {
+            if (o.geometry) o.geometry.dispose();
+            [].concat(o.material || []).forEach(m => { if (m.map) m.map.dispose(); m.dispose(); });
+        });
+    },
+
+    _loop() {
+        const g = Carro3D._g; cancelAnimationFrame(g.raf);
+        const passo = t => {
+            const m = document.getElementById('c3dModal');
+            if (!m || m.style.display === 'none') return;
+            g.raf = requestAnimationFrame(passo);
+            g.ctl.update();
+            if (g.matVazia) {   // vazias piscando devagar
+                const k = 0.5 + 0.5 * Math.sin(t / 280);
+                g.matVazia.opacity = 0.35 + 0.45 * k; g.matVazia.emissiveIntensity = 0.25 + 0.5 * k;
+            }
+            g.r.render(g.cena, g.cam);
+        };
+        g.raf = requestAnimationFrame(passo);
+    },
+
+    _acerto(e) {
+        const g = Carro3D._g; if (!g || !g.grupo) return null;
+        const rc = g.r.domElement.getBoundingClientRect();
+        g.mouse.set((e.clientX - rc.left) / rc.width * 2 - 1, -((e.clientY - rc.top) / rc.height) * 2 + 1);
+        g.ray.setFromCamera(g.mouse, g.cam);
+        const alvos = [Carro3D.soVazias ? null : g.mCheia, g.mVazia].filter(Boolean);
+        const h = g.ray.intersectObjects(alvos, false)[0];
+        if (!h || h.instanceId == null) return null;
+        return { mesh: h.object, i: h.instanceId, p: h.object.userData.pos[h.instanceId] };
+    },
+    // vazia = vermelho; cheia = branco, azul ou preto pelo codigo (so para parecer os rolos reais)
+    _tom(p) {
+        if (!p.itens.length) return Carro3D.COR.vazia;
+        let h = 0; const s = String(p.itens[0].code);
+        for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+        return h % 10 < 7 ? Carro3D.COR.cheia : h % 10 < 9 ? 0x3b82f6 : 0x334155;
+    },
+    _igual(a, b) { return !!(a && b && a.mesh === b.mesh && a.i === b.i); },
+    _pintar(alvo, marcar) {
+        const g = Carro3D._g;
+        alvo.mesh.setColorAt(alvo.i, g.cor.set(marcar ? Carro3D.COR.marca : Carro3D._tom(alvo.p)));
+        alvo.mesh.instanceColor.needsUpdate = true;
+    },
+
+    _onde(p) {
+        return `Lado ${p.lado ? 'B (tras)' : 'A (frente)'} · Andar ${p.andar + 1} · ${p.slot + 1}ª da esquerda`;
+    },
+
+    _passar(e) {
+        const g = Carro3D._g, tip = document.getElementById('c3dTip'); if (!g) return;
+        const h = e ? Carro3D._acerto(e) : null;
+        if (!Carro3D._igual(h, g.hover)) {
+            if (g.hover && !Carro3D._igual(g.hover, Carro3D.sel)) Carro3D._pintar(g.hover, false);
+            if (h) Carro3D._pintar(h, true);
+            g.hover = h;
+        }
+        if (!h) { tip.style.display = 'none'; g.r.domElement.style.cursor = ''; return; }
+        const S = Security.sanitize, p = h.p;
+        g.r.domElement.style.cursor = 'pointer';
+        tip.innerHTML = `<b>Posicao ${S(p.loc)}</b> — ${p.itens.length ? S(p.itens.map(i => i.code).join(', ')) : '<b style="color:#fca5a5;">VAZIA</b>'}<br><span style="color:#cbd5e1;">${Carro3D._onde(p)}</span>`;
+        const rc = g.palco.getBoundingClientRect();
+        tip.style.display = 'block';
+        tip.style.left = Math.min(e.clientX - rc.left + 14, rc.width - tip.offsetWidth - 8) + 'px';
+        tip.style.top = Math.max(e.clientY - rc.top - tip.offsetHeight - 10, 8) + 'px';
+    },
+
+    _clique(e) {
+        const g = Carro3D._g, h = Carro3D._acerto(e), info = document.getElementById('c3dInfo');
+        if (Carro3D.sel && !Carro3D._igual(Carro3D.sel, h)) Carro3D._pintar(Carro3D.sel, false);
+        Carro3D.sel = h;
+        if (!h) { if (info) info.innerHTML = 'Clique num rolo ou numa posicao vermelha para ver os detalhes.'; return; }
+        Carro3D._pintar(h, true);
+        if (Carro3D.girando) Carro3D.girar();   // para de girar para a pessoa conferir
+        const S = Security.sanitize, p = h.p;
+        info.innerHTML = `<div style="font-size:1.1rem; font-weight:900; color:var(--tpv-dark-blue); font-family:'Roboto Mono',monospace;">Posicao ${S(p.loc)}</div>
+            <div style="color:#64748b; font-size:.75rem; margin-bottom:6px;">${Carro3D._onde(p)}</div>
+            ${p.itens.length ? p.itens.map(i => `<div><span class="badge bg-ok">OCUPADA</span> <b style="font-family:'Roboto Mono',monospace;">${S(i.code)}</b> · qtd ${S(i.qty)}</div>`).join('')
+                             : '<span class="badge bg-err">VAZIA</span>'}`;
+        g.hover = h;
+    },
+};
+window.Carro3D = Carro3D;
 
 </script>
 <script>
