@@ -1421,7 +1421,7 @@ body.menu-recolhido #menuRodape .rodape-sair { display: block; text-align: cente
         <!-- ==================== TABS ADMIN ==================== -->
         <!-- GESTAO ESTOQUE -->
         <div id="adm-stock_manage" class="section active">
-            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:10px;"><h2 style="color:var(--ind-red); border-color:var(--ind-red); margin-bottom:0;" id="stockManageTitle">Gestao de Estoque Completa</h2><button class="btn-3d btn-blue" style="padding:9px 16px; font-size:0.82rem;" onclick="OcupCarros.abrir()"><i class="fas fa-chart-bar"></i> OCUPACAO POR CARRO</button><button class="btn-3d btn-blue" style="padding:9px 16px; font-size:0.82rem;" onclick="Carro3D.abrir(State.selectedMapCar)"><i class="fas fa-cube"></i> CARRO EM 3D</button></div>
+            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:10px;"><h2 style="color:var(--ind-red); border-color:var(--ind-red); margin-bottom:0;" id="stockManageTitle">Gestao de Estoque Completa</h2><button class="btn-3d btn-blue" style="padding:9px 16px; font-size:0.82rem;" onclick="OcupCarros.abrir()"><i class="fas fa-cube"></i> OCUPACAO POR CARRO</button></div>
             <details class="viewer-hidden op-hidden" style="margin-bottom:20px; background:#fff5f5; border:1px solid #fecaca; padding:15px; border-radius:6px;">
                 <summary style="font-weight:bold; color:var(--ind-red); cursor:pointer;">Opcoes Avancadas: Carga Mestra (Reset Total)</summary>
                 <div style="padding-top:15px;">
@@ -13637,55 +13637,34 @@ const StockDash = {
 
 window.StockDash = StockDash;
 
-// v17.50: OCUPACAO POR CARRO (aba Estoque) — janela com filtros
+// v17.50: OCUPACAO POR CARRO (aba Estoque) — lista de carros com filtros.
+// v17.51: a lista fica na barra da direita da tela cheia do Carro 3D;
+// clicar no carro mostra ele em 3D.
 const OcupCarros = {
-    ord: 'asc', tipo: '', faixa: '', busca: '',
-    abrir() {
-        let m = document.getElementById('ocupModal');
-        if (!m) {
-            m = document.createElement('div'); m.id = 'ocupModal'; m.className = 'modal-backdrop';
-            m.style.zIndex = '100050';
-            m.onclick = e => { if (e.target === m) OcupCarros.fechar(); };
-            m.innerHTML = `<div style="background:#fff; border-radius:10px; width:95%; max-width:1100px; max-height:90vh; display:flex; flex-direction:column; border-top:6px solid var(--tpv-blue); box-shadow:0 25px 50px rgba(0,0,0,.25);">
-                <div style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
-                    <div><div style="font-weight:900; font-size:1.1rem; color:var(--tpv-dark-blue);"><i class="fas fa-car" style="color:var(--tpv-blue);"></i> Ocupacao por Carro</div>
-                    <div style="font-size:0.75rem; color:#64748b;">Verde = ≥80% | Amarelo = 40–79% | Vermelho = &lt;40% · clique no carro para abrir no estoque</div></div>
-                    <button onclick="OcupCarros.fechar()" style="background:none; border:none; font-size:1.6rem; cursor:pointer; color:#64748b;">&times;</button></div>
-                <div style="padding:12px 20px; display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; background:#f8fafc; border-bottom:1px solid #e2e8f0;">
-                    <div><div class="oa-lbl">Ordenar</div><select class="big-input" style="padding:7px 10px; width:auto;" onchange="OcupCarros.ord=this.value; OcupCarros.render()">
-                        <option value="asc">Menos material primeiro</option><option value="desc">Mais material primeiro</option>
-                        <option value="vazias">Mais posicoes vazias</option><option value="nome">Nome do carro</option></select></div>
-                    <div><div class="oa-lbl">Tipo</div><select class="big-input" style="padding:7px 10px; width:auto;" onchange="OcupCarros.tipo=this.value; OcupCarros.render()">
-                        <option value="">Todos</option><option>NXT</option><option>XP</option><option>PTH</option><option value="__sem">Sem tipo</option><option value="__arm">Armarios IA</option><option value="__carros">So carros (sem armarios)</option></select></div>
-                    <div><div class="oa-lbl">Faixa</div><select class="big-input" style="padding:7px 10px; width:auto;" onchange="OcupCarros.faixa=this.value; OcupCarros.render()">
-                        <option value="">Todas</option><option value="r">Vermelho (&lt;40%)</option><option value="a">Amarelo (40–79%)</option><option value="g">Verde (≥80%)</option></select></div>
-                    <div style="flex:1; min-width:150px;"><div class="oa-lbl">Buscar carro</div><input class="big-input" style="padding:7px 10px;" placeholder="Ex.: 05" oninput="OcupCarros.busca=this.value; OcupCarros.render()"></div>
-                    <div id="ocupResumo" style="font-size:0.8rem; color:#475569; font-weight:700; padding-bottom:8px;"></div>
-                </div>
-                <div id="ocupGrid" style="padding:16px 20px; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:12px;"></div></div>`;
-            document.body.appendChild(m);
-        }
-        m.style.display = 'flex';
-        OcupCarros.render();
-    },
-    fechar() { const m = document.getElementById('ocupModal'); if (m) m.style.display = 'none'; },
-    render() {
-        const grid = document.getElementById('ocupGrid'); if (!grid) return;
+    ord: 'asc', tipo: '__carros', faixa: '', busca: '', _lista: [],
+    abrir(car) { Carro3D.abrir(car); },
+    fechar() { Carro3D.fechar(); },
+    // por carro: posicoes cadastradas (sem repetir) e quantas tem material
+    _todos() {
         const tot = {}, che = {};
-        (State.validLocations || []).forEach(l => { tot[l.car] = (tot[l.car] || 0) + 1; });
-        (State.inventory || []).forEach(i => { if (i.code) che[i.car] = (che[i.car] || 0) + 1; });
-        const tipos = State.carMaterialType || {}, b = OcupCarros.busca.trim().toUpperCase();
-        let arr = Object.keys(tot).map(car => {
-            const f = che[car] || 0, t = tot[car], pct = t ? Math.round(f / t * 100) : 0;
-            return { car, f, t, pct, vaz: t - f, tipo: tipos[car] || '', arm: PTHCabinets.isCabinet(car) };
-        }).filter(x => {
+        (State.validLocations || []).forEach(l => { (tot[l.car] = tot[l.car] || new Set()).add(String(l.loc)); });
+        (State.inventory || []).forEach(i => {
+            if (i.code && tot[i.car] && tot[i.car].has(String(i.loc))) (che[i.car] = che[i.car] || new Set()).add(String(i.loc));
+        });
+        const tipos = State.carMaterialType || {};
+        return Object.keys(tot).map(car => {
+            const t = tot[car].size, f = che[car] ? che[car].size : 0;
+            return { car, f, t, pct: t ? Math.round(f / t * 100) : 0, vaz: t - f, tipo: tipos[car] || '', arm: PTHCabinets.isCabinet(car) };
+        });
+    },
+    filtrar() {
+        const b = OcupCarros.busca.trim().toUpperCase(), T = OcupCarros.tipo, F = OcupCarros.faixa;
+        const arr = OcupCarros._todos().filter(x => {
             if (b && !x.car.toUpperCase().includes(b)) return false;
-            const T = OcupCarros.tipo;
             if (T === '__sem' && x.tipo) return false;
             if (T === '__arm' && !x.arm) return false;
             if (T === '__carros' && x.arm) return false;
             if (T && T[0] !== '_' && x.tipo !== T) return false;
-            const F = OcupCarros.faixa;
             if (F === 'r' && x.pct >= 40) return false;
             if (F === 'a' && (x.pct < 40 || x.pct >= 80)) return false;
             if (F === 'g' && x.pct < 80) return false;
@@ -13694,18 +13673,31 @@ const OcupCarros = {
         const nm = (a, c) => a.car.localeCompare(c.car, undefined, { numeric: true });
         arr.sort((a, c) => OcupCarros.ord === 'asc' ? (a.pct - c.pct || nm(a, c)) : OcupCarros.ord === 'desc' ? (c.pct - a.pct || nm(a, c))
             : OcupCarros.ord === 'vazias' ? (c.vaz - a.vaz || nm(a, c)) : nm(a, c));
-        document.getElementById('ocupResumo').textContent = arr.length + ' carro(s)';
-        const S = Security.sanitize;
+        OcupCarros._lista = arr;
+        return arr;
+    },
+    render() {
+        const grid = document.getElementById('ocupGrid'); if (!grid) return;
+        const arr = OcupCarros.filtrar(), S = Security.sanitize;
+        const t = arr.reduce((s, x) => s + x.t, 0), v = arr.reduce((s, x) => s + x.vaz, 0);
+        document.getElementById('ocupResumo').innerHTML = `${arr.length} carro(s) · ocupacao geral <b>${t ? Math.round((t - v) / t * 100) : 0}%</b> · <b style="color:#dc2626;">${v}</b> posicoes vazias`;
         grid.innerHTML = arr.length ? arr.map(x => {
-            const cor = x.pct >= 80 ? '#10b981' : x.pct >= 40 ? '#f59e0b' : '#ef4444';
-            return `<div onclick="OcupCarros.fechar(); StockAdmin.selectCar('${S(x.car)}')" title="Abrir no estoque" style="cursor:pointer; background:#fff; border:1px solid #e2e8f0; border-left:4px solid ${cor}; border-radius:8px; padding:12px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div style="font-weight:900; color:var(--tpv-dark-blue); font-family:'Roboto Mono',monospace;">${S(x.car)}${x.tipo ? ` <span style="font-size:0.62rem; background:#eff6ff; color:var(--tpv-blue); border:1px solid #bfdbfe; border-radius:4px; padding:1px 5px;">${S(x.tipo)}</span>` : ''}</div>
-                    <div style="font-size:1.15rem; font-weight:900; color:${cor}; font-family:'Roboto Mono',monospace;">${x.pct}%</div></div>
-                <div style="background:#f1f5f9; border-radius:4px; height:8px; overflow:hidden; margin-bottom:6px;"><div style="width:${x.pct}%; height:100%; background:${cor};"></div></div>
-                <div style="font-size:0.7rem; color:#64748b; display:flex; justify-content:space-between;"><span>${x.vaz} vazias</span><span>${x.f} / ${x.t} pos.</span></div>
-                ${x.arm ? '' : `<button class="btn-3d btn-blue" style="width:100%; margin-top:8px; padding:5px; font-size:0.7rem; color:#fff;" onclick="event.stopPropagation(); Carro3D.abrir('${S(x.car)}')"><i class="fas fa-cube"></i> VER EM 3D</button>`}</div>`;
-        }).join('') : '<div style="grid-column:1/-1; text-align:center; color:#94a3b8; padding:30px;">Nenhum carro neste filtro.</div>';
+            const cor = Carro3D._corPct(x.pct);
+            return `<div class="oc-card" data-car="${S(x.car)}" title="${x.arm ? 'Armario IA (sem desenho 3D)' : 'Ver em 3D'}" style="border-left-color:${cor};">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <div style="font-weight:900; color:var(--tpv-dark-blue); font-family:'Roboto Mono',monospace;">${S(x.car)}${x.tipo ? ` <span class="c3d-tipo">${S(x.tipo)}</span>` : ''}</div>
+                    <div style="font-size:1.1rem; font-weight:900; color:${cor}; font-family:'Roboto Mono',monospace;">${x.pct}%</div></div>
+                <div style="background:#f1f5f9; border-radius:4px; height:7px; overflow:hidden; margin-bottom:5px;"><div style="width:${x.pct}%; height:100%; background:${cor};"></div></div>
+                <div style="font-size:0.7rem; color:#64748b; display:flex; justify-content:space-between;"><span>${x.vaz} vazias</span><span>${x.f} / ${x.t} pos.</span></div></div>`;
+        }).join('') : '<div style="text-align:center; color:#94a3b8; padding:30px;">Nenhum carro neste filtro.</div>';
+        OcupCarros.marcar();
+    },
+    marcar() {
+        document.querySelectorAll('#ocupGrid .oc-card').forEach(el => {
+            const sel = el.dataset.car === Carro3D.car;
+            el.classList.toggle('sel', sel);
+            if (sel) el.scrollIntoView({ block: 'nearest' });
+        });
     },
 };
 window.OcupCarros = OcupCarros;
@@ -13718,6 +13710,8 @@ window.OcupCarros = OcupCarros;
 // divididas por igual nos 8 andares/lados.
 // Ordem: lado A, andar 1 (o de cima), da esquerda para a direita de quem esta
 // de frente para o lado; depois andar 2, 3 e 4; depois o lado B do mesmo jeito.
+// Abre pelo botao OCUPACAO POR CARRO, em tela cheia: o carro no meio e a lista
+// de carros (com os filtros) na barra da direita.
 // O Three.js (r128) so e baixado quando a janela abre pela primeira vez.
 const Carro3D = {
     ANDARES: 4, LADOS: 2,
@@ -13726,9 +13720,9 @@ const Carro3D = {
     // medidas em metros (carro de arame 1,22 x 0,61 m, rolo de 7")
     M: { comp: 1.22, prof: 0.61, alt: 1.62, roda: 0.12, andarY: [1.38, 1.04, 0.70, 0.36], rolo: 0.178 },
     COR: { cheia: 0xf8fafc, vazia: 0xef4444, marca: 0xfacc15 },
-    VISTAS: { padrao: [2.5, 1.6, 2.9], frente: [0, 1.0, 3.7], tras: [0, 1.0, -3.7], lateral: [3.7, 1.0, 0] },
+    VISTAS: { padrao: [2.6, 1.65, 3.05], frente: [0, 1.0, 3.7], tras: [0, 1.0, -3.7], lateral: [3.7, 1.0, 0] },
     car: null, girando: true, soVazias: false, sel: null,
-    _lib: null, _g: null, _d: null, _res: null,
+    _lib: null, _g: null, _d: null,
 
     _carregarLibs() {
         if (Carro3D._lib) return Carro3D._lib;
@@ -13741,22 +13735,6 @@ const Carro3D = {
             .then(() => um(Carro3D.LIBS[1], () => window.THREE && THREE.OrbitControls))
             .catch(e => { Carro3D._lib = null; throw e; });
         return Carro3D._lib;
-    },
-
-    // posicoes e ocupadas de todos os carros (sem armarios), numa passada so
-    _resumo() {
-        const locs = {}, che = {};
-        (State.validLocations || []).forEach(l => {
-            if (!PTHCabinets.isCabinet(l.car)) (locs[l.car] = locs[l.car] || new Set()).add(String(l.loc));
-        });
-        (State.inventory || []).forEach(i => {
-            if (i.code && locs[i.car] && locs[i.car].has(String(i.loc))) (che[i.car] = che[i.car] || new Set()).add(String(i.loc));
-        });
-        const carros = Object.keys(locs).sort(Picking._natural);
-        const pct = {};
-        carros.forEach(c => { pct[c] = Math.round((che[c] ? che[c].size : 0) / locs[c].size * 100); });
-        Carro3D._res = { carros, pct };
-        return Carro3D._res;
     },
 
     dados(car) {
@@ -13776,93 +13754,160 @@ const Carro3D = {
     _corPct(p) { return p >= 80 ? '#10b981' : p >= 40 ? '#f59e0b' : '#ef4444'; },
 
     abrir(car) {
-        const res = Carro3D._resumo();
-        if (!res.carros.length) { Toast.error('Nenhum carro cadastrado no Mapa de Carros.'); return; }
-        Carro3D.car = res.carros.includes(car) ? car : res.carros[0];
+        const todos = OcupCarros._todos().map(x => x.car);
+        if (!todos.length) { Toast.error('Nenhum carro cadastrado no Mapa de Carros.'); return; }
         const m = document.getElementById('c3dModal') || Carro3D._criarJanela();
+        const lista = OcupCarros.filtrar();
+        // abre no carro pedido, no carro aberto no estoque ou no primeiro da lista
+        const quer = [car, State.selectedMapCar].find(c => c && todos.includes(c) && !PTHCabinets.isCabinet(c));
+        Carro3D.car = quer || (lista[0] ? lista[0].car : todos[0]);
         m.style.display = 'flex';
-        Carro3D._lista();
+        OcupCarros.render();
         Carro3D._painel(Carro3D.dados(Carro3D.car));
-        Carro3D._msg('Carregando o 3D...');
+        if (!Carro3D._g) Carro3D._msg('Carregando o 3D...');
         Carro3D._carregarLibs().then(() => {
             if (m.style.display === 'none') return;
             if (!Carro3D._g && !Carro3D._iniciar()) return;
-            Carro3D._msg('');
             Carro3D._tamanho();
-            Carro3D._montar();
+            Carro3D._desenhar();
             Carro3D._loop();
         }).catch(() => Carro3D._msg('Nao foi possivel carregar o 3D.<br>Confira a internet deste PC e abra de novo.'));
     },
 
     fechar() {
         const m = document.getElementById('c3dModal'); if (m) m.style.display = 'none';
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
         Carro3D._semDica();
         if (Carro3D._g) cancelAnimationFrame(Carro3D._g.raf);
     },
 
+    telaCheia() {
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        else { const m = document.getElementById('c3dModal'); if (m.requestFullscreen) m.requestFullscreen().catch(() => {}); }
+    },
+
+    // anda na ordem da lista da direita (com os filtros)
     trocar(passo) {
-        const l = Carro3D._res.carros, i = l.indexOf(Carro3D.car);
-        Carro3D.ir(l[(i + passo + l.length) % l.length]);
+        const l = OcupCarros._lista.map(x => x.car); if (!l.length) return;
+        const i = l.indexOf(Carro3D.car);
+        Carro3D.ir(l[i < 0 ? 0 : (i + passo + l.length) % l.length]);
     },
 
     ir(car) {
         Carro3D.car = car;
-        const sel = document.getElementById('c3dCarro'); if (sel) sel.value = car;
-        if (Carro3D._g) Carro3D._montar(); else Carro3D._painel(Carro3D.dados(car));
+        OcupCarros.marcar();
+        if (Carro3D._g) Carro3D._desenhar(); else Carro3D._painel(Carro3D.dados(car));
+    },
+
+    // armario IA nao tem o desenho do carro: mostra so os numeros
+    _desenhar() {
+        const g = Carro3D._g;
+        if (!PTHCabinets.isCabinet(Carro3D.car)) { Carro3D._msg(''); Carro3D._montar(); return; }
+        Carro3D._painel(Carro3D.dados(Carro3D.car));
+        document.getElementById('c3dInfo').style.display = 'none';
+        if (g.grupo) { g.cena.remove(g.grupo); Carro3D._liberar(g.grupo); }
+        g.grupo = g.mCheia = g.mVazia = null; g.hover = null; Carro3D.sel = null;
+        Carro3D._msg('Armario IA nao tem desenho 3D.<br>Use ABRIR NO ESTOQUE para ver as posicoes.');
     },
 
     _criarJanela() {
         const css = document.createElement('style');
         css.textContent = `
-            #c3dModal .c3d-box { background:#fff; border-radius:10px; width:96%; max-width:1280px; height:90vh; display:flex; flex-direction:column; border-top:6px solid var(--tpv-blue); box-shadow:0 25px 50px rgba(0,0,0,.25); overflow:hidden; }
-            #c3dModal .c3d-topo { padding:12px 18px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #e2e8f0; flex-wrap:wrap; }
-            #c3dModal .c3d-seta { background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; width:34px; height:34px; cursor:pointer; font-weight:900; color:var(--tpv-dark-blue); }
+            #c3dModal { position:fixed; inset:0; z-index:100060; background:#fff; display:none; flex-direction:column; }
+            #c3dModal .btn-3d { color:#fff; }
+            #c3dModal .c3d-topo { padding:10px 18px; display:flex; align-items:center; gap:14px; border-bottom:1px solid #e2e8f0; border-top:5px solid var(--tpv-blue); flex-wrap:wrap; }
             #c3dModal .c3d-corpo { flex:1; display:flex; min-height:0; }
-            #c3dModal .c3d-palco { flex:1; position:relative; min-height:300px; background:radial-gradient(ellipse at 50% 40%, #ffffff 0%, #e8eef5 60%, #d5dee8 100%); overflow:hidden; }
+            #c3dModal .c3d-palco { flex:1; position:relative; min-width:0; background:radial-gradient(ellipse at 55% 40%, #ffffff 0%, #e8eef5 60%, #d5dee8 100%); overflow:hidden; }
             #c3dModal .c3d-palco canvas { position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; }
             #c3dModal .c3d-msg { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:800; color:#475569; pointer-events:none; }
-            #c3dModal .c3d-tip { position:absolute; display:none; pointer-events:none; background:rgba(15,23,42,.92); color:#fff; font-size:.78rem; padding:7px 10px; border-radius:6px; max-width:280px; line-height:1.35; z-index:2; }
-            #c3dModal .c3d-leg { position:absolute; left:12px; bottom:10px; font-size:.7rem; color:#475569; font-weight:700; background:rgba(255,255,255,.85); padding:6px 10px; border-radius:6px; pointer-events:none; }
-            #c3dModal .c3d-bola { display:inline-block; width:10px; height:10px; border-radius:50%; margin:0 4px -1px 0; border:1px solid #94a3b8; }
-            #c3dModal .c3d-lado { width:300px; border-left:1px solid #e2e8f0; padding:16px; overflow-y:auto; background:#f8fafc; }
-            #c3dModal .c3d-sub { font-size:.66rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.6px; margin:14px 0 6px; }
-            #c3dModal .c3d-tab { width:100%; border-collapse:collapse; font-size:.8rem; }
-            #c3dModal .c3d-tab th { font-size:.68rem; color:#64748b; padding:4px; text-align:center; }
-            #c3dModal .c3d-tab td { padding:6px 4px; text-align:center; border-top:1px solid #e2e8f0; font-weight:800; }
+            #c3dModal .c3d-tip { position:absolute; display:none; pointer-events:none; background:rgba(15,23,42,.92); color:#fff; font-size:.78rem; padding:7px 10px; border-radius:6px; max-width:280px; line-height:1.35; z-index:3; }
+            #c3dModal .c3d-esq { position:absolute; top:14px; left:14px; width:270px; display:flex; flex-direction:column; gap:10px; z-index:2; max-height:calc(100% - 90px); overflow-y:auto; }
+            #c3dModal .c3d-card { background:rgba(255,255,255,.93); border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px; box-shadow:0 6px 18px rgba(15,23,42,.08); font-size:.8rem; color:#334155; line-height:1.45; }
+            #c3dModal .c3d-nome { font-size:1.15rem; font-weight:900; color:var(--tpv-dark-blue); font-family:'Roboto Mono',monospace; }
+            #c3dModal .c3d-tipo { font-size:0.62rem; background:#eff6ff; color:var(--tpv-blue); border:1px solid #bfdbfe; border-radius:4px; padding:1px 5px; font-family:'Roboto',sans-serif; vertical-align:middle; }
+            #c3dModal .c3d-sub, #c3dModal .c3d-lbl { font-size:.64rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.6px; }
+            #c3dModal .c3d-sub { margin:12px 0 4px; }
+            #c3dModal .c3d-lbl { margin-bottom:3px; }
+            #c3dModal .c3d-tab { width:100%; border-collapse:collapse; font-size:.78rem; }
+            #c3dModal .c3d-tab th { font-size:.64rem; color:#64748b; padding:3px; text-align:center; }
+            #c3dModal .c3d-tab td { padding:5px 3px; text-align:center; border-top:1px solid #e2e8f0; font-weight:800; }
             #c3dModal .c3d-tab td.c3d-cel { cursor:pointer; border-radius:4px; }
             #c3dModal .c3d-tab td.c3d-cel:hover { background:#e0f2fe; }
-            #c3dModal .c3d-bts { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
-            #c3dModal .btn-3d { color:#fff; }
-            #c3dModal .c3d-bts button { padding:7px 6px; font-size:.72rem; }
-            #c3dModal .c3d-info { margin-top:14px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; font-size:.8rem; color:#334155; line-height:1.45; }
-            @media (max-width: 820px) { #c3dModal .c3d-corpo { flex-direction:column; } #c3dModal .c3d-lado { width:auto; border-left:none; border-top:1px solid #e2e8f0; max-height:42%; } }`;
+            #c3dModal .c3d-bts { position:absolute; left:0; right:0; margin:0 auto; width:max-content; bottom:14px; display:flex; gap:6px; flex-wrap:wrap; justify-content:center; background:rgba(255,255,255,.88); padding:8px; border-radius:10px; box-shadow:0 6px 18px rgba(15,23,42,.1); z-index:2; max-width:calc(100% - 28px); }
+            #c3dModal .c3d-bts button { padding:7px 11px; font-size:.7rem; }
+            #c3dModal .c3d-leg { position:absolute; right:12px; top:12px; font-size:.7rem; color:#475569; font-weight:700; background:rgba(255,255,255,.85); padding:6px 10px; border-radius:6px; pointer-events:none; text-align:right; z-index:2; }
+            #c3dModal .c3d-bola { display:inline-block; width:10px; height:10px; border-radius:50%; margin:0 4px -1px 0; border:1px solid #94a3b8; }
+            #c3dModal .c3d-dir { width:340px; border-left:1px solid #e2e8f0; display:flex; flex-direction:column; background:#f8fafc; min-height:0; }
+            #c3dModal .c3d-filtros { padding:12px; display:grid; grid-template-columns:1fr 1fr; gap:8px; border-bottom:1px solid #e2e8f0; }
+            #c3dModal .c3d-filtros .big-input { width:100%; padding:6px 8px; font-size:.78rem; }
+            #c3dModal .c3d-lista { flex:1; overflow-y:auto; padding:10px 12px; display:flex; flex-direction:column; gap:8px; }
+            #c3dModal .oc-card { background:#fff; border:1px solid #e2e8f0; border-left:4px solid; border-radius:8px; padding:9px 11px; cursor:pointer; }
+            #c3dModal .oc-card:hover { box-shadow:0 0 0 1px #93c5fd; }
+            #c3dModal .oc-card.sel { background:#eff6ff; box-shadow:0 0 0 2px var(--tpv-blue); }
+            @media (max-width: 900px) {   /* tela estreita: a % ja aparece em cima do carro e na lista */
+                #c3dModal .c3d-corpo { flex-direction:column; }
+                #c3dModal .c3d-dir { width:auto; border-left:none; border-top:1px solid #e2e8f0; max-height:38%; }
+                #c3dModal .c3d-esq { top:8px; left:8px; width:auto; max-width:calc(100% - 16px); }
+                #c3dModal #c3dLado, #c3dModal .c3d-leg { display:none; }
+                #c3dModal .c3d-card { padding:6px 10px; font-size:.72rem; }
+                #c3dModal .c3d-bts { bottom:8px; gap:4px; padding:5px; }
+                #c3dModal .c3d-bts button { padding:5px 7px; font-size:.6rem; }
+            }`;
         document.head.appendChild(css);
+        const sel = (lbl, campo, ops) => `<div><div class="c3d-lbl">${lbl}</div><select class="big-input" id="ocup_${campo}" onchange="OcupCarros.${campo}=this.value; OcupCarros.render()">${ops}</select></div>`;
         const m = document.createElement('div');
-        m.id = 'c3dModal'; m.className = 'modal-backdrop'; m.style.zIndex = '100060';
-        m.onclick = e => { if (e.target === m) Carro3D.fechar(); };
-        m.innerHTML = `<div class="c3d-box">
+        m.id = 'c3dModal';
+        m.innerHTML = `
             <div class="c3d-topo">
-                <div style="font-weight:900; font-size:1.1rem; color:var(--tpv-dark-blue); margin-right:8px;"><i class="fas fa-cube" style="color:var(--tpv-blue);"></i> Carro em 3D</div>
-                <button class="c3d-seta" title="Carro anterior" onclick="Carro3D.trocar(-1)">&#8249;</button>
-                <select id="c3dCarro" class="big-input" style="padding:6px 10px; width:auto; min-width:170px;" onchange="Carro3D.ir(this.value)"></select>
-                <button class="c3d-seta" title="Proximo carro" onclick="Carro3D.trocar(1)">&#8250;</button>
+                <div style="font-weight:900; font-size:1.15rem; color:var(--tpv-dark-blue);"><i class="fas fa-cube" style="color:var(--tpv-blue);"></i> Ocupacao por Carro</div>
+                <div id="ocupResumo" style="font-size:.82rem; color:#475569;"></div>
                 <div style="flex:1;"></div>
-                <button onclick="Carro3D.fechar()" title="Fechar" style="background:none; border:none; font-size:1.6rem; cursor:pointer; color:#64748b;">&times;</button>
+                <button class="btn-3d btn-gray" id="c3dCheia" style="padding:7px 12px; font-size:.75rem;" onclick="Carro3D.telaCheia()"><i class="fas fa-expand"></i> TELA CHEIA</button>
+                <button onclick="Carro3D.fechar()" title="Fechar (Esc)" style="background:none; border:none; font-size:1.8rem; cursor:pointer; color:#64748b; line-height:1;">&times;</button>
             </div>
             <div class="c3d-corpo">
                 <div class="c3d-palco" id="c3dPalco">
                     <div class="c3d-msg" id="c3dMsg"></div>
                     <div class="c3d-tip" id="c3dTip"></div>
-                    <div class="c3d-leg"><span class="c3d-bola" style="background:#f8fafc;"></span>Rolo = ocupada &nbsp; <span class="c3d-bola" style="background:#ef4444; border-color:#ef4444;"></span>Vermelho = vazia &nbsp; <span class="c3d-bola" style="background:#facc15; border-color:#eab308;"></span>Selecionada<br>Arraste para girar · roda do mouse = zoom · setas do teclado = trocar de carro</div>
+                    <div class="c3d-esq">
+                        <div class="c3d-card" id="c3dLado"></div>
+                        <div class="c3d-card" id="c3dInfo"></div>
+                    </div>
+                    <div class="c3d-leg"><span class="c3d-bola" style="background:#f8fafc;"></span>Rolo = ocupada &nbsp; <span class="c3d-bola" style="background:#ef4444; border-color:#ef4444;"></span>Vermelho = vazia &nbsp; <span class="c3d-bola" style="background:#facc15; border-color:#eab308;"></span>Selecionada<br>Arraste para girar · roda do mouse = zoom · setas = trocar de carro</div>
+                    <div class="c3d-bts">
+                        <button class="btn-3d btn-blue" id="c3dGirar" onclick="Carro3D.girar()">${Carro3D.girando ? 'PARAR' : 'GIRAR'}</button>
+                        <button class="btn-3d btn-gray" onclick="Carro3D.vista('frente')">FRENTE (A)</button>
+                        <button class="btn-3d btn-gray" onclick="Carro3D.vista('tras')">TRAS (B)</button>
+                        <button class="btn-3d btn-gray" onclick="Carro3D.vista('lateral')">LATERAL</button>
+                        <button class="btn-3d btn-gray" onclick="Carro3D.vista('padrao')">DIAGONAL</button>
+                        <button class="btn-3d ${Carro3D.soVazias ? 'btn-red' : 'btn-gray'}" id="c3dSoVazias" onclick="Carro3D.alternarVazias()">SO VAZIAS</button>
+                        <button class="btn-3d btn-blue" onclick="Carro3D.fechar(); StockAdmin.selectCar(Carro3D.car)"><i class="fas fa-warehouse"></i> ABRIR NO ESTOQUE</button>
+                    </div>
                 </div>
-                <div class="c3d-lado" id="c3dLado"></div>
-            </div></div>`;
+                <div class="c3d-dir">
+                    <div class="c3d-filtros">
+                        ${sel('Ordenar', 'ord', '<option value="asc">Menos material primeiro</option><option value="desc">Mais material primeiro</option><option value="vazias">Mais posicoes vazias</option><option value="nome">Nome do carro</option>')}
+                        ${sel('Tipo', 'tipo', '<option value="__carros">So carros</option><option value="">Todos</option><option>NXT</option><option>XP</option><option>PTH</option><option value="__sem">Sem tipo</option><option value="__arm">Armarios IA</option>')}
+                        ${sel('Faixa', 'faixa', '<option value="">Todas</option><option value="r">Vermelho (&lt;40%)</option><option value="a">Amarelo (40–79%)</option><option value="g">Verde (≥80%)</option>')}
+                        <div><div class="c3d-lbl">Buscar carro</div><input class="big-input" id="ocup_busca" placeholder="Ex.: 05" oninput="OcupCarros.busca=this.value; OcupCarros.render()"></div>
+                    </div>
+                    <div class="c3d-lista" id="ocupGrid"></div>
+                </div>
+            </div>`;
         document.body.appendChild(m);
+        ['ord', 'tipo', 'faixa', 'busca'].forEach(c => { document.getElementById('ocup_' + c).value = OcupCarros[c]; });
+        document.getElementById('ocupGrid').onclick = e => { const c = e.target.closest('.oc-card'); if (c) Carro3D.ir(c.dataset.car); };
+        Carro3D._dicaInfo();
+        document.addEventListener('fullscreenchange', () => {
+            const b = document.getElementById('c3dCheia');
+            if (b) b.innerHTML = document.fullscreenElement ? '<i class="fas fa-compress"></i> SAIR DA TELA CHEIA' : '<i class="fas fa-expand"></i> TELA CHEIA';
+        });
         document.addEventListener('keydown', e => {
             if (m.style.display === 'none') return;
+            const campo = e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT';
             if (e.key === 'Escape') { e.stopPropagation(); Carro3D.fechar(); }
-            else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && e.target.tagName !== 'SELECT' && e.target.tagName !== 'INPUT') {
-                e.preventDefault(); Carro3D.trocar(e.key === 'ArrowLeft' ? -1 : 1);
+            else if (!campo && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                e.preventDefault(); Carro3D.trocar(e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1);
             }
         });
         return m;
@@ -13872,42 +13917,32 @@ const Carro3D = {
 
     _msg(html) { const e = document.getElementById('c3dMsg'); if (e) e.innerHTML = html; },
 
-    _lista() {
-        const S = Security.sanitize, { carros, pct } = Carro3D._res;
-        const sel = document.getElementById('c3dCarro');
-        sel.innerHTML = carros.map(c => `<option value="${S(c)}">${S(c)} — ${pct[c]}%</option>`).join('');
-        sel.value = Carro3D.car;
+    _dicaInfo() {
+        const e = document.getElementById('c3dInfo'); if (!e) return;
+        e.style.display = '';
+        e.innerHTML = '<span style="color:#64748b;">Clique num rolo ou numa posicao vermelha para ver os detalhes.</span>';
     },
 
     _painel(d) {
-        const lado = document.getElementById('c3dLado'); if (!lado) return;
-        if (!d.total) { lado.innerHTML = '<div style="color:#94a3b8; font-weight:700;">Este carro nao tem posicoes cadastradas.</div>'; return; }
+        const el = document.getElementById('c3dLado'); if (!el) return;
+        const S = Security.sanitize, tipo = (State.carMaterialType || {})[d.car];
+        const topo = `<div style="display:flex; align-items:center; justify-content:space-between; gap:8px;"><div class="c3d-nome">${S(d.car)}</div>${tipo ? `<span class="c3d-tipo">${S(tipo)}</span>` : ''}</div>`;
+        if (!d.total) { el.innerHTML = topo + '<div style="color:#94a3b8; font-weight:700; margin-top:6px;">Este carro nao tem posicoes cadastradas.</div>'; return; }
         const cor = Carro3D._corPct(d.pct);
-        const vaz = [0, 1].map(l => [0, 1, 2, 3].map(a => d.pos.filter(p => p.lado === l && p.andar === a)));
-        const cel = (ps, l) => {
+        const cel = (l, a) => {
+            const ps = d.pos.filter(p => p.lado === l && p.andar === a);
             if (!ps.length) return '<td style="color:#cbd5e1;">—</td>';
             const v = ps.filter(p => !p.itens.length).length;
             return `<td class="c3d-cel" title="Ver o lado ${l ? 'B' : 'A'}" onclick="Carro3D.vista('${l ? 'tras' : 'frente'}')" style="color:${v ? '#dc2626' : '#059669'};">${v ? v + ' vazia' + (v > 1 ? 's' : '') : 'cheio'}</td>`;
         };
-        lado.innerHTML = `
-            <div class="c3d-sub" style="margin-top:0;">Ocupacao do carro</div>
-            <div style="font-size:2.8rem; font-weight:900; color:${cor}; font-family:'Roboto Mono',monospace; line-height:1;">${d.pct}%</div>
-            <div style="background:#e2e8f0; border-radius:4px; height:10px; overflow:hidden; margin:8px 0;"><div style="width:${d.pct}%; height:100%; background:${cor};"></div></div>
-            <div style="font-size:.8rem; color:#475569;"><b>${d.cheias}</b> ocupadas · <b style="color:#dc2626;">${d.vazias}</b> vazias · ${d.total} posicoes<br><span style="color:#94a3b8;">${d.porLinha} posicoes por andar em cada lado</span></div>
+        el.innerHTML = `${topo}
+            <div style="font-size:2.6rem; font-weight:900; color:${cor}; font-family:'Roboto Mono',monospace; line-height:1.05; margin-top:4px;">${d.pct}%</div>
+            <div style="background:#e2e8f0; border-radius:4px; height:9px; overflow:hidden; margin:6px 0;"><div style="width:${d.pct}%; height:100%; background:${cor};"></div></div>
+            <div><b>${d.cheias}</b> ocupadas · <b style="color:#dc2626;">${d.vazias}</b> vazias · ${d.total} posicoes</div>
+            ${PTHCabinets.isCabinet(d.car) ? '' : `<div style="color:#94a3b8;">${d.porLinha} posicoes por andar em cada lado</div>
             <div class="c3d-sub">Vazias por andar</div>
             <table class="c3d-tab"><tr><th>Andar</th><th>Lado A<br>frente</th><th>Lado B<br>tras</th></tr>
-                ${[0, 1, 2, 3].map(a => `<tr><td>${a + 1}</td>${cel(vaz[0][a], 0)}${cel(vaz[1][a], 1)}</tr>`).join('')}</table>
-            <div class="c3d-sub">Ver</div>
-            <div class="c3d-bts">
-                <button class="btn-3d btn-blue" id="c3dGirar" onclick="Carro3D.girar()">${Carro3D.girando ? 'PARAR' : 'GIRAR'}</button>
-                <button class="btn-3d ${Carro3D.soVazias ? 'btn-red' : 'btn-gray'}" id="c3dSoVazias" onclick="Carro3D.alternarVazias()">SO VAZIAS</button>
-                <button class="btn-3d btn-gray" onclick="Carro3D.vista('frente')">FRENTE (A)</button>
-                <button class="btn-3d btn-gray" onclick="Carro3D.vista('tras')">TRAS (B)</button>
-                <button class="btn-3d btn-gray" onclick="Carro3D.vista('lateral')">LATERAL</button>
-                <button class="btn-3d btn-gray" onclick="Carro3D.vista('padrao')">DIAGONAL</button>
-            </div>
-            <div class="c3d-info" id="c3dInfo">Clique num rolo ou numa posicao vermelha para ver os detalhes.</div>
-            <button class="btn-3d btn-blue" style="width:100%; margin-top:12px; font-size:.78rem;" onclick="Carro3D.fechar(); OcupCarros.fechar(); StockAdmin.selectCar(Carro3D.car)"><i class="fas fa-warehouse"></i> ABRIR NO ESTOQUE</button>`;
+                ${[0, 1, 2, 3].map(a => `<tr><td>${a + 1}</td>${cel(0, a)}${cel(1, a)}</tr>`).join('')}</table>`}`;
     },
 
     girar() {
@@ -13980,7 +14015,10 @@ const Carro3D = {
         const g = Carro3D._g; if (!g) return;
         const w = g.palco.clientWidth, h = g.palco.clientHeight; if (!w || !h) return;
         g.r.setSize(w, h, false);
-        g.cam.aspect = w / h; g.cam.updateProjectionMatrix();
+        g.cam.aspect = w / h;
+        // tela larga: o carro fica um pouco para a direita, livre do quadro da esquerda
+        if (w >= 900) g.cam.setViewOffset(w, h, -140, 24, w, h); else g.cam.clearViewOffset();
+        g.cam.updateProjectionMatrix();
     },
 
     _textura(w, h, desenhar) {
@@ -13994,6 +14032,7 @@ const Carro3D = {
         const g = Carro3D._g, M = Carro3D.M, d = Carro3D.dados(Carro3D.car);
         Carro3D._d = d; Carro3D.sel = null; g.hover = null; Carro3D._semDica();
         Carro3D._painel(d);
+        Carro3D._dicaInfo();
         if (g.grupo) { g.cena.remove(g.grupo); Carro3D._liberar(g.grupo); }
         const grupo = new THREE.Group(); g.grupo = grupo; g.cena.add(grupo);
         const L = M.comp, D = M.prof, cromo = new THREE.MeshPhongMaterial({ color: 0xc9d1da, specular: 0xffffff, shininess: 90 });
@@ -14181,7 +14220,7 @@ const Carro3D = {
         const g = Carro3D._g, h = Carro3D._acerto(e), info = document.getElementById('c3dInfo');
         if (Carro3D.sel && !Carro3D._igual(Carro3D.sel, h)) Carro3D._pintar(Carro3D.sel, false);
         Carro3D.sel = h;
-        if (!h) { if (info) info.innerHTML = 'Clique num rolo ou numa posicao vermelha para ver os detalhes.'; return; }
+        if (!h) { Carro3D._dicaInfo(); return; }
         Carro3D._pintar(h, true);
         if (Carro3D.girando) Carro3D.girar();   // para de girar para a pessoa conferir
         const S = Security.sanitize, p = h.p;
