@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia Conexão de Pasta</title>
+<style>
+:root { --bg:#f8fafc; --card:#ffffff; --txt:#0f172a; --fraco:#475569; --linha:#e2e8f0; --azul:#1d4ed8; --verde:#15803d; --verm:#b91c1c; --amar:#a16207; --code:#0f172a; --codetxt:#e2e8f0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0b1220; --card:#111a2e; --txt:#e2e8f0; --fraco:#94a3b8; --linha:#1e293b; --azul:#60a5fa; --verde:#4ade80; --verm:#f87171; --amar:#fbbf24; --code:#020617; } }
+:root[data-theme="dark"] { --bg:#0b1220; --card:#111a2e; --txt:#e2e8f0; --fraco:#94a3b8; --linha:#1e293b; --azul:#60a5fa; --verde:#4ade80; --verm:#f87171; --amar:#fbbf24; --code:#020617; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--txt); font:15px/1.6 'Segoe UI',Roboto,Arial,sans-serif; }
+main { max-width:900px; margin:0 auto; padding:24px 16px 60px; }
+h1 { font-size:26px; margin:0 0 4px; } h2 { font-size:19px; margin:34px 0 10px; padding-bottom:6px; border-bottom:2px solid var(--linha); }
+h3 { font-size:16px; margin:20px 0 6px; }
+.sub { color:var(--fraco); margin:0 0 20px; }
+.card { background:var(--card); border:1px solid var(--linha); border-radius:10px; padding:14px 16px; margin:12px 0; }
+.ok { border-left:5px solid var(--verde); } .no { border-left:5px solid var(--verm); } .at { border-left:5px solid var(--amar); }
+pre { background:var(--code); color:var(--codetxt); padding:14px; border-radius:8px; overflow:auto; font:12.5px/1.5 Consolas,'Roboto Mono',monospace; position:relative; }
+code { font-family:Consolas,'Roboto Mono',monospace; font-size:.92em; }
+p code, li code, td code { background:var(--linha); padding:1px 5px; border-radius:4px; }
+table { width:100%; border-collapse:collapse; font-size:14px; } th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--linha); vertical-align:top; }
+.copiar { position:absolute; top:8px; right:8px; background:#334155; color:#fff; border:0; border-radius:6px; padding:4px 10px; font-size:12px; cursor:pointer; }
+.fluxo { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.passo { background:var(--card); border:2px solid var(--azul); border-radius:8px; padding:8px 12px; font-weight:600; font-size:14px; }
+.seta { color:var(--fraco); font-weight:700; }
+</style>
+</head>
+<body>
+<main>
+<h1>Conexão de pasta em 1 clique</h1>
+<p class="sub">Guia de engenharia para aplicar em qualquer sistema HTML da MMT que guarda dados numa pasta de rede.
+Referência: Spare Parts v17.54 · Guilherme Fernandes.</p>
+
+<div class="card at"><b>Como usar este guia com a IA:</b> abra uma conversa nova, anexe o HTML do sistema e este arquivo,
+e cole o <a href="#prompt">prompt pronto</a> do fim da página. A IA tem tudo o que precisa aqui.</div>
+
+<h2>1. O que o usuário vê</h2>
+<div class="fluxo">
+  <span class="passo">Abre o sistema</span><span class="seta">→</span>
+  <span class="passo">Clica em “Conectar Sistema”</span><span class="seta">→</span>
+  <span class="passo">Autoriza no navegador</span><span class="seta">→</span>
+  <span class="passo" style="border-color:var(--verde)">✔ Conectado, faz login</span>
+</div>
+<ul>
+  <li><b>Um botão só</b> na tela de login: <b>Conectar Sistema</b>. Não tem campo com o endereço, botão de copiar nem botão “selecionar”.</li>
+  <li><b>O endereço da pasta é fixo</b> e fica só dentro do código.</li>
+  <li><b>Depois de conectado</b>, aparece um cartão verde com o que foi lido (ex.: “1834 posições e 42 usuários lidos”) e o login é liberado.</li>
+  <li><b>Se o usuário marcar “Permitir em todas as visitas”</b> na janela do navegador, nas próximas vezes o sistema <b>conecta sozinho, sem clique</b>.</li>
+</ul>
+
+<h2>2. As regras do navegador (o que é possível e o que não é)</h2>
+<div class="card no"><b>❌ O navegador NÃO abre uma pasta pelo endereço.</b> Não dá para escrever <code>S:\MMT\...</code> no código e abrir direto.
+Por segurança, o Chrome e o Edge só deixam a página usar uma pasta que o <b>usuário escolheu</b> numa janela, pelo menos uma vez.</div>
+<div class="card ok"><b>✅ Mas o navegador LEMBRA a pasta escolhida.</b> A “alça” da pasta (<code>FileSystemDirectoryHandle</code>) é guardada no
+<b>IndexedDB</b>. Da próxima vez, o sistema já sabe qual é a pasta e só precisa pedir a <b>permissão</b>, o que custa um clique e nenhuma janela de escolher pasta.</div>
+<table>
+  <tr><th>Situação</th><th>O que acontece ao clicar em “Conectar Sistema”</th></tr>
+  <tr><td>Primeira vez neste PC/navegador</td><td>Abre a janela de pasta <b>uma única vez</b>. O endereço já vai para o Ctrl+V sem aparecer na tela: é só colar na barra da janela e dar Enter.</td></tr>
+  <tr><td>Já conectou antes</td><td>Só aparece o aviso do navegador “Permitir acesso?”. <b>Nenhuma janela de pasta.</b></td></tr>
+  <tr><td>Usuário marcou “Permitir em todas as visitas”</td><td>Conecta <b>sozinho</b> ao abrir a página, sem nenhum clique.</td></tr>
+  <tr><td>Escolheu a pasta errada</td><td>É recusada sem criar nada (arquivo de confirmação, ver item 4) e a janela abre de novo.</td></tr>
+</table>
+<p>Outras regras importantes:</p>
+<ul>
+  <li>Pedir permissão (<code>requestPermission</code>) e abrir a janela (<code>showDirectoryPicker</code>) <b>só funcionam dentro de um clique</b>. Ao abrir a página, o sistema só pode <b>consultar</b> (<code>queryPermission</code>) e, se já estiver liberado, conectar sem clique.</li>
+  <li><b>Só Chrome ou Edge</b>: o Firefox não tem essa API.</li>
+  <li>A memória é <b>por PC e por navegador</b>. Num PC novo, a primeira vez abre a janela de novo.</li>
+  <li><b>Uma permissão da pasta raiz cobre todas as subpastas</b> (<code>dados/</code>, <code>backups/</code>...). Não precisa autorizar cada arquivo.</li>
+  <li>O HTML precisa ser aberto <b>sempre do mesmo lugar</b>. A memória é ligada à origem da página; abrir uma cópia de outro caminho começa do zero.</li>
+</ul>
+
+<h2>3. O fluxo por dentro</h2>
+<pre>AO ABRIR A PÁGINA (sem clique)
+  alça = IndexedDB.get('pasta')
+  se existe alça E queryPermission == 'granted'  →  conectar(alça)   ← zero clique
+  senão                                          →  só mostra o botão "Conectar Sistema"
+
+AO CLICAR EM "CONECTAR SISTEMA"
+  alça = IndexedDB.get('pasta')
+  se existe alça:
+      requestPermission('readwrite')              ← 1 clique, sem janela de pasta
+      se 'granted' → conectar(alça) e FIM
+      se a pasta sumiu/mudou → esquecer a alça e seguir abaixo
+  copiar o endereço fixo para o Ctrl+V (silencioso)
+  alça = showDirectoryPicker({ id:'meu-sistema', mode:'read' })
+  conferir arquivo de confirmação; se errado → avisar e abrir de novo
+  requestPermission('readwrite') → conectar(alça) → IndexedDB.put('pasta', alça)
+
+conectar(alça)
+  lê o banco → mostra cartão verde com o resumo → libera o login</pre>
+
+<h2>4. Trava contra pasta errada</h2>
+<p>O navegador <b>não informa o caminho completo</b> da pasta escolhida, só o nome. Para garantir que é a pasta certa:</p>
+<ul>
+  <li>Coloque <b>à mão, uma única vez</b>, um arquivo de confirmação na raiz da pasta oficial. Exemplo: <code>MEU_SISTEMA_PASTA_DO_SISTEMA.json</code> com <code>{"sistema":"MEU_SISTEMA_MMT"}</code>.</li>
+  <li>O sistema <b>nunca cria</b> esse arquivo, senão qualquer pasta viraria “oficial”.</li>
+  <li>Abra a janela com <code>mode:'read'</code> e confira o arquivo <b>antes</b> de pedir gravação. Assim o usuário não autoriza “editar” uma pasta errada.</li>
+  <li>Avise o erro mais comum: quem entra na subpasta <code>dados</code> em vez de escolher a pasta de cima.</li>
+</ul>
+
+<h2>5. Código de referência (copiar e adaptar)</h2>
+<p>Módulo independente. Troque só o bloco <code>CONFIG</code> e a função <code>aoConectar</code>.</p>
+<pre id="cod"><button class="copiar" onclick="copiar('cod')">Copiar</button>/* ===== ConexaoPasta: conecta a pasta do sistema em 1 clique ===== */
+const ConexaoPasta = {
+  CONFIG: {
+    caminho:     'S:\\MMT\\...\\NOME_DA_PASTA',           // endereço fixo (só vai para o Ctrl+V)
+    confirmacao: 'MEU_SISTEMA_PASTA_DO_SISTEMA.json',      // arquivo colocado à mão na pasta
+    sistema:     'MEU_SISTEMA_MMT',                        // valor do campo "sistema" desse arquivo
+    idJanela:    'meu-sistema',                            // o Windows lembra a última pasta aberta com este id
+    idb:         'meu_sistema_handles',                    // nome do IndexedDB (único por sistema!)
+  },
+  dir: null,
+
+  // ---------- memória da pasta (IndexedDB) ----------
+  _db() { return new Promise((ok, err) => { const r = indexedDB.open(this.CONFIG.idb, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('h'); r.onsuccess = () => ok(r.result); r.onerror = () => err(r.error); }); },
+  async _get() { try { const db = await this._db(); return await new Promise(ok => {
+    const q = db.transaction('h').objectStore('h').get('pasta'); q.onsuccess = () => ok(q.result || null); q.onerror = () => ok(null); }); } catch (e) { return null; } },
+  async _put(v) { try { const db = await this._db(); const t = db.transaction('h', 'readwrite');
+    v ? t.objectStore('h').put(v, 'pasta') : t.objectStore('h').delete('pasta'); } catch (e) {} },
+
+  async _ehOficial(dh) {
+    try { const t = await (await (await dh.getFileHandle(this.CONFIG.confirmacao)).getFile()).text();
+          return JSON.parse(t).sistema === this.CONFIG.sistema; } catch (e) { return false; }
+  },
+
+  // ---------- 1) ao abrir a página: conecta sozinho se já estiver liberado ----------
+  async aoAbrir() {
+    if (!window.showDirectoryPicker) return;
+    const dh = await this._get(); if (!dh) return;
+    try { if ((await dh.queryPermission({ mode: 'readwrite' })) === 'granted') await this._conectar(dh); } catch (e) {}
+  },
+
+  // ---------- 2) o ÚNICO botão: "Conectar Sistema" ----------
+  async botao() {
+    if (this.dir) return;
+    if (!window.showDirectoryPicker) { alert('Use Google Chrome ou Microsoft Edge.'); return; }
+    const lembrada = await this._get();
+    if (lembrada) {
+      try {
+        if ((await lembrada.requestPermission({ mode: 'readwrite' })) !== 'granted') return;  // negou: fica no botão
+        if (await this._ehOficial(lembrada)) { await this._conectar(lembrada); return; }
+      } catch (e) { /* pasta movida/renomeada/rede fora */ }
+      await this._put(null);   // esquece e cai na escolha abaixo
+    }
+    try { await navigator.clipboard.writeText(this.CONFIG.caminho); } catch (e) {}   // pronto para Ctrl+V
+    while (true) {
+      let dh;
+      try { dh = await window.showDirectoryPicker({ id: this.CONFIG.idJanela, mode: 'read' }); }
+      catch (e) { if (e.name !== 'AbortError') this.erro('Não abriu a janela: ' + e.message + '. Clique de novo.'); return; }
+      if (await this._ehOficial(dh)) {
+        if ((await dh.requestPermission({ mode: 'readwrite' })) !== 'granted') { this.erro('Permissão de gravação negada.'); return; }
+        await this._conectar(dh); return;
+      }
+      if (!confirm('A pasta "' + dh.name + '" NÃO é a pasta do sistema.' + (dh.name.toLowerCase() === 'dados' ? '\nNão entre em "dados": escolha a pasta de CIMA.' : '') +
+                   '\n\nEscolha:\n' + this.CONFIG.caminho + '\n\nNada foi alterado. Tentar de novo?')) return;
+    }
+  },
+
+  async _conectar(dh) {
+    this.dir = dh;
+    await this._put(dh);
+    try { await this.aoConectar(dh); }
+    catch (e) { this.dir = null; this.erro('Erro ao ler o banco: ' + e.message); }
+  },
+
+  // ---------- adapte ao sistema ----------
+  async aoConectar(dh) {
+    // 1) ler o banco da pasta (ex.: dados/banco/...)
+    // 2) mostrar o cartão verde com o resumo e liberar o login:
+    // document.getElementById('statusPasta').innerHTML = '✔ Conectado: <b>' + dh.name + '</b><br>X itens lidos.';
+    // liberarLogin();
+  },
+  erro(msg) { const el = document.getElementById('erroPasta'); if (el) el.textContent = msg; else alert(msg); },
+};
+ConexaoPasta.aoAbrir();</pre>
+
+<h3>HTML da tela de login</h3>
+<pre id="html"><button class="copiar" onclick="copiar('html')">Copiar</button>&lt;div id="statusPasta"&gt;&lt;/div&gt;
+&lt;button onclick="ConexaoPasta.botao()"&gt;Conectar Sistema&lt;/button&gt;
+&lt;div id="erroPasta"&gt;&lt;/div&gt;</pre>
+
+<h2>6. O que remover dos sistemas antigos</h2>
+<table>
+  <tr><th>Remover</th><th>Por quê</th></tr>
+  <tr><td>Campo de texto mostrando o endereço da pasta</td><td>O endereço é fixo e fica no código. O usuário não precisa ver.</td></tr>
+  <tr><td>Botão “copiar endereço”</td><td>A cópia para o Ctrl+V acontece sozinha, dentro do botão Conectar.</td></tr>
+  <tr><td>Botões separados “Selecionar pasta” e “Reconectar”</td><td>Viraram <b>um botão só</b>: ele decide sozinho se abre a janela ou só pede permissão.</td></tr>
+  <tr><td>Pedir para escolher arquivo JSON um por um</td><td>A permissão da <b>pasta</b> cobre todos os arquivos dela.</td></tr>
+</table>
+<p><b>Mantenha o estilo de cada sistema:</b> o botão usa as mesmas classes e cores dos botões que já existem naquela tela de login. A troca é só de comportamento, não de visual.</p>
+
+<h2>7. Erros comuns (já vistos na prática)</h2>
+<ul>
+  <li><b>Pedir permissão ao abrir a página</b> não funciona: precisa de clique. Ao abrir, só use <code>queryPermission</code>.</li>
+  <li><b>Muita espera antes de abrir a janela.</b> Se o clique faz leituras lentas na rede antes do <code>showDirectoryPicker</code>, o navegador pode recusar (“precisa de gesto do usuário”). Abra a janela cedo; se falhar, peça para clicar de novo.</li>
+  <li><b>Mesmo nome de IndexedDB em dois sistemas</b> faz um sistema pegar a pasta do outro. Use um nome único por sistema.</li>
+  <li><b>Esquecer a alça quando o usuário só negou a permissão.</b> Negar não significa pasta errada: mantenha a alça e deixe o botão.</li>
+  <li><b>Criar o arquivo de confirmação pelo sistema.</b> Nunca: ele é colocado à mão.</li>
+</ul>
+
+<h2>8. Checklist de teste</h2>
+<ol>
+  <li>PC que nunca abriu: clicar em Conectar abre a janela → Ctrl+V cola o endereço → conecta → cartão verde.</li>
+  <li>Fechar e abrir de novo: clicar em Conectar <b>não abre janela</b>, só pede permissão.</li>
+  <li>Marcar “Permitir em todas as visitas” e reabrir: <b>conecta sozinho</b>.</li>
+  <li>Escolher a pasta <code>dados</code> ou outra qualquer: é recusada e nada é criado.</li>
+  <li>Negar a permissão: continua no botão e funciona no próximo clique.</li>
+  <li>Renomear/mover a pasta: o sistema esquece e abre a janela de novo.</li>
+</ol>
+
+<h2 id="prompt">9. Prompt pronto para a IA</h2>
+<pre id="pr"><button class="copiar" onclick="copiar('pr')">Copiar</button>Anexei o HTML do meu sistema e o arquivo GUIA_CONEXAO_PASTA.html.
+Implemente no meu sistema a "Conexão de pasta em 1 clique" exatamente como o guia descreve:
+
+1. Endereço fixo da pasta: [COLE AQUI O ENDEREÇO, ex.: S:\MMT\...\NOME_DA_PASTA]
+   Arquivo de confirmação: [NOME]_PASTA_DO_SISTEMA.json com {"sistema":"[NOME]_MMT"}
+2. Na tela de login, REMOVA o campo que mostra o endereço, o botão de copiar,
+   e os botões separados de selecionar/reconectar pasta.
+3. Coloque UM botão "Conectar Sistema", no mesmo estilo dos botões que já existem nessa tela de login.
+   - Pasta já conhecida (IndexedDB): só pede a permissão.
+   - Primeira vez: copia o endereço para o Ctrl+V sem mostrar e abre a janela de pasta.
+   - Pasta errada: recusa sem criar nada.
+4. Ao abrir a página: se a permissão já estiver liberada, conecta sozinho (zero clique).
+5. Depois de conectar: mostre um cartão verde com o que foi lido e libere o login.
+6. Use um nome de IndexedDB ÚNICO para este sistema.
+7. Mantenha toda a leitura/gravação atual do banco funcionando: mude só COMO a pasta é conectada.
+8. Me explique o que mudou e me entregue o HTML para testar, com o checklist do item 8 do guia.</pre>
+</main>
+<script>
+function copiar(id) {
+  const el = document.getElementById(id), t = el.innerText.replace(/^Copiar\n?/, '');
+  navigator.clipboard.writeText(t).then(() => { const b = el.querySelector('.copiar'); b.textContent = 'Copiado!'; setTimeout(() => b.textContent = 'Copiar', 1500); });
+}
+</script>
+</body>
+</html>
