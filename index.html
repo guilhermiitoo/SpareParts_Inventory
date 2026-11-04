@@ -14,7 +14,7 @@
          dist/SPARE_PARTS_UNICO.html, sem depender de nenhum arquivo solto.
          O mesmo desenho, em .ico para o atalho do Windows, esta em icone/. -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20256%20256'%3E%20%3Cdefs%3E%20%3ClinearGradient%20id='borda'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%23e53935'/%3E%20%3Cstop%20offset='1'%20stop-color='%23b3211c'/%3E%20%3C/linearGradient%3E%20%3ClinearGradient%20id='miolo'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%20%3Cstop%20offset='0'%20stop-color='%230079BD'/%3E%20%3Cstop%20offset='1'%20stop-color='%23004065'/%3E%20%3C/linearGradient%3E%20%3C/defs%3E%20%3Crect%20x='0'%20y='0'%20width='256'%20height='256'%20rx='56'%20fill='url(%23borda)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='url(%23miolo)'/%3E%20%3Crect%20x='22'%20y='22'%20width='212'%20height='212'%20rx='39'%20fill='none'%20stroke='%23000000'%20stroke-opacity='0.22'%20stroke-width='2'/%3E%20%3Cg%20transform='translate(128%20128)%20scale(0.065548)%20translate(-1340.50%20705.00)'%20fill='%23ffffff'%3E%20%3Cpath%20d='M1286.0%20-406Q1286.0%20-199%201132.5%20-89.5Q979.0%2020%20682.0%2020Q411.0%2020%20257.0%20-76.0Q103.0%20-172%2059.0%20-367L344.0%20-414Q373.0%20-302%20457.0%20-251.5Q541.0%20-201%20690.0%20-201Q999.0%20-201%20999.0%20-389Q999.0%20-449%20963.5%20-488.0Q928.0%20-527%20863.5%20-553.0Q799.0%20-579%20616.0%20-616Q458.0%20-653%20396.0%20-675.5Q334.0%20-698%20284.0%20-728.5Q234.0%20-759%20199.0%20-802.0Q164.0%20-845%20144.5%20-903.0Q125.0%20-961%20125.0%20-1036Q125.0%20-1227%20268.5%20-1328.5Q412.0%20-1430%20686.0%20-1430Q948.0%20-1430%201079.5%20-1348.0Q1211.0%20-1266%201249.0%20-1077L963.0%20-1038Q941.0%20-1129%20873.5%20-1175.0Q806.0%20-1221%20680.0%20-1221Q412.0%20-1221%20412.0%20-1053Q412.0%20-998%20440.5%20-963.0Q469.0%20-928%20525.0%20-903.5Q581.0%20-879%20752.0%20-842Q955.0%20-799%201042.5%20-762.5Q1130.0%20-726%201181.0%20-677.5Q1232.0%20-629%201259.0%20-561.5Q1286.0%20-494%201286.0%20-406Z%20M2622.0%20-963Q2622.0%20-827%202560.0%20-720.0Q2498.0%20-613%202382.5%20-554.5Q2267.0%20-496%202108.0%20-496H1758.0V0H1463.0V-1409H2096.0Q2349.0%20-1409%202485.5%20-1292.5Q2622.0%20-1176%202622.0%20-963ZM2325.0%20-958Q2325.0%20-1180%202063.0%20-1180H1758.0V-723H2071.0Q2193.0%20-723%202259.0%20-783.5Q2325.0%20-844%202325.0%20-958Z'/%3E%20%3C/g%3E%20%3C/svg%3E">
-    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.51</title>
+    <title>TPV | MMT Pecas de Reposicao - Sistema de Controle v17.52</title>
 
     <!-- bibliotecas externas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2927,6 +2927,162 @@ const UI = {
 //   JSON antigo (_buildPayload / _applyParsed). Por isso nenhum dos outros
 //   modulos do sistema precisou ser alterado.
 // ==========================================================================
+// ==========================================================================
+// v17.52: SERVIDOR DE GRAVACAO (cliente)
+//
+// Se o SPARE_PARTS_SERVIDOR.html estiver aberto em algum PC, este PC NAO
+// grava mais nos JSON do banco. Ele monta um PEDIDO (o que mudou + a versao
+// em que se baseou) e deixa em dados/servidor/fila/. O servidor confere,
+// decide se aceita, grava e responde em dados/servidor/respostas/.
+//
+// Se o servidor estiver fechado (ou cair), tudo volta a funcionar como antes:
+// gravacao direta com a trava .lock. Nada para de funcionar.
+// ==========================================================================
+const ServidorCliente = {
+    PASTA: 'servidor',
+    STATUS: 'status.json',
+    ESPERA_RESPOSTA: 10000,   // ms ate desistir e tentar cancelar o pedido
+    ESPERA_EXTRA: 30000,      // ms a mais se o servidor ja pegou o pedido
+    _cache: null, _cacheEm: 0, _ultSeq: null, _seqMudouEm: 0, _ignorarAte: 0,
+
+    async _dir(nome) {
+        const s = await Store._dados.getDirectoryHandle(ServidorCliente.PASTA);   // SEM create
+        return nome ? await s.getDirectoryHandle(nome) : s;
+    },
+
+    // O servidor esta vivo? Olha o "batimento" (seq que muda a cada 2s).
+    // Usa o relogio DESTE PC para medir, entao relogio errado no servidor nao atrapalha.
+    async ativo() {
+        if (!Store._dados || Date.now() < ServidorCliente._ignorarAte) return false;
+        if (Date.now() - ServidorCliente._cacheEm < 3000 && ServidorCliente._cache !== null) return ServidorCliente._cache;
+        let vivo = false;
+        try {
+            const txt = await Store._lerTexto(await ServidorCliente._dir(), ServidorCliente.STATUS);
+            const st = txt ? JSON.parse(txt) : null;
+            if (st && !st.parado) {
+                const agora = Date.now();
+                if (st.seq !== ServidorCliente._ultSeq) {
+                    const primeira = ServidorCliente._ultSeq === null;
+                    ServidorCliente._ultSeq = st.seq;
+                    ServidorCliente._seqMudouEm = (primeira && Math.abs(agora - (st.ts || 0)) > 20000) ? 0 : agora;
+                }
+                vivo = (agora - ServidorCliente._seqMudouEm) < 10000;
+            }
+        } catch (e) { vivo = false; }
+        ServidorCliente._cache = vivo; ServidorCliente._cacheEm = Date.now();
+        return vivo;
+    },
+
+    _desligarPor(ms) { ServidorCliente._ignorarAte = Date.now() + ms; ServidorCliente._cache = null; },
+
+    // Mesma montagem do Store.gravar, mas SEM marcar nada como gravado:
+    // so marca depois que o servidor aceitar.
+    async gravar(payload, paraGravar) {
+        const agora = Date.now();
+        const movPend = [];
+        (payload.checkoutHistory || []).forEach(h => {
+            if (!h || !h.id) return;
+            const id = String(h.id);
+            const pleno = Store._enriquecer(h, Store._movArquivo.get(id));
+            const can = Store._canonico(pleno);
+            if (Store._movEscrito.get(id) === can) return;
+            movPend.push({ id, pleno, can, linha: JSON.stringify(Store._linhaMov(pleno, agora)) });
+        });
+        const logPend = [];
+        (payload.logs || []).forEach(l => {
+            if (!l || !l.timestamp) return;
+            const k = l.timestamp + '_' + l.matricula;
+            if (Store._logEscrito.has(k)) return;
+            logPend.push({ k, linha: JSON.stringify(l) });
+        });
+        if (!paraGravar.length && !movPend.length && !logPend.length) return [];
+
+        const shard = Store._shardHoje();
+        const id = agora.toString(36) + '_' + Store.pcId() + '_' + Math.random().toString(36).slice(2, 7);
+        const u = State.currentUser || {};
+        const pedido = {
+            v: 1, id, pc: Store.pcId(), criado: agora,
+            user: { matricula: u.matricula || 'SISTEMA', nome: u.nome || 'AUTO' },
+            dominios: paraGravar.map(g => ({ dom: g.dom, base: Store._tokenDe(Store._indice, g.dom), txt: g.txt })),
+            mov:  movPend.length ? { nome: shard, linhas: movPend.map(m => m.linha).join('\n') + '\n', n: movPend.length } : null,
+            logs: logPend.length ? { nome: shard, linhas: logPend.map(m => m.linha).join('\n') + '\n', n: logPend.length } : null,
+            flags: { forceLogout: payload.forceLogout || null, lastAutoBackupDate: payload.lastAutoBackupDate || null, lastBackupInfo: payload.lastBackupInfo || null },
+        };
+
+        let fila, resp;
+        try { fila = await ServidorCliente._dir('fila'); resp = await ServidorCliente._dir('respostas'); }
+        catch (e) { ServidorCliente._desligarPor(30000); return null; }
+        await Store._gravarTexto(fila, id + '.json', JSON.stringify(pedido), false, true);
+
+        const r = await ServidorCliente._esperar(resp, fila, id);
+        if (r === null) return null;   // servidor nao pegou: grava direto
+
+        if (!r.ok) {
+            const err = new Error(r.conflito ? ('outro PC gravou ' + (r.dominios || []).join(', ') + ' antes (servidor)')
+                                             : ('SERVIDOR RECUSOU: ' + (r.motivo || 'sem motivo')));
+            err.conflito = !!r.conflito; err.dominios = r.dominios || []; err.recusado = !r.conflito;
+            throw err;
+        }
+
+        // ACEITO: agora sim marca como gravado
+        const idx = Store._indice || (Store._indice = Store._indiceNovo());
+        idx.arquivos = idx.arquivos || {}; idx.movimentos = idx.movimentos || {}; idx.logs = idx.logs || {};
+        const escritos = [];
+        paraGravar.forEach(({ dom, txt }) => {
+            Store._brutoAnterior[dom] = Store._bruto[dom];
+            Store._bruto[dom] = txt;
+            if (r.tokens && r.tokens[dom]) idx.arquivos[dom] = r.tokens[dom];
+            escritos.push(dom);
+        });
+        if (movPend.length) {
+            movPend.forEach(m => {
+                Store._movEscrito.set(m.id, m.can);
+                Store._movArquivo.set(m.id, { ...m.pleno });
+                Store._movCache.set(m.id, { _s: agora, rec: m.pleno });
+            });
+            Store._lido[shard] = r.movFim; idx.movimentos[shard] = r.movFim;
+            escritos.push('movimentos(' + movPend.length + ')');
+        }
+        if (logPend.length) {
+            logPend.forEach(m => Store._logEscrito.add(m.k));
+            Store._lido['L:' + shard] = r.logsFim; idx.logs[shard] = r.logsFim;
+            escritos.push('logs(' + logPend.length + ')');
+        }
+        if (r.idxMtime) Store._idxMtime = r.idxMtime;
+        escritos.push('via servidor');
+        return escritos;
+    },
+
+    async _esperar(resp, fila, id) {
+        const pausa = (ms) => new Promise(ok => setTimeout(ok, ms));
+        const ler = async () => {
+            const txt = await Store._lerTexto(resp, id + '.json');
+            if (!txt) return null;
+            try { const o = JSON.parse(txt); resp.removeEntry(id + '.json').catch(() => {}); return o; }
+            catch (e) { return null; }   // ainda sendo escrito
+        };
+        const inicio = Date.now();
+        while (Date.now() - inicio < ServidorCliente.ESPERA_RESPOSTA) {
+            const o = await ler(); if (o) return o;
+            await pausa(150);
+        }
+        // Demorou. Se o pedido ainda esta na fila, o servidor NAO pegou:
+        // apagamos e gravamos direto (sem risco de gravar 2x).
+        try {
+            await fila.removeEntry(id + '.json');
+            console.warn('[Servidor] nao respondeu em ' + ServidorCliente.ESPERA_RESPOSTA / 1000 + 's: gravando direto');
+            ServidorCliente._desligarPor(30000);
+            return null;
+        } catch (e) { /* NotFound = o servidor ja pegou: espera a resposta */ }
+        const fim = Date.now() + ServidorCliente.ESPERA_EXTRA;
+        while (Date.now() < fim) {
+            const o = await ler(); if (o) return o;
+            await pausa(300);
+        }
+        throw new Error('o servidor pegou o pedido mas nao respondeu. Confira o SPARE_PARTS_SERVIDOR e refaca a operacao.');
+    },
+};
+
 const Store = {
 
     ESQUEMA:      17,
@@ -3960,6 +4116,13 @@ const Store = {
         // ABORTAMOS sem escrever nada e avisamos o chamador, que refaz o
         // merge com o dado novo e tenta de novo.
         // ==================================================================
+        // v17.52: servidor de gravacao aberto? Entao o pedido vai para ele.
+        // null = servidor caiu ou nao pegou: segue a gravacao direta abaixo.
+        if (await ServidorCliente.ativo()) {
+            const viaServidor = await ServidorCliente.gravar(payload, paraGravar);
+            if (viaServidor) return viaServidor;
+        }
+
         // Nada mudou em nenhum dominio de estado: nem pega a trava.
         let lock = null;
         if (paraGravar.length) {
