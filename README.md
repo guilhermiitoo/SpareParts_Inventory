@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.52**
+**Versão atual: v17.53**
 
 ---
 
@@ -13,6 +13,7 @@ Desenvolvido por Guilherme Fernandes.
 - **Pasta fixa do sistema:** `S:\MMT\49. JOÃO - ARQUIVOS HTML\GUILHERME FERNANDES\2 - SpareParts_Inventory`.
   O endereço aparece na tela de login (botão de copiar). Outra pasta é recusada sem criar nada.
   Como o navegador não informa o caminho completo, a conferência é pelo **nome da pasta** + existência do banco dentro dela.
+- **Conexão em 1 clique (v17.53):** ao abrir, a tela de login mostra a pasta já conhecida ("Pasta encontrada"). Um clique em **CONECTAR À PASTA DO SISTEMA** pede a autorização do navegador e o banco é lido, e o cartão fica verde com quantas posições e usuários foram lidos. A pasta do backup diário, se for outra, é liberada no mesmo clique. Se você escolher **"Permitir em todas as visitas"**, nas próximas vezes o sistema conecta sozinho. **Selecionar pasta** copia o endereço oficial para o Ctrl+V.
 - **Atalho:** dois cliques em `CRIAR ATALHO NA AREA DE TRABALHO.bat` (na pasta do sistema).
 
 ### Estrutura da pasta
