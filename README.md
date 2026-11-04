@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.54**
+**Versão atual: v17.55**
 
 ---
 
@@ -14,6 +14,7 @@ Desenvolvido por Guilherme Fernandes.
   O endereço aparece na tela de login (botão de copiar). Outra pasta é recusada sem criar nada.
   Como o navegador não informa o caminho completo, a conferência é pelo **nome da pasta** + existência do banco dentro dela.
 - **Conexão em 1 clique (v17.54):** a tela de login tem só o botão **CONECTAR SISTEMA**, e o endereço fica fixo no código. Pasta já conhecida: só pede a autorização. Primeira vez no PC: abre a janela uma vez (o endereço já vai para o Ctrl+V). "Permitir em todas as visitas" = conecta sozinho. Guia para outros sistemas: `docs/GUIA_CONEXAO_PASTA.html`.
+- **Mesma posição mexida por dois PCs (v17.55):** antes de gravar, o sistema compara posição por posição o que ele conhecia, o que mudou nele e o que está no disco. Se outro PC já gravou uma mudança **na mesma posição**, por exemplo os dois retiraram o mesmo material ou um retirou e o outro devolveu ali, **quem gravou primeiro ganha**. A operação do segundo **não é gravada inteira**: a tela volta ao estoque real e ele vê *"A posição X foi alterada por FULANO às hh:mm um instante antes. Sua operação NÃO foi gravada"*. Posições **diferentes** ao mesmo tempo continuam sendo gravadas normalmente, as duas.
 - **Atalho:** dois cliques em `CRIAR ATALHO NA AREA DE TRABALHO.bat` (na pasta do sistema).
 
 ### Estrutura da pasta
@@ -48,18 +49,6 @@ Desenvolvido por Guilherme Fernandes.
 - **Limpeza automática:** 1x por dia, 20 s depois de abrir, cada PC apaga o que passou de 90 dias.
 
 - **Uma versão só no GitHub:** `main` e `claude/brave-allen-9k8wup` têm o mesmo arquivo da **fábrica** (sistema real, pede a pasta do banco). O modo de testes com dados fictícios foi retirado na v17.36.
-
-### Servidor de gravação (v17.52) — `SPARE_PARTS_SERVIDOR.html`
-Funciona como um "servidor SQL" feito só com HTML. Ele fica aberto em **um PC** (pode ficar minimizado) e é o **único que grava** nos JSON do banco.
-1. O PC monta um **pedido** com o que mudou e a versão em que se baseou, e o deixa em `dados/servidor/fila/`.
-2. O servidor pega os pedidos **um por vez**, na ordem de chegada, e decide:
-   - **GRAVADO**: a versão bate e as regras passam. Ele grava tudo (domínios + movimentos + logs + índice) como uma transação.
-   - **CONFLITO**: outro PC gravou antes. O PC relê, junta as alterações e manda de novo, sozinho. Nada é sobrescrito.
-   - **RECUSADO**: JSON corrompido, estoque ou catálogo perdendo mais da metade de uma vez, ou lista de usuários vazia.
-3. A resposta volta em `dados/servidor/respostas/`. Tudo fica registrado em `dados/servidor/registro/AAAA-MM-DD.jsonl` e na tela do servidor.
-- **Se o servidor fechar**, os PCs voltam sozinhos, em até 10 s, a gravar direto com a trava `.lock`, como antes. O servidor usa a mesma trava, então os dois modos convivem.
-- O PC do servidor **não pode suspender**. Coloque o `SPARE_PARTS_SERVIDOR.html` na pasta do sistema e abra no Chrome ou Edge.
-- Passam pelo servidor: estoque, catálogo, sistema, ranking, caixas, movimentos, logs e índice. Preços, OPs e dados do SAP (`dados/consumo/`) e os backups em Excel continuam gravando direto.
 
 ### Abas
 | Aba | Para que serve |
