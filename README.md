@@ -3,7 +3,7 @@
 Sistema de controle do estoque de Spare Parts da MMT (TPV Vision).
 Desenvolvido por Guilherme Fernandes.
 
-**Versão atual: v17.55**
+**Versão atual: v17.56**
 
 ---
 
@@ -13,7 +13,7 @@ Desenvolvido por Guilherme Fernandes.
 - **Pasta fixa do sistema:** `S:\MMT\49. JOÃO - ARQUIVOS HTML\GUILHERME FERNANDES\2 - SpareParts_Inventory`.
   O endereço aparece na tela de login (botão de copiar). Outra pasta é recusada sem criar nada.
   Como o navegador não informa o caminho completo, a conferência é pelo **nome da pasta** + existência do banco dentro dela.
-- **Conexão em 1 clique (v17.54):** a tela de login tem só o botão **CONECTAR SISTEMA**, e o endereço fica fixo no código. Pasta já conhecida: só pede a autorização. Primeira vez no PC: abre a janela uma vez (o endereço já vai para o Ctrl+V). "Permitir em todas as visitas" = conecta sozinho. Guia para outros sistemas: `docs/GUIA_CONEXAO_PASTA.html`.
+- **Tela de conexão (v17.56):** voltou ao formato original, com o endereço sugerido para copiar e colar, o botão "Reconectar (última pasta usada)" e "Selecionar pasta do sistema". A trava da pasta (arquivo de confirmação) continua.
 - **Mesma posição mexida por dois PCs (v17.55):** antes de gravar, o sistema compara posição por posição o que ele conhecia, o que mudou nele e o que está no disco. Se outro PC já gravou uma mudança **na mesma posição**, por exemplo os dois retiraram o mesmo material ou um retirou e o outro devolveu ali, **quem gravou primeiro ganha**. A operação do segundo **não é gravada inteira**: a tela volta ao estoque real e ele vê *"A posição X foi alterada por FULANO às hh:mm um instante antes. Sua operação NÃO foi gravada"*. Posições **diferentes** ao mesmo tempo continuam sendo gravadas normalmente, as duas.
 - **Atalho:** dois cliques em `CRIAR ATALHO NA AREA DE TRABALHO.bat` (na pasta do sistema).
 
